@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Design Local Product Demo Recorder",
+  "version": "1.0.0",
+  "description": "Captures a local product tab for repository demo videos.",
+  "permissions": ["activeTab", "tabCapture"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Record the current product demo"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Start recording the current local product tab"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://127.0.0.1/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

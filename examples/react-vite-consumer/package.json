@@ -1,0 +1,11 @@
+{
+  "name": "designqr-react-vite-consumer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "designqr": "file:../../packages/designqr",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}

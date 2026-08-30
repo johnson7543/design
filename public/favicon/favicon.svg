@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Design">
+  <rect width="64" height="64" rx="18" fill="#98596e"/>
+  <rect x="13" y="14" width="24" height="24" rx="7" fill="#fff9f7"/>
+  <rect x="29" y="14" width="22" height="24" rx="7" fill="#f4b4cf"/>
+  <rect x="21" y="30" width="22" height="21" rx="7" fill="#86b668"/>
+  <path d="M29 14h8v24h-8z" fill="#f8d9e5" opacity=".78"/>
+  <path d="M21 30h22v8H21z" fill="#b7cf9e" opacity=".78"/>
+</svg>

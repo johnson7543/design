@@ -1,0 +1,89 @@
+.designqr-root,
+.designqr-root *,
+.designqr-root *::before,
+.designqr-root *::after {
+  box-sizing: border-box;
+}
+
+.designqr-root {
+  --stage-transform: none;
+  --designqr-background-top: #f6e2d5;
+  --designqr-background-bottom: #f1cdbd;
+  --designqr-title-color: #98596e;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.designqr-canvas-wrapper {
+  touch-action: none;
+  cursor: grab;
+}
+
+.designqr-canvas-wrapper:active {
+  cursor: grabbing;
+}
+
+.designqr-canvas-wrapper.view-scan,
+.designqr-canvas-wrapper.view-scan:active {
+  cursor: pointer;
+}
+
+.designqr-webgl-canvas,
+.designqr-presentation-canvas,
+.designqr-stage-transform-probe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.designqr-webgl-canvas {
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.designqr-presentation-canvas {
+  display: block;
+  pointer-events: none;
+}
+
+.designqr-stage-transform-probe {
+  visibility: hidden;
+  pointer-events: none;
+  transform: var(--stage-transform);
+  transform-origin: center;
+}
+
+.designqr-error {
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+  padding: 1rem;
+  color: #3f352b;
+  background: radial-gradient(
+    circle at 50% 30%,
+    var(--designqr-background-top),
+    var(--designqr-background-bottom)
+  );
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .designqr-root,
+  .designqr-root *,
+  .designqr-root *::before,
+  .designqr-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

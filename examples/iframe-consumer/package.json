@@ -1,0 +1,9 @@
+{
+  "name": "designqr-iframe-consumer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "designqr": "file:../../packages/designqr"
+  }
+}

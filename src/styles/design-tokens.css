@@ -1,0 +1,110 @@
+:root {
+  /* Shared foundations used by the Design platform and Design QR. */
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+
+  --color-dark: #3f352b;
+  --color-muted: #7d6b5c;
+  --color-light: #fff9f1;
+  --color-border: rgba(95, 78, 61, 0.12);
+  --color-glass: rgba(255, 250, 243, 0.72);
+  --color-glass-border: rgba(255, 255, 255, 0.65);
+
+  --shadow-subtle: 0 8px 32px rgba(63, 53, 43, 0.08);
+  --shadow-elevation: 0 16px 48px rgba(63, 53, 43, 0.12);
+
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 9999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-layout: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/*
+ * Design QR semantic contract.
+ * Components consume these role-based tokens instead of inventing new raw
+ * surfaces, borders, control heights, or interaction timing.
+ */
+.app-root {
+  --qr-ink: var(--color-dark);
+  --qr-ink-muted: var(--color-muted);
+  --qr-ink-placeholder: #a89888;
+  --qr-on-accent: var(--color-light);
+
+  --qr-accent: #c07a3a;
+  --qr-accent-strong: #a45e22;
+  --qr-accent-deep: #8c4c16;
+  --qr-success: #38b04a;
+  --qr-danger: #d32f2f;
+
+  --qr-code-keyword: #98596e;
+  --qr-code-string: #286018;
+  --qr-code-tag: #3a8ef5;
+  --qr-code-property: #a45e22;
+  --qr-code-number: #e77433;
+  --qr-code-literal: #db2777;
+  --qr-code-comment: #a89888;
+  --qr-code-punctuation: #7d6b5c;
+
+  --qr-surface-panel: var(--color-glass);
+  --qr-surface-elevated: rgba(255, 250, 243, 0.92);
+  --qr-surface-warm: rgba(255, 250, 243, 0.78);
+  --qr-surface-warm-hover: rgba(255, 250, 243, 0.95);
+  --qr-surface-subtle: rgba(255, 255, 255, 0.45);
+  --qr-surface-control: rgba(255, 255, 255, 0.55);
+  --qr-surface-control-hover: rgba(255, 255, 255, 0.9);
+  --qr-surface-solid: #fff;
+
+  --qr-border-subtle: rgba(95, 78, 61, 0.08);
+  --qr-border-default: rgba(95, 78, 61, 0.12);
+  --qr-border-strong: rgba(95, 78, 61, 0.2);
+  --qr-border-hover: rgba(95, 78, 61, 0.25);
+  --qr-border-accent: rgba(192, 122, 58, 0.4);
+
+  --qr-shadow-control: 0 2px 8px rgba(63, 53, 43, 0.04);
+  --qr-shadow-control-hover: 0 4px 12px rgba(63, 53, 43, 0.08);
+  --qr-shadow-control-active: 0 4px 12px rgba(63, 53, 43, 0.08);
+  --qr-shadow-accent: 0 4px 12px rgba(192, 122, 58, 0.2);
+  --qr-focus-color: rgba(192, 122, 58, 0.58);
+
+  --qr-control-height: 38px;
+  --qr-control-gap: 8px;
+  --qr-control-padding-inline: 12px;
+  --qr-control-font-size: 0.82rem;
+  --qr-control-radius: var(--radius-md);
+
+  --qr-drawer-padding-block: 16px;
+  --qr-drawer-padding-inline: 20px;
+  --qr-drawer-gap: 14px;
+  --qr-overlay-edge: 16px;
+
+  --qr-duration-fast: 180ms;
+  --qr-duration-control: 220ms;
+  --qr-duration-enter: 300ms;
+  --qr-transition-control: var(--qr-duration-control) var(--ease-smooth);
+  --qr-transition-layout: 320ms var(--ease-layout);
+}
+
+@media (max-width: 640px) {
+  .app-root {
+    --qr-control-height: 34px;
+    --qr-control-gap: 5px;
+    --qr-control-padding-inline: 8px;
+    --qr-control-font-size: 0.72rem;
+    --qr-drawer-padding-block: 8px;
+    --qr-drawer-padding-inline: 8px;
+    --qr-drawer-gap: 6px;
+    --qr-overlay-edge: 8px;
+  }
+}

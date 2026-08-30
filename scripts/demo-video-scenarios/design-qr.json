@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "id": "design-qr",
+  "product": "Design QR",
+  "description": "Type the example URL in two stages, then morph 3D to 2D and back at the default 1x speed.",
+  "route": "/qr",
+  "windowTitle": "Design QR",
+  "readySelector": ".designqr-webgl-canvas",
+  "settleMs": 2500,
+  "viewport": {
+    "width": 412,
+    "height": 915,
+    "deviceScaleFactor": 1,
+    "isMobile": true,
+    "hasTouch": true
+  },
+  "recording": {
+    "fps": 60,
+    "durationSeconds": 8,
+    "output": "public/previews/design-qr-pixel-7.mp4",
+    "poster": "public/previews/design-qr-pixel-7.webp",
+    "posterAtSeconds": 0.4,
+    "posterQuality": 82,
+    "size": {
+      "width": 720,
+      "height": 1280
+    },
+    "crop": {
+      "width": "iw",
+      "height": 732,
+      "x": 0,
+      "y": 94
+    },
+    "crf": 22
+  },
+  "recordingCss": ".app-header, .customizer-card, .floating-edit-toggle { visibility: hidden !important; }",
+  "quality": {
+    "contactSheetFps": 2,
+    "motionChecks": [
+      {
+        "label": "3D to 2D",
+        "startSeconds": 4.48,
+        "durationSeconds": 0.95,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 20
+      },
+      {
+        "label": "2D to 3D",
+        "startSeconds": 6.12,
+        "durationSeconds": 0.95,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 20
+      }
+    ]
+  },
+  "actions": [
+    {
+      "action": "wait",
+      "ms": 600
+    },
+    {
+      "action": "selectAll",
+      "selector": ".url-input"
+    },
+    {
+      "action": "type",
+      "text": "https://design.",
+      "delayMs": 28
+    },
+    {
+      "action": "wait",
+      "ms": 1100
+    },
+    {
+      "action": "type",
+      "text": "johnson7543.com",
+      "delayMs": 28
+    },
+    {
+      "action": "press",
+      "key": "Tab"
+    },
+    {
+      "action": "wait",
+      "ms": 1250
+    },
+    {
+      "action": "click",
+      "selector": ".canvas-hint-badge"
+    },
+    {
+      "action": "wait",
+      "ms": 1500
+    },
+    {
+      "action": "click",
+      "selector": ".canvas-hint-badge"
+    }
+  ],
+  "assertions": [
+    {
+      "selector": ".url-input",
+      "value": "https://design.johnson7543.com"
+    },
+    {
+      "selector": ".app-root",
+      "hasClass": "view-3d"
+    },
+    {
+      "selector": "#transition-speed",
+      "value": "1"
+    }
+  ],
+  "application": {
+    "consumerFiles": [
+      "src/platform/DesignHomePage.tsx"
+    ],
+    "videoPublicPath": "/previews/design-qr-pixel-7.mp4",
+    "posterPublicPath": "/previews/design-qr-pixel-7.webp"
+  }
+}

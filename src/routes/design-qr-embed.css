@@ -1,0 +1,23 @@
+.designqr-embed-route {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.designqr-embed-player {
+  width: 100%;
+  height: 100%;
+}
+
+.designqr-embed-error {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: #3f352b;
+  background: radial-gradient(circle at 50% 30%, #f6e2d5, #f1cdbd);
+  font-family: var(--font-body);
+  text-align: center;
+  user-select: text;
+}

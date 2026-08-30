@@ -1,0 +1,17 @@
+# {{DESIGN_NAME}} documentation
+
+{{ONE_SENTENCE_IMPLEMENTED_SCOPE}}
+
+| Document | Status | Purpose |
+| --- | --- | --- |
+| [Interface style principles](style-principles.md) | Active | {{STYLE_DOCUMENT_PURPOSE}} |
+| [Color mappings](color-mappings.md) | Active | {{COLOR_DOCUMENT_PURPOSE}} |
+
+## Sources of truth
+
+| Concern | Source |
+| --- | --- |
+| Interface implementation | {{INTERFACE_SOURCE_LINKS}} |
+| Styles and tokens | {{STYLE_SOURCE_LINKS}} |
+| Globally permitted colors | [Repository color registry]({{GLOBAL_COLOR_REGISTRY_LINK}}) |
+| Agent enforcement | [Repository instructions]({{AGENTS_LINK}}) |

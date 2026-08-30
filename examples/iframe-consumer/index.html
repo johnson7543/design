@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DesignQR iframe consumer</title>
+  </head>
+  <body>
+    <main
+      class="iframe-consumer"
+      data-ready="false"
+      data-view="unknown"
+      data-early-export-status="working"
+      data-export-status="idle"
+    >
+      <section class="iframe-consumer-controls" aria-label="Embed controls">
+        <strong>External DesignQR host</strong>
+        <button id="show-qr" type="button">Show QR</button>
+        <button id="set-config" type="button">Set config</button>
+        <button id="pause-player" type="button">Pause</button>
+        <button id="export-image" type="button">Export PNG</button>
+        <output id="status">Connecting…</output>
+      </section>
+      <iframe
+        id="designqr-frame"
+        title="Interactive DesignQR"
+        sandbox="allow-scripts allow-same-origin"
+        referrerpolicy="no-referrer"
+      ></iframe>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

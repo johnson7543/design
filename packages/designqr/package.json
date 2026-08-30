@@ -1,0 +1,72 @@
+{
+  "name": "designqr",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Reusable interactive 3D and 2D DesignQR player",
+  "license": "MIT",
+  "author": "Johnson YuKai Wang",
+  "keywords": [
+    "qr-code",
+    "react",
+    "three.js",
+    "webgl",
+    "3d",
+    "design"
+  ],
+  "homepage": "https://design.johnson7543.com/qr",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnson7543/design.git",
+    "directory": "packages/designqr"
+  },
+  "bugs": {
+    "url": "https://github.com/johnson7543/design/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/designqr.cjs",
+  "module": "./dist/designqr.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/designqr.js",
+      "require": "./dist/designqr.cjs"
+    },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "import": "./dist/config.js",
+      "require": "./dist/config.cjs"
+    },
+    "./embed": {
+      "types": "./dist/embed/index.d.ts",
+      "import": "./dist/embed.js",
+      "require": "./dist/embed.cjs"
+    },
+    "./style.css": "./dist/designqr.css"
+  },
+  "sideEffects": [
+    "./dist/designqr.css"
+  ],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json && node scripts/fix-declarations.mjs && node scripts/check-build.mjs",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build && npm test && npm run typecheck"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "three": "^0.185.1"
+  }
+}

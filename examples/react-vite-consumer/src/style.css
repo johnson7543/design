@@ -1,0 +1,38 @@
+:root {
+  color: #3f352b;
+  background: #fef6e9;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  min-height: 2.5rem;
+}
+
+.consumer-shell {
+  width: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 2rem;
+}
+
+.consumer-actions,
+.consumer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.consumer-grid {
+  margin-top: 1rem;
+}
+
+.consumer-player {
+  width: min(30rem, 100%);
+  height: 30rem;
+  overflow: hidden;
+  border: 1px solid #f0ccbd;
+  border-radius: 1rem;
+}

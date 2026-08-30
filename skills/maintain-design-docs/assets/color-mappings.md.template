@@ -1,0 +1,17 @@
+# {{DESIGN_NAME}} color mappings
+
+Status: Active product specification<br>
+Scope: {{DESIGN_OWNED_COLOR_SCOPE}}
+
+[Back to the design documentation index](README.md)
+
+This document assigns colors from the
+[global repository allowlist]({{GLOBAL_COLOR_REGISTRY_LINK}}) to roles owned by
+{{DESIGN_NAME}}. It does not authorize new base colors.
+
+| Role | Approved base color or token | Applied components |
+| --- | --- | --- |
+| {{ROLE}} | {{APPROVED_COLOR_OR_TOKEN}} | {{COMPONENTS}} |
+
+Alpha, gradients, lighting, and programmatic blends may derive from these bases
+as permitted by the global contract.

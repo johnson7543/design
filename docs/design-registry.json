@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "sharedSourcePaths": [
+    "src/styles/design-tokens.css"
+  ],
+  "designs": [
+    {
+      "id": "design-platform",
+      "name": "Design platform",
+      "routes": [
+        "/",
+        "*"
+      ],
+      "sourcePaths": [
+        "index.html",
+        "public/favicon",
+        "src/main.tsx",
+        "src/platform",
+        "src/platform.css"
+      ],
+      "docsDirectory": "docs/design-platform",
+      "documents": {
+        "index": "README.md",
+        "style": "style-principles.md",
+        "colors": "color-mappings.md"
+      }
+    },
+    {
+      "id": "design-qr",
+      "name": "Design QR",
+      "routes": [
+        "/qr",
+        "/qr/embed"
+      ],
+      "sourcePaths": [
+        "examples/iframe-consumer",
+        "examples/react-vite-consumer",
+        "packages/designqr",
+        "public/previews",
+        "src/App.tsx",
+        "src/components",
+        "src/editor",
+        "src/index.css",
+        "src/routes",
+        "src/utils"
+      ],
+      "docsDirectory": "docs/design-qr",
+      "documents": {
+        "index": "README.md",
+        "style": "style-principles.md",
+        "colors": "color-palettes.md"
+      }
+    }
+  ]
+}

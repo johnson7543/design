@@ -1,0 +1,28 @@
+# {{DESIGN_NAME}} style principles
+
+Status: Active interface contract<br>
+Scope: {{IMPLEMENTED_VISUAL_SCOPE}}
+
+[Back to the design documentation index](README.md)
+
+## Intent
+
+{{VISUAL_INTENT}}
+
+## Layout and responsive behavior
+
+{{LAYOUT_AND_BREAKPOINT_CONTRACTS}}
+
+## Component contracts
+
+| Component | Contract |
+| --- | --- |
+| {{COMPONENT}} | {{IMPLEMENTED_CONTRACT}} |
+
+## Interaction, accessibility, and motion
+
+{{INTERACTION_ACCESSIBILITY_AND_MOTION_CONTRACTS}}
+
+## Implementation checklist
+
+{{DESIGN_SPECIFIC_CHECKLIST}}
