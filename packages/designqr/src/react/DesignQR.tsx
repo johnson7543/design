@@ -12,17 +12,19 @@ import {
   DesignQRConfigError,
   type DesignQRConfigV1,
   type DesignQRError,
-  type DesignQRThemePreset,
+  type ResolvedTreeTheme,
   type DesignQRView,
 } from '../config/types.ts';
-import { normalizeDesignQRConfig } from '../config/normalize.ts';
 import {
-  SEASONS,
-  hexToRgbTuple,
-} from '../designs/tree/constants.ts';
-import { generateQRMatrix } from '../designs/tree/qr.ts';
+  normalizeDesignQRConfig,
+  normalizeDesignQRTheme,
+} from '../config/normalize.ts';
+import {
+  generateQRMatrix,
+  resolveQRErrorCorrectionLevel,
+} from '../designs/tree/qr.ts';
 import { build3DTree, type TreeData } from '../designs/tree/treeBuilder.ts';
-import { resolveTreeTitleColor } from '../designs/tree/themes.ts';
+import { resolveTreeTheme } from '../designs/tree/themes.ts';
 import {
   DesignQRCanvas,
   type DesignQRCanvasHandle,
@@ -31,29 +33,20 @@ import type { DesignQRHandle, DesignQRProps } from './types.ts';
 
 interface PreparedDesignQR {
   config: DesignQRConfigV1;
-  seasonId: number;
-  backgroundTop: string;
-  backgroundBottom: string;
-  customColor: [number, number, number];
-  titleColor: string;
+}
+
+interface PreparedTreeTheme {
+  normalized: DesignQRConfigV1['theme'];
+  resolved: ResolvedTreeTheme;
 }
 
 type PreparationResult =
   | { ok: true; value: PreparedDesignQR }
   | { ok: false; error: DesignQRError };
 
-const PRESET_SEASON_IDS: Readonly<Record<DesignQRThemePreset, number>> = {
-  spring: 0,
-  summer: 1,
-  autumn: 2,
-  winter: 3,
-};
-
-function rgbTupleToHex(color: [number, number, number]): string {
-  return `#${color
-    .map((channel) => Math.round(channel * 255).toString(16).padStart(2, '0'))
-    .join('')}`;
-}
+type ThemePreparationResult =
+  | { ok: true; value: PreparedTreeTheme }
+  | { ok: false; error: DesignQRError };
 
 function toDesignQRError(
   cause: unknown,
@@ -68,11 +61,12 @@ function prepareDesignQR(input: {
   value: string;
   design: DesignQRProps['design'];
   tree: DesignQRProps['tree'];
-  theme: DesignQRProps['theme'];
+  theme: DesignQRConfigV1['theme'];
   view: DesignQRView;
   details: DesignQRProps['details'];
   interaction: DesignQRProps['interaction'];
-  quality: DesignQRProps['quality'];
+  logo: DesignQRProps['logo'];
+  transparentBackground: DesignQRProps['transparentBackground'];
 }): PreparationResult {
   try {
     const config = normalizeDesignQRConfig({
@@ -86,25 +80,28 @@ function prepareDesignQR(input: {
       view: { initial: input.view },
       details: input.details,
       interaction: input.interaction,
-      quality: input.quality,
+      logo: input.logo,
+      transparentBackground: input.transparentBackground,
     });
-    const seasonId = config.theme.type === 'preset'
-      ? PRESET_SEASON_IDS[config.theme.preset]
-      : 0;
-    const season = SEASONS[seasonId] ?? SEASONS[0];
-    const customTheme = config.theme.type === 'custom' ? config.theme.value : null;
+    return {
+      ok: true,
+      value: { config },
+    };
+  } catch (cause) {
+    return { ok: false, error: toDesignQRError(cause) };
+  }
+}
 
+function prepareTreeTheme(
+  theme: DesignQRProps['theme']
+): ThemePreparationResult {
+  try {
+    const normalized = normalizeDesignQRTheme(theme);
     return {
       ok: true,
       value: {
-        config,
-        seasonId,
-        backgroundTop: customTheme?.skyTop ?? rgbTupleToHex(season.skyTop),
-        backgroundBottom: customTheme?.skyBottom ?? rgbTupleToHex(season.skyBottom),
-        customColor: customTheme
-          ? hexToRgbTuple(customTheme.foliageColor)
-          : hexToRgbTuple(season.foliageHex),
-        titleColor: resolveTreeTitleColor(config.theme),
+        normalized,
+        resolved: resolveTreeTheme(normalized),
       },
     };
   } catch (cause) {
@@ -123,7 +120,8 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
       defaultView,
       details,
       interaction,
-      quality = 'high',
+      logo = false,
+      transparentBackground = false,
       className,
       style,
       ariaLabel,
@@ -136,7 +134,6 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     const [uncontrolledView, setUncontrolledView] = useState<DesignQRView>(
       () => defaultView ?? 'design'
     );
-    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
     const canvasRef = useRef<DesignQRCanvasHandle>(null);
     const onReadyRef = useRef(onReady);
     const onErrorRef = useRef(onError);
@@ -157,27 +154,33 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
       }
     }, [defaultView, view]);
 
-    useEffect(() => {
-      const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const updatePreference = () => setPrefersReducedMotion(media.matches);
-      updatePreference();
-      media.addEventListener('change', updatePreference);
-      return () => media.removeEventListener('change', updatePreference);
-    }, []);
-
-    const prepared = useMemo(
-      () => prepareDesignQR({
+    const preparedTheme = useMemo(() => prepareTreeTheme(theme), [theme]);
+    const prepared = useMemo<PreparationResult>(() => {
+      if (!preparedTheme.ok) {
+        return { ok: false, error: preparedTheme.error };
+      }
+      return prepareDesignQR({
         value,
         design,
         tree,
-        theme,
+        theme: preparedTheme.value.normalized,
         view: activeView,
         details,
         interaction,
-        quality,
-      }),
-      [activeView, design, details, interaction, quality, theme, tree, value]
-    );
+        logo,
+        transparentBackground,
+      });
+    }, [
+      activeView,
+      design,
+      details,
+      interaction,
+      logo,
+      preparedTheme,
+      transparentBackground,
+      tree,
+      value,
+    ]);
 
     const preparedValue = prepared.ok ? prepared.value.config.value : null;
     const preparedSeed = prepared.ok
@@ -186,6 +189,9 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     const preparedShape = prepared.ok
       ? prepared.value.config.design.options.shape
       : null;
+    const preparedLogoEnabled = prepared.ok
+      ? prepared.value.config.logo !== false
+      : false;
     const preparedTree = useMemo<
       { ok: true; value: TreeData } | { ok: false; error: DesignQRError } | null
     >(() => {
@@ -193,7 +199,10 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
         return null;
       }
       try {
-        const matrix = generateQRMatrix(preparedValue, 'M');
+        const matrix = generateQRMatrix(
+          preparedValue,
+          resolveQRErrorCorrectionLevel(preparedLogoEnabled)
+        );
         return {
           ok: true,
           value: build3DTree(matrix.modules, preparedSeed, preparedShape),
@@ -208,7 +217,7 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
           ),
         };
       }
-    }, [preparedSeed, preparedShape, preparedValue]);
+    }, [preparedLogoEnabled, preparedSeed, preparedShape, preparedValue]);
 
     const activeError = !prepared.ok
       ? prepared.error
@@ -276,7 +285,7 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
       },
     }), [requestView]);
 
-    if (!prepared.ok || !preparedTree?.ok) {
+    if (!prepared.ok || !preparedTheme.ok || !preparedTree?.ok) {
       return (
         <div
           className={`designqr-root designqr-error${className ? ` ${className}` : ''}`}
@@ -289,7 +298,6 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     }
 
     const { config } = prepared.value;
-    const customTheme = config.theme.type === 'custom' ? config.theme.value : null;
     const border = config.details.border;
     const detailsVisible = activeView === 'qr' && (
       config.details.title.trim().length > 0
@@ -301,28 +309,28 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
       <DesignQRCanvas
         ref={canvasRef}
         treeData={preparedTree.value}
-        seasonId={prepared.value.seasonId}
-        customTheme={customTheme}
-        customColor={prepared.value.customColor}
-        customStrength={customTheme ? 1 : 0}
+        theme={preparedTheme.value.resolved}
         viewMode={activeView === 'qr' ? 'scan' : '3d'}
         onToggleScanMode={() => requestView(activeView === 'qr' ? 'design' : 'qr')}
         onRendererReady={() => onReadyRef.current?.()}
         onRendererError={handleRendererError}
-        enableMotionBlur={config.interaction.motionBlur && !prefersReducedMotion}
+        enableMotionBlur={config.interaction.motionBlur}
         dragToRotate={config.interaction.dragToRotate}
         tapToToggleView={config.interaction.tapToToggleView}
-        autoRotate={config.interaction.autoRotate && !prefersReducedMotion}
-        quality={config.quality}
-        backgroundTop={prepared.value.backgroundTop}
-        backgroundBottom={prepared.value.backgroundBottom}
+        autoRotate={config.interaction.autoRotate}
+        autoRotateDirection={config.interaction.autoRotateDirection}
+        transitionSpeed={config.interaction.transitionSpeed}
+        logo={config.logo}
+        transparentBackground={config.transparentBackground === true}
+        backgroundTop={preparedTheme.value.resolved.skyTop}
+        backgroundBottom={preparedTheme.value.resolved.skyBottom}
         showQrDetails={detailsVisible}
         qrTitle={config.details.title}
         showQrContent={config.details.showValue}
         qrValue={config.value}
         qrBorderEnabled={border !== false}
         qrBorderPadding={border === false ? undefined : border.padding}
-        qrTitleColor={prepared.value.titleColor}
+        qrTitleColor={preparedTheme.value.resolved.titleColor}
         className={className}
         style={style}
         ariaLabel={ariaLabel}

@@ -1,19 +1,35 @@
 import * as THREE from 'three';
-import type { DesignQRQuality, TreeTheme } from '../../config/types.ts';
+import {
+  DesignQRConfigError,
+  type DesignQRLogoOptions,
+  type AutoRotateDirection,
+  type ResolvedTreeTheme,
+} from '../../config/types.ts';
+import {
+  DESIGN_QR_LOGO_MAX_IMAGE_BYTES,
+  DESIGN_QR_LOGO_SIZE_MAX,
+  DESIGN_QR_LOGO_SIZE_MIN,
+} from '../../config/defaults.ts';
 import type { TreeData, VoxelBlock } from '../../designs/tree/treeBuilder.ts';
 import {
+  resolveTreeFoliageMorph,
+  resolveTreeQRDarkModuleRole,
+  TREE_THEME_PRESETS,
+} from '../../designs/tree/themes.ts';
+import {
   BLOCK_SIZE,
-  QR_SCAN_DESKTOP_DISTANCE,
-  QR_SCAN_DESKTOP_VERTICAL_FOV,
-  QR_SCAN_MOBILE_DISTANCE,
-  QR_SCAN_MOBILE_HORIZONTAL_FOV,
+  getAutoRotateDelta,
+  QR_2D_DEPTH_FILTER,
+  resolveQR2DLightDisplayRgb,
+  resolveQRViewportProjection,
+  resolveViewTransitionProgress,
   QR_VISUAL_REFERENCE_GRID_SIZE,
+  type QRViewportProjection,
   VIEW_TRANSITION_DURATION_SECONDS,
   VIEW_TRANSITION_SPEED_DEFAULT,
   VIEW_TRANSITION_SPEED_MAX,
   VIEW_TRANSITION_SPEED_MIN,
   TreeBlockType,
-  SEASON_ENV_CONFIGS,
   hexToRgbTuple,
 } from '../../designs/tree/constants.ts';
 
@@ -22,6 +38,8 @@ const DEFAULT_TREE_PITCH = -0.55;
 const TREE_DESKTOP_DISTANCE = 2.85;
 const TREE_MOBILE_DISTANCE = 2.45;
 const ROTATION_RESET_DURATION_MS = 600;
+const LOGO_MAX_IMAGE_DIMENSION = 2_048;
+const LOGO_RENDER_ORDER = 10_000;
 
 // 1. Authentic 5-Petal Flower Blossom Geometry (Spring / Custom)
 function createBlossomFlowerGeometry(
@@ -219,7 +237,11 @@ function createLeafGeometry(
 }
 
 // 3. Delicate 6-Point Snowflake Crystal Geometry
-function createSnowflakeGeometry(size: number): THREE.BufferGeometry {
+function createSnowflakeGeometry(
+  size: number,
+  baseColor: THREE.Color,
+  highlightColor: THREE.Color
+): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   const verts: number[] = [];
   const norms: number[] = [];
@@ -244,7 +266,7 @@ function createSnowflakeGeometry(size: number): THREE.BufferGeometry {
     );
     for (let k = 0; k < 3; k++) {
       norms.push(0, 1, 0);
-      colors.push(0.96, 0.98, 1.0); // Pure ice white
+      colors.push(highlightColor.r, highlightColor.g, highlightColor.b);
     }
 
     // Side crystal branches
@@ -265,7 +287,7 @@ function createSnowflakeGeometry(size: number): THREE.BufferGeometry {
     );
     for (let k = 0; k < 6; k++) {
       norms.push(0, 1, 0);
-      colors.push(0.92, 0.96, 1.0);
+      colors.push(baseColor.r, baseColor.g, baseColor.b);
     }
   }
 
@@ -275,52 +297,11 @@ function createSnowflakeGeometry(size: number): THREE.BufferGeometry {
   return geo;
 }
 
-// 2c. Soft Volumetric Frosted Snowdrifts
-function createSnowdriftsGeometry(): THREE.BufferGeometry {
-  const geo = new THREE.BufferGeometry();
-  const segments = 8;
-  const verts: number[] = [];
-  const norms: number[] = [];
-  const colors: number[] = [];
-  const w = 0.0095;
-  const h = 0.022;
-
-  for (let i = 0; i < segments; i++) {
-    const a0 = (i / segments) * Math.PI * 2;
-    const a1 = ((i + 1) / segments) * Math.PI * 2;
-    const cos0 = Math.cos(a0), sin0 = Math.sin(a0);
-    const cos1 = Math.cos(a1), sin1 = Math.sin(a1);
-
-    // Base ring to mid mound
-    verts.push(
-      cos0 * w, 0, sin0 * w,
-      cos1 * w, 0, sin1 * w,
-      cos0 * (w * 0.65), h * 0.65, sin0 * (w * 0.65)
-    );
-    verts.push(
-      cos1 * w, 0, sin1 * w,
-      cos1 * (w * 0.65), h * 0.65, sin1 * (w * 0.65),
-      cos0 * (w * 0.65), h * 0.65, sin0 * (w * 0.65)
-    );
-
-    // Mid mound to soft rounded apex
-    verts.push(
-      cos0 * (w * 0.65), h * 0.65, sin0 * (w * 0.65),
-      cos1 * (w * 0.65), h * 0.65, sin1 * (w * 0.65),
-      0, h, 0
-    );
-
-    for (let k = 0; k < 6; k++) norms.push(cos0 * 0.5, 0.7, sin0 * 0.5);
-    for (let k = 0; k < 3; k++) norms.push(0, 1.0, 0);
-
-    for (let k = 0; k < 6; k++) colors.push(0.88, 0.94, 0.99);
-    for (let k = 0; k < 3; k++) colors.push(1.0, 1.0, 1.0);
-  }
-
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-  geo.setAttribute('normal', new THREE.Float32BufferAttribute(norms, 3));
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  return geo;
+// 2c. Axis-aligned cubic ground pixels. Their hard edges deliberately echo the
+// QR voxels without turning the organic grass option into the same treatment.
+function createPixelGroundDecorGeometry(): THREE.BufferGeometry {
+  const pixelSize = BLOCK_SIZE * 0.44;
+  return new THREE.BoxGeometry(pixelSize, pixelSize, pixelSize);
 }
 
 // 2a. Flat 2D Petal Geometry for Ground Fallen Leaves (same outline as canopy blossom, all y=0)
@@ -480,7 +461,12 @@ function createOrganicBranchGeometry(
   length: number,
   depth: number,
   seed: number,
-  isWinter: boolean
+  palette: {
+    shadow: THREE.Color;
+    base: THREE.Color;
+    highlight: THREE.Color;
+    tip: THREE.Color;
+  }
 ): THREE.BufferGeometry {
   const segments = 10;
   const heightSegments = 3;
@@ -490,10 +476,10 @@ function createOrganicBranchGeometry(
   const colors: number[] = [];
 
   // Multi-tonal rich aged wood bark palette
-  const deepShadow = isWinter ? new THREE.Color(0.18, 0.14, 0.12) : new THREE.Color(0.19, 0.09, 0.04);
-  const midBark = isWinter ? new THREE.Color(0.28, 0.22, 0.18) : new THREE.Color(0.30, 0.16, 0.08);
-  const ridgeLight = isWinter ? new THREE.Color(0.38, 0.32, 0.28) : new THREE.Color(0.44, 0.26, 0.14);
-  const tipWood = isWinter ? new THREE.Color(0.48, 0.44, 0.40) : new THREE.Color(0.54, 0.36, 0.20);
+  const deepShadow = palette.shadow;
+  const midBark = palette.base;
+  const ridgeLight = palette.highlight;
+  const tipWood = palette.tip;
 
   const depthFactor = Math.min(1.0, depth * 0.35);
   const baseTone = midBark.clone().lerp(tipWood, depthFactor);
@@ -551,7 +537,7 @@ function createOrganicBranchGeometry(
 }
 
 // 4. Summer Rain Streak Geometry
-function createRainStreakGeometry(): THREE.BufferGeometry {
+function createRainStreakGeometry(color: THREE.Color): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   const h = 0.055;
   const w = 0.0012;
@@ -562,9 +548,9 @@ function createRainStreakGeometry(): THREE.BufferGeometry {
   ]);
   const norms = new Float32Array([0, 1, 0, 0, 1, 0, 0, 1, 0]);
   const colors = new Float32Array([
-    0.75, 0.88, 1.0,
-    0.75, 0.88, 1.0,
-    0.90, 0.96, 1.0,
+    color.r * 0.82, color.g * 0.82, color.b * 0.82,
+    color.r * 0.82, color.g * 0.82, color.b * 0.82,
+    color.r, color.g, color.b,
   ]);
   geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
   geo.setAttribute('normal', new THREE.BufferAttribute(norms, 3));
@@ -572,7 +558,10 @@ function createRainStreakGeometry(): THREE.BufferGeometry {
   return geo;
 }
 
-function createButterflyWingGeometry(species: number): THREE.BufferGeometry {
+function createButterflyWingGeometry(
+  species: number,
+  monochromeColor?: THREE.Color
+): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   // 6 vertices per wing (2 triangles forming realistic curved wing shape)
   // Vertex 0: Body base pivot (0,0,0)
@@ -602,9 +591,19 @@ function createButterflyWingGeometry(species: number): THREE.BufferGeometry {
   ];
 
   const pal = speciesPalettes[species % speciesPalettes.length];
-  const b = pal.base;
-  const t = pal.tip;
-  const e = pal.edge;
+  const b = monochromeColor
+    ? [monochromeColor.r, monochromeColor.g, monochromeColor.b]
+    : pal.base;
+  const t = monochromeColor
+    ? [
+        Math.min(1, monochromeColor.r * 1.18),
+        Math.min(1, monochromeColor.g * 1.18),
+        Math.min(1, monochromeColor.b * 1.18),
+      ]
+    : pal.tip;
+  const e = monochromeColor
+    ? [monochromeColor.r * 0.55, monochromeColor.g * 0.55, monochromeColor.b * 0.55]
+    : pal.edge;
 
   const colors = new Float32Array([
     b[0], b[1], b[2],
@@ -682,12 +681,13 @@ export class ThreeFallbackRenderer {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
+  private viewportProjection: QRViewportProjection;
   private animFrameId: number | null = null;
   private isRunning = false;
   private isDestroyed = false;
-  private quality: DesignQRQuality;
   public onProgressUpdate?: (progress: number, blurIntensity: number) => void;
   public onAfterRender?: () => void;
+  public onError?: (error: unknown) => void;
 
   // Tree and Meshes
   private treeData: TreeData | null = null;
@@ -697,19 +697,25 @@ export class ThreeFallbackRenderer {
   private morphBlocks: VoxelBlock[] = [];
   private branchesGroup: THREE.Group = new THREE.Group();
   private canopyFlowersMesh: THREE.InstancedMesh | null = null;
-  private grassMesh: THREE.InstancedMesh | null = null;
+  private groundDecorMesh: THREE.InstancedMesh | null = null;
   private petalsInstancedMesh: THREE.InstancedMesh | null = null;
   private rainMesh: THREE.InstancedMesh | null = null;
   private snowMesh: THREE.InstancedMesh | null = null;
   private islandBaseMesh: THREE.Mesh | null = null;
   private butterfliesGroup: THREE.Group = new THREE.Group();
   private butterflies: ButterflyState[] = [];
+  private logoGroup: THREE.Group | null = null;
+  private logoConfig: false | Required<DesignQRLogoOptions> = false;
+  private logoLoadController: AbortController | null = null;
+  private logoLoadVersion = 0;
 
   // Interactive Cursor Tracking for Butterfly Follow
   private mouse3D: THREE.Vector3 = new THREE.Vector3(0, 0.35, 0);
   private mouseActive: boolean = false;
   private raycaster: THREE.Raycaster = new THREE.Raycaster();
   private hoverPlane: THREE.Plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.35);
+  private readonly qrDepthHsl = { h: 0, s: 0, l: 0 };
+  private readonly qrLightDisplayColor = new THREE.Color();
 
   // Cached positions
   private groundPositions: VoxelBlock[] = [];
@@ -722,10 +728,7 @@ export class ThreeFallbackRenderer {
   private hasSpawned: boolean = false;
 
   // Material & Theme
-  private season: number = 0;
-  private customColor: THREE.Color = new THREE.Color(0.96, 0.48, 0.65);
-  private customStrength: number = 0;
-  private activeCustomTheme: TreeTheme | null = null;
+  private activeTheme: ResolvedTreeTheme = { ...TREE_THEME_PRESETS.spring };
   private startTime: number = performance.now();
 
   // Camera Orbit State & Smooth Ease-Out Transition
@@ -739,7 +742,10 @@ export class ThreeFallbackRenderer {
   private transitionDuration: number = VIEW_TRANSITION_DURATION_SECONDS;
   private isTransitioning: boolean = false;
   private lastGroundProgress: number = -1;
+  private lastVoxelProgress: number = -1;
   public isTurntable: boolean = false;
+  private turntableDirection: AutoRotateDirection = 'clockwise';
+  private lastFrameTime: number = performance.now();
   private isResettingRotation: boolean = false;
   private rotationResetStartTime: number = 0;
   private rotationResetStartYaw: number = DEFAULT_TREE_YAW;
@@ -807,18 +813,254 @@ export class ThreeFallbackRenderer {
     this.isResettingRotation = false;
   }
 
-  constructor(canvas: HTMLCanvasElement, quality: DesignQRQuality = 'high') {
-    this.quality = quality;
+  public setTurntableDirection(direction: AutoRotateDirection) {
+    this.turntableDirection = direction;
+  }
+
+  public setLogo(logo: false | Required<DesignQRLogoOptions>) {
+    const previousSource = this.logoConfig === false ? null : this.logoConfig.src;
+    this.logoConfig = logo === false ? false : { ...logo };
+
+    if (logo === false) {
+      this.cancelLogoLoad();
+      this.disposeLogoVisual();
+      this.renderOnce();
+      return;
+    }
+
+    if (previousSource === logo.src && this.logoGroup) {
+      this.updateLogoTransform(this.currentProgress);
+      this.renderOnce();
+      return;
+    }
+
+    this.cancelLogoLoad();
+    this.disposeLogoVisual();
+    const requestVersion = ++this.logoLoadVersion;
+    const controller = new AbortController();
+    this.logoLoadController = controller;
+    void this.loadLogoTexture(logo.src, requestVersion, controller);
+  }
+
+  private cancelLogoLoad() {
+    this.logoLoadVersion += 1;
+    this.logoLoadController?.abort();
+    this.logoLoadController = null;
+  }
+
+  private disposeLogoVisual() {
+    if (!this.logoGroup) return;
+    this.scene.remove(this.logoGroup);
+    disposeObjectResources(this.logoGroup);
+    this.logoGroup = null;
+  }
+
+  private async loadLogoTexture(
+    source: string,
+    requestVersion: number,
+    controller: AbortController
+  ) {
+    try {
+      const blob = source.startsWith('data:')
+        ? this.decodeLogoDataUrl(source)
+        : await this.fetchLogoBlob(source, controller.signal);
+      const rasterTypes = new Set(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']);
+      const mediaType = blob.type.toLowerCase().split(';', 1)[0].trim();
+      if (!rasterTypes.has(mediaType)) {
+        throw new Error('The logo response must be a PNG, JPEG, or WebP image.');
+      }
+      if (blob.size === 0 || blob.size > DESIGN_QR_LOGO_MAX_IMAGE_BYTES) {
+        throw new Error('The logo image size is outside the supported range.');
+      }
+
+      const objectUrl = URL.createObjectURL(blob);
+      let texture: THREE.Texture;
+      try {
+        texture = await new THREE.TextureLoader().loadAsync(objectUrl);
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+
+      if (
+        this.isDestroyed
+        || controller.signal.aborted
+        || requestVersion !== this.logoLoadVersion
+        || this.logoConfig === false
+        || this.logoConfig.src !== source
+      ) {
+        texture.dispose();
+        return;
+      }
+
+      const image = texture.image as {
+        naturalWidth?: number;
+        naturalHeight?: number;
+        width?: number;
+        height?: number;
+      };
+      const width = image.naturalWidth ?? image.width ?? 0;
+      const height = image.naturalHeight ?? image.height ?? 0;
+      if (
+        width <= 0
+        || height <= 0
+        || width > LOGO_MAX_IMAGE_DIMENSION
+        || height > LOGO_MAX_IMAGE_DIMENSION
+      ) {
+        texture.dispose();
+        throw new Error('The logo dimensions are outside the supported range.');
+      }
+
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+      this.logoLoadController = null;
+      this.createLogoVisual(texture, width / height);
+      this.renderOnce();
+    } catch (cause) {
+      if (
+        controller.signal.aborted
+        || requestVersion !== this.logoLoadVersion
+        || this.isDestroyed
+      ) {
+        return;
+      }
+
+      this.logoLoadController = null;
+      this.disposeLogoVisual();
+      this.onError?.(new DesignQRConfigError(
+        'LOGO_LOAD_FAILED',
+        'DesignQR could not load the configured logo. Check its raster format and CORS access.',
+        cause
+      ));
+      this.renderOnce();
+    }
+  }
+
+  private decodeLogoDataUrl(source: string): Blob {
+    const match = source.match(
+      /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/]+={0,2})$/i
+    );
+    if (!match) throw new Error('The logo data URL is not a supported raster image.');
+
+    const binary = atob(match[2]);
+    if (binary.length === 0 || binary.length > DESIGN_QR_LOGO_MAX_IMAGE_BYTES) {
+      throw new Error('The logo image size is outside the supported range.');
+    }
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    return new Blob([bytes], { type: match[1].toLowerCase() });
+  }
+
+  private async fetchLogoBlob(source: string, signal: AbortSignal): Promise<Blob> {
+    const resolvedSource = new URL(source, window.location.href);
+    const sameOrigin = resolvedSource.origin === window.location.origin;
+    const response = await fetch(resolvedSource, {
+      mode: 'cors',
+      credentials: sameOrigin ? 'same-origin' : 'omit',
+      signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Logo request failed with status ${response.status}.`);
+    }
+
+    const contentLength = Number(response.headers.get('content-length'));
+    if (
+      Number.isFinite(contentLength)
+      && contentLength > DESIGN_QR_LOGO_MAX_IMAGE_BYTES
+    ) {
+      throw new Error('The logo image is larger than the supported limit.');
+    }
+
+    return response.blob();
+  }
+
+  private createLogoVisual(texture: THREE.Texture, aspectRatio: number) {
+    this.disposeLogoVisual();
+
+    const group = new THREE.Group();
+    group.name = 'designqr-logo';
+    group.renderOrder = LOGO_RENDER_ORDER;
+
+    const imageGeometry = new THREE.PlaneGeometry(1, 1);
+    const imageMaterial = new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+      alphaTest: 0.01,
+      depthTest: false,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      toneMapped: false,
+    });
+    const image = new THREE.Mesh(imageGeometry, imageMaterial);
+    image.name = 'designqr-logo-image';
+    image.position.z = 0.001;
+    image.renderOrder = LOGO_RENDER_ORDER + 1;
+    image.frustumCulled = false;
+
+    const boundedAspect = THREE.MathUtils.clamp(aspectRatio, 0.25, 4);
+    if (boundedAspect >= 1) {
+      image.scale.y = 1 / boundedAspect;
+    } else {
+      image.scale.x = boundedAspect;
+    }
+
+    group.add(image);
+    this.logoGroup = group;
+    this.scene.add(group);
+    this.updateLogoTransform(this.currentProgress);
+  }
+
+  private updateQRLightDisplayColor() {
+    const [r, g, b] = resolveQR2DLightDisplayRgb(this.activeTheme.groundColor);
+    this.qrLightDisplayColor.setRGB(r, g, b, THREE.SRGBColorSpace);
+  }
+
+  private updateLogoTransform(progress: number) {
+    if (!this.logoGroup || this.logoConfig === false || !this.treeData) return;
+
+    const qrWidth = this.treeData.gridSize * BLOCK_SIZE;
+    const horizontalCameraDistance = Math.hypot(
+      this.camera.position.x,
+      this.camera.position.z
+    );
+    const frontX = horizontalCameraDistance > 0.0001
+      ? this.camera.position.x / horizontalCameraDistance
+      : Math.SQRT1_2;
+    const frontZ = horizontalCameraDistance > 0.0001
+      ? this.camera.position.z / horizontalCameraDistance
+      : Math.SQRT1_2;
+    const frontDistance = qrWidth * 0.31 * (1 - progress);
+    const treeY = this.treeData.trunkHeight * 1.08;
+    const scanY = BLOCK_SIZE * 0.72;
+    const safeLogoSize = THREE.MathUtils.clamp(
+      this.logoConfig.size,
+      DESIGN_QR_LOGO_SIZE_MIN,
+      DESIGN_QR_LOGO_SIZE_MAX
+    );
+    const logoSize = qrWidth * safeLogoSize
+      * THREE.MathUtils.lerp(0.92, 1, progress);
+
+    this.logoGroup.position.set(
+      frontX * frontDistance,
+      THREE.MathUtils.lerp(treeY, scanY, progress),
+      frontZ * frontDistance
+    );
+    this.logoGroup.quaternion.copy(this.camera.quaternion);
+    this.logoGroup.scale.setScalar(logoSize);
+    this.logoGroup.visible = true;
+  }
+
+  constructor(canvas: HTMLCanvasElement) {
     this.scene = new THREE.Scene();
     this.scene.background = null;
 
     const width = canvas.clientWidth || window.innerWidth || 800;
     const height = canvas.clientHeight || window.innerHeight || 600;
-    const aspect = width / height;
-    const initialFov = aspect < 1.0
-      ? (2 * Math.atan(Math.tan((QR_SCAN_MOBILE_HORIZONTAL_FOV * Math.PI) / 360) / aspect) * 180) / Math.PI
-      : QR_SCAN_DESKTOP_VERTICAL_FOV;
-    this.camera = new THREE.PerspectiveCamera(initialFov, aspect, 0.1, 100);
+    this.viewportProjection = resolveQRViewportProjection(width, height);
+    this.camera = new THREE.PerspectiveCamera(
+      this.viewportProjection.verticalFov,
+      this.viewportProjection.aspect,
+      0.1,
+      100
+    );
     this.camera.position.set(1.5, 1.8, 1.5);
     this.camera.lookAt(0, 0.2, 0);
 
@@ -834,6 +1076,8 @@ export class ThreeFallbackRenderer {
     this.renderer.toneMapping = THREE.NoToneMapping;
     // Remove Three.js version fingerprint from DOM
     this.renderer.domElement.removeAttribute('data-engine');
+
+    this.updateQRLightDisplayColor();
 
     this.scene.add(this.branchesGroup);
     this.scene.add(this.butterfliesGroup);
@@ -854,9 +1098,9 @@ export class ThreeFallbackRenderer {
   }
 
   private initWeatherParticles() {
-    // Generate 180 Rain Streaks (Summer)
+    // Pre-generate the maximum pools; each resolved theme controls visible counts.
     this.rainData = [];
-    for (let i = 0; i < 180; i++) {
+    for (let i = 0; i < 300; i++) {
       this.rainData.push({
         x: (Math.random() - 0.5) * 1.8,
         y: Math.random() * 1.8,
@@ -866,9 +1110,9 @@ export class ThreeFallbackRenderer {
       });
     }
 
-    // Generate 300 Floating Snowflakes
+    // Generate the maximum floating-snow pool.
     this.snowData = [];
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 500; i++) {
       this.snowData.push({
         x: (Math.random() - 0.5) * 2.0,
         y: Math.random() * 1.9,
@@ -891,84 +1135,37 @@ export class ThreeFallbackRenderer {
   }
 
   private getEnvConfig() {
-    if (this.activeCustomTheme) {
-      const p = this.activeCustomTheme.particleType;
-      const customCanopyDensity =
-        typeof this.activeCustomTheme.canopyDensity === 'number'
-          ? Math.max(0.15, Math.min(1.0, this.activeCustomTheme.canopyDensity > 1.0 ? this.activeCustomTheme.canopyDensity / 100 : this.activeCustomTheme.canopyDensity))
-          : 1.0;
+    const theme = this.activeTheme;
+    const fallingLeafType = theme.particleType === 'leaf'
+      || theme.particleType === 'sakura'
+      ? theme.particleType
+      : 'none';
+    const fallingLeavesCount = fallingLeafType === 'none'
+      ? 0
+      : theme.particleAmount;
+    const groundLeafCount = theme.groundLeavesAmount;
 
-      if (p === 'leaf' || p === 'sakura') {
-        const amount =
-          typeof this.activeCustomTheme.particleAmount === 'number'
-            ? Math.max(0, Math.min(500, this.activeCustomTheme.particleAmount))
-            : 60;
-        const groundAmount =
-          typeof this.activeCustomTheme.groundLeavesAmount === 'number'
-            ? Math.max(0, Math.min(200, this.activeCustomTheme.groundLeavesAmount))
-            : Math.round(amount * 0.85);
-
-        return {
-          id: 0,
-          name: 'custom_leaves',
-          canopyDensity: customCanopyDensity,
-          fallingLeavesCount: amount,
-          fallingLeafType: 'leaf',
-          groundLeafCoverage: groundAmount === 0 ? 0.0 : Math.min(0.50, 0.05 + groundAmount * 0.0035),
-          groundLeafCount: groundAmount,
-          butterflyCount: 2,
-          butterflyColor: 0xffedf4,
-          snowflakesCount: 0,
-        };
-      } else if (p === 'fireflies') {
-        return {
-          id: 1,
-          name: 'custom_fireflies',
-          canopyDensity: customCanopyDensity,
-          fallingLeavesCount: 0,
-          fallingLeafType: 'none',
-          groundLeafCoverage: 0.08,
-          groundLeafCount: 16,
-          butterflyCount: 12,
-          butterflyColor: 0xffea44, // Bright glowing golden fireflies
-          snowflakesCount: 0,
-        };
-      } else if (p === 'snow') {
-        return {
-          id: 3,
-          name: 'custom_snow',
-          canopyDensity: customCanopyDensity,
-          fallingLeavesCount: 0,
-          fallingLeafType: 'none',
-          groundLeafCoverage: 0.0,
-          groundLeafCount: 0,
-          butterflyCount: 0,
-          butterflyColor: 0xffedf4,
-          snowflakesCount: 300,
-        };
-      } else {
-        // 'none' / clean
-        return {
-          id: 4,
-          name: 'custom_clean',
-          canopyDensity: customCanopyDensity,
-          fallingLeavesCount: 0,
-          fallingLeafType: 'none',
-          groundLeafCoverage: 0.0,
-          groundLeafCount: 0,
-          butterflyCount: 0,
-          butterflyColor: 0xffffff,
-          snowflakesCount: 0,
-        };
-      }
-    }
-    return SEASON_ENV_CONFIGS[this.season] || SEASON_ENV_CONFIGS[0];
+    return {
+      canopyDensity: Math.max(0.15, Math.min(1, theme.canopyDensity / 100)),
+      fallingLeavesCount,
+      fallingLeafType,
+      groundLeafCoverage: groundLeafCount === 0
+        ? 0
+        : Math.min(0.5, 0.05 + groundLeafCount * 0.0035),
+      groundLeafCount,
+      butterflyCount: theme.ambientParticleType === 'none'
+        ? 0
+        : theme.ambientParticleAmount,
+      snowflakesCount: theme.snowflakeAmount,
+      rainCount: theme.weatherType === 'rain' ? theme.weatherAmount : 0,
+    };
   }
 
   private rebuildMeshes() {
     if (!this.treeData) return;
 
     const envConfig = this.getEnvConfig();
+    const isPixelFoliage = this.activeTheme.foliageShape === 'pixel';
     const gridSize = this.treeData.gridSize;
     const islandWidth = gridSize * BLOCK_SIZE; // Flush with QR code grid — NO exposed border frame!
 
@@ -981,15 +1178,7 @@ export class ThreeFallbackRenderer {
     }
 
     const slabGeo = new THREE.BoxGeometry(islandWidth, 0.02, islandWidth);
-    let slabColor =
-      this.season === 0
-        ? new THREE.Color(101 / 255, 89 / 255, 93 / 255) // ⑦   in Spring 3D
-        : new THREE.Color(0.44, 0.44, 0.48); // Deep slate stone pedestal in 3D
-
-    if (this.activeCustomTheme) {
-      const [cr, cg, cb] = hexToRgbTuple(this.activeCustomTheme.groundColor);
-      slabColor = new THREE.Color(cr * 0.70, cg * 0.70, cb * 0.70);
-    }
+    const slabColor = new THREE.Color(this.activeTheme.pedestalColor);
 
     const slabMat = new THREE.MeshBasicMaterial({ color: slabColor });
     this.islandBaseMesh = new THREE.Mesh(slabGeo, slabMat);
@@ -1069,10 +1258,10 @@ export class ThreeFallbackRenderer {
           const offX = Math.cos(offAngle) * offDist;
           const offZ = Math.sin(offAngle) * offDist;
 
-          const rotSeed = Math.sin(c * 53.71 + k * 73.19 + (this.season + 1) * 19.31) * 43758.5453;
+          const rotSeed = Math.sin(c * 53.71 + k * 73.19 + (this.activeTheme.groundLeavesSeed + 1) * 19.31) * 43758.5453;
           const normRot = rotSeed - Math.floor(rotSeed);
 
-          const scaleSeed = Math.sin(c * 91.37 + k * 29.47 + (this.season + 1) * 41.17) * 43758.5453;
+          const scaleSeed = Math.sin(c * 91.37 + k * 29.47 + (this.activeTheme.groundLeavesSeed + 1) * 41.17) * 43758.5453;
           const normScale = scaleSeed - Math.floor(scaleSeed);
 
           leafInstances.push({
@@ -1111,9 +1300,8 @@ export class ThreeFallbackRenderer {
 
       // Flat 2D ground leaves
       let leafGeo: THREE.BufferGeometry;
-      const isBlossomPetal = this.activeCustomTheme
-        ? (this.activeCustomTheme.foliageShape === 'blossom' || this.activeCustomTheme.particleType === 'sakura')
-        : (this.season === 0 || envConfig.fallingLeafType === 'sakura');
+      const isBlossomPetal = this.activeTheme.foliageShape === 'blossom'
+        || envConfig.fallingLeafType === 'sakura';
 
       if (isBlossomPetal) {
         leafGeo = createFlatGroundPetalGeometry(1.0, new THREE.Color(0.88, 0.88, 0.88), new THREE.Color(1.12, 1.12, 1.12), new THREE.Color(0.80, 0.80, 0.80));
@@ -1162,6 +1350,7 @@ export class ThreeFallbackRenderer {
     }
 
     this.morphBlocks = this.treeData.blocks.filter((b) => b.y > 0);
+    this.lastVoxelProgress = -1;
     if (this.morphBlocks.length > 0) {
       const voxelGeo = new THREE.BoxGeometry(BLOCK_SIZE * 0.96, BLOCK_SIZE * 0.96, BLOCK_SIZE * 0.96);
       const voxelMat = new THREE.MeshBasicMaterial();
@@ -1173,7 +1362,7 @@ export class ThreeFallbackRenderer {
         this.morphVoxelMesh.setMatrixAt(i, matrix);
 
         if (b.type === TreeBlockType.Trunk) {
-          color.setRGB(0.38, 0.22, 0.12);
+          color.set(this.activeTheme.branchColor);
         } else {
           this.getFoliageQRColor(b, color);
         }
@@ -1181,7 +1370,9 @@ export class ThreeFallbackRenderer {
       }
       this.morphVoxelMesh.instanceMatrix.needsUpdate = true;
       if (this.morphVoxelMesh.instanceColor) this.morphVoxelMesh.instanceColor.needsUpdate = true;
-      this.morphVoxelMesh.visible = false;
+      this.morphVoxelMesh.visible = resolveTreeFoliageMorph(
+        this.currentProgress
+      ).voxelVisible;
       this.scene.add(this.morphVoxelMesh);
     }
 
@@ -1198,7 +1389,12 @@ export class ThreeFallbackRenderer {
       side: THREE.DoubleSide,
     });
 
-    const isWinter = this.season === 3;
+    const branchPalette = {
+      shadow: new THREE.Color(this.activeTheme.branchShadowColor),
+      base: new THREE.Color(this.activeTheme.branchColor),
+      highlight: new THREE.Color(this.activeTheme.branchHighlightColor),
+      tip: new THREE.Color(this.activeTheme.branchTipColor),
+    };
     for (const b of this.treeData.branches) {
       const start = new THREE.Vector3(b.startX, b.startY, b.startZ);
       const end = new THREE.Vector3(b.endX, b.endY, b.endZ);
@@ -1211,7 +1407,7 @@ export class ThreeFallbackRenderer {
         length,
         b.depth,
         b.seed,
-        isWinter
+        branchPalette
       );
       const cylMesh = new THREE.Mesh(cylGeo, branchMat);
       const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
@@ -1253,18 +1449,25 @@ export class ThreeFallbackRenderer {
     }
 
     this.flowerBaseData = flowerList;
-    const isBlossom = this.activeCustomTheme
-      ? (this.activeCustomTheme.foliageShape === 'blossom' || this.activeCustomTheme.particleType === 'sakura')
-      : (this.season === 0 || this.season === 3);
+    const isBlossom = this.activeTheme.foliageShape === 'blossom';
 
     const flowerGeo = isBlossom
-      ? (this.season === 0 || (this.activeCustomTheme && this.activeCustomTheme.foliageShape === 'blossom')
-          ? createBlossomFlowerGeometry(1.0, new THREE.Color(0.92, 0.92, 0.92), new THREE.Color(1.08, 1.08, 1.08), new THREE.Color(247 / 255, 234 / 255, 94 / 255))
-          : createBlossomFlowerGeometry(1.0, new THREE.Color(0.86, 0.86, 0.86), new THREE.Color(1.14, 1.14, 1.14), new THREE.Color(0.78, 0.78, 0.78)))
-      : createLeafGeometry(1.0, new THREE.Color(0.85, 0.85, 0.85), new THREE.Color(1.15, 1.15, 1.15));
+      ? createBlossomFlowerGeometry(
+          1.0,
+          new THREE.Color(0.92, 0.92, 0.92),
+          new THREE.Color(1.08, 1.08, 1.08),
+          new THREE.Color(this.activeTheme.blossomCenterColor)
+        )
+      : isPixelFoliage
+        ? new THREE.BoxGeometry(1.35, 1.35, 1.35)
+        : createLeafGeometry(
+            1.0,
+            new THREE.Color(0.85, 0.85, 0.85),
+            new THREE.Color(1.15, 1.15, 1.15)
+          );
 
     const flowerMat = new THREE.MeshBasicMaterial({
-      vertexColors: true,
+      vertexColors: !isPixelFoliage,
       side: THREE.DoubleSide,
       depthTest: true,
       depthWrite: true,
@@ -1281,8 +1484,12 @@ export class ThreeFallbackRenderer {
 
     for (let i = 0; i < flowerList.length; i++) {
       const fl = flowerList[i];
-      fEuler.set(fl.normX, fl.angle, fl.normZ);
-      fQuat.setFromEuler(fEuler);
+      if (isPixelFoliage) {
+        fQuat.identity();
+      } else {
+        fEuler.set(fl.normX, fl.angle, fl.normZ);
+        fQuat.setFromEuler(fEuler);
+      }
       fScale.set(fl.scale, fl.scale, fl.scale);
       fMatrix.compose(new THREE.Vector3(fl.x, fl.y, fl.z), fQuat, fScale);
       this.canopyFlowersMesh.setMatrixAt(i, fMatrix);
@@ -1300,24 +1507,25 @@ export class ThreeFallbackRenderer {
     if (this.canopyFlowersMesh.instanceColor) this.canopyFlowersMesh.instanceColor.needsUpdate = true;
     this.scene.add(this.canopyFlowersMesh);
 
-    // 6. Distinct Ground Decor (Grass, Snowdrifts , or Clean) on 4 Corners
-    if (this.grassMesh) {
-      this.scene.remove(this.grassMesh);
-      this.grassMesh.geometry.dispose();
-      (this.grassMesh.material as THREE.Material).dispose();
-      this.grassMesh = null;
+    // 6. Distinct Ground Decor (Grass, Pixel, or Clean) on 4 Corners
+    if (this.groundDecorMesh) {
+      this.scene.remove(this.groundDecorMesh);
+      this.groundDecorMesh.geometry.dispose();
+      (this.groundDecorMesh.material as THREE.Material).dispose();
+      this.groundDecorMesh = null;
     }
 
-    const isSnowGround = this.activeCustomTheme
-      ? this.activeCustomTheme.groundFeature === 'snow'
-      : this.season === 3;
-    const isNoGround = this.activeCustomTheme?.groundFeature === 'none';
+    const isPixelGround = this.activeTheme.groundFeature === 'pixel';
+    const isNoGround = this.activeTheme.groundFeature === 'none';
 
-    const grassCount = this.treeData.grass.length;
-    if (grassCount > 0 && !isNoGround) {
+    const groundDecorInstances = isPixelGround
+      ? this.treeData.grass.filter((_blade, index) => index % 3 === 0)
+      : this.treeData.grass;
+    const groundDecorCount = groundDecorInstances.length;
+    if (groundDecorCount > 0 && !isNoGround) {
       let decorGeo: THREE.BufferGeometry;
-      if (isSnowGround) {
-        decorGeo = createSnowdriftsGeometry();
+      if (isPixelGround) {
+        decorGeo = createPixelGroundDecorGeometry();
       } else {
         const bladeGeo = new THREE.BufferGeometry();
         const w = 0.0042;
@@ -1344,12 +1552,16 @@ export class ThreeFallbackRenderer {
       }
 
       const decorMat = new THREE.MeshBasicMaterial({
-        vertexColors: true,
+        vertexColors: !isPixelGround,
         side: THREE.DoubleSide,
       });
 
-      this.grassMesh = new THREE.InstancedMesh(decorGeo, decorMat, grassCount);
-      this.grassMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      this.groundDecorMesh = new THREE.InstancedMesh(
+        decorGeo,
+        decorMat,
+        groundDecorCount
+      );
+      this.groundDecorMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       const gMatrix = new THREE.Matrix4();
       const gQuat = new THREE.Quaternion();
       const gEuler = new THREE.Euler();
@@ -1358,15 +1570,25 @@ export class ThreeFallbackRenderer {
 
       const baseH = 0.052;
 
-      for (let i = 0; i < grassCount; i++) {
-        const g = this.treeData.grass[i];
-        if (isSnowGround) {
-          // Soft rounded snowdrifts pillowed over the 4 ground corners
-          gEuler.set(0, g.seed * Math.PI * 2, 0);
-          gQuat.setFromEuler(gEuler);
-          const s = 0.85 + 0.55 * ((g.seed * 31.7) % 1);
-          gScale.set(s, s * 0.85, s);
-          gMatrix.compose(new THREE.Vector3(g.x, 0.005, g.z), gQuat, gScale);
+      for (let i = 0; i < groundDecorCount; i++) {
+        const g = groundDecorInstances[i];
+        if (isPixelGround) {
+          // Sparse, upright blocks form crisp frost clusters over the same
+          // finder-corner footprint as grass, without organic tilt or wind.
+          gQuat.identity();
+          const widthScale = 0.78 + 0.42 * ((g.seed * 31.7) % 1);
+          const heightScale = 0.68 + 1.02 * ((g.seed * 47.3) % 1);
+          gScale.set(widthScale, heightScale, widthScale);
+          const pixelHeight = BLOCK_SIZE * 0.44 * heightScale;
+          gMatrix.compose(
+            new THREE.Vector3(
+              g.x,
+              BLOCK_SIZE * 0.38 + pixelHeight * 0.5,
+              g.z
+            ),
+            gQuat,
+            gScale
+          );
         } else {
           // Upright natural grass blade
           gEuler.set(g.tilt, g.seed * Math.PI * 2, 0);
@@ -1375,14 +1597,16 @@ export class ThreeFallbackRenderer {
           gScale.set(1, s, 1);
           gMatrix.compose(new THREE.Vector3(g.x, g.y, g.z), gQuat, gScale);
         }
-        this.grassMesh.setMatrixAt(i, gMatrix);
+        this.groundDecorMesh.setMatrixAt(i, gMatrix);
 
-        this.getGrassBladeColor(g.seed, i, gColor);
-        this.grassMesh.setColorAt(i, gColor);
+        this.getGroundFeatureColor(g.seed, i, gColor);
+        this.groundDecorMesh.setColorAt(i, gColor);
       }
-      this.grassMesh.instanceMatrix.needsUpdate = true;
-      if (this.grassMesh.instanceColor) this.grassMesh.instanceColor.needsUpdate = true;
-      this.scene.add(this.grassMesh);
+      this.groundDecorMesh.instanceMatrix.needsUpdate = true;
+      if (this.groundDecorMesh.instanceColor) {
+        this.groundDecorMesh.instanceColor.needsUpdate = true;
+      }
+      this.scene.add(this.groundDecorMesh);
     }
 
     // 7. Parameterized Airborne Falling Particles (Dynamic pool supporting up to 500+ particles)
@@ -1398,9 +1622,8 @@ export class ThreeFallbackRenderer {
 
     if (pCount > 0) {
       let petalGeo: THREE.BufferGeometry;
-      const isBlossomPetal = this.activeCustomTheme
-        ? (this.activeCustomTheme.foliageShape === 'blossom' || this.activeCustomTheme.particleType === 'sakura')
-        : (this.season === 0 || envConfig.fallingLeafType === 'sakura');
+      const isBlossomPetal = this.activeTheme.foliageShape === 'blossom'
+        || envConfig.fallingLeafType === 'sakura';
 
       if (isBlossomPetal) {
         petalGeo = createBlossomFlowerGeometry(1.0, new THREE.Color(0.86, 0.86, 0.86), new THREE.Color(1.14, 1.14, 1.14), new THREE.Color(0.78, 0.78, 0.78));
@@ -1455,15 +1678,21 @@ export class ThreeFallbackRenderer {
       this.rainMesh = null;
     }
 
-    if (!this.activeCustomTheme && this.season === 1) {
-      const rainGeo = createRainStreakGeometry();
+    if (envConfig.rainCount > 0) {
+      const rainGeo = createRainStreakGeometry(
+        new THREE.Color(this.activeTheme.weatherColor)
+      );
       const rainMat = new THREE.MeshBasicMaterial({
         vertexColors: true,
         transparent: true,
         opacity: 0.7,
         side: THREE.DoubleSide,
       });
-      this.rainMesh = new THREE.InstancedMesh(rainGeo, rainMat, this.rainData.length);
+      this.rainMesh = new THREE.InstancedMesh(
+        rainGeo,
+        rainMat,
+        Math.min(envConfig.rainCount, this.rainData.length)
+      );
       this.rainMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       this.scene.add(this.rainMesh);
     }
@@ -1477,7 +1706,12 @@ export class ThreeFallbackRenderer {
     }
 
     if (envConfig.snowflakesCount > 0) {
-      const snowGeo = createSnowflakeGeometry(1.0);
+      const snowColor = new THREE.Color(this.activeTheme.snowflakeColor);
+      const snowGeo = createSnowflakeGeometry(
+        1.0,
+        snowColor.clone().multiplyScalar(0.94),
+        snowColor
+      );
       const snowMat = new THREE.MeshBasicMaterial({
         vertexColors: true,
         side: THREE.DoubleSide,
@@ -1500,7 +1734,12 @@ export class ThreeFallbackRenderer {
     if (butterflyCount > 0) {
       for (let i = 0; i < butterflyCount; i++) {
         const species = i % 4; // 0: Morpho Blue, 1: Monarch Orange, 2: Emerald Swallowtail, 3: Pink Pearl
-        const wingGeo = createButterflyWingGeometry(species);
+        const wingGeo = createButterflyWingGeometry(
+          species,
+          this.activeTheme.ambientParticleType === 'fireflies'
+            ? new THREE.Color(this.activeTheme.ambientParticleColor)
+            : undefined
+        );
         const wingMat = new THREE.MeshBasicMaterial({
           vertexColors: true,
           side: THREE.DoubleSide,
@@ -1579,649 +1818,189 @@ export class ThreeFallbackRenderer {
     const n1 = s1 - Math.floor(s1);
     const s2 = Math.sin(col * 0.45 - row * 0.85 + seed * 7.19) * 23421.6312;
     const n2 = s2 - Math.floor(s2);
-    // Combine spatial cluster + seed for natural clustering and leaf-to-leaf variance
-    const r = (n1 * 0.65 + n2 * 0.35 + seed * 0.20) % 1.0;
-    const micro = (Math.sin(col * 19.3 + row * 37.1 + seed * 41.7) * 43758.5453 % 1 - 0.5) * 0.035;
-
-    // 🎨 Custom Theme: Support full 4-color harmonic custom palette if provided
-    if (this.activeCustomTheme?.foliageHighlightColor || this.activeCustomTheme?.foliageShadowColor) {
-      const cShadow = hexToRgbTuple(this.activeCustomTheme.foliageShadowColor || this.activeCustomTheme.foliageColor);
-      const cMain = hexToRgbTuple(this.activeCustomTheme.foliageColor);
-      const cMid = hexToRgbTuple(this.activeCustomTheme.foliageMidtoneColor || this.activeCustomTheme.foliageColor);
-      const cHigh = hexToRgbTuple(this.activeCustomTheme.foliageHighlightColor || this.activeCustomTheme.foliageColor);
-
-      if (r < 0.22) {
-        target.setRGB(cShadow[0] + micro * 0.15, cShadow[1] + micro * 0.15, cShadow[2] + micro * 0.15);
-      } else if (r < 0.55) {
-        target.setRGB(cMain[0] + micro * 0.15, cMain[1] + micro * 0.15, cMain[2] + micro * 0.15);
-      } else if (r < 0.82) {
-        target.setRGB(cMid[0] + micro * 0.15, cMid[1] + micro * 0.15, cMid[2] + micro * 0.15);
-      } else {
-        target.setRGB(cHigh[0] + micro * 0.15, cHigh[1] + micro * 0.15, cHigh[2] + micro * 0.15);
-      }
-      return;
-    }
-
-    const customHex = this.activeCustomTheme?.foliageColor?.toLowerCase();
-
-    if (customHex === '#f4b4cf' || (this.season === 0 && this.customStrength <= 0.01)) {
-      // 🌸 Spring Swatch Palette: Hanagoromo + Yae-Beni-Shidare + Somei-Yoshino + Hanaakari
-      if (r < 0.35) {
-        target.setRGB(217 / 255 + micro * 0.15, 142 / 255 + micro * 0.15, 176 / 255 + micro * 0.15);
-      } else if (r < 0.70) {
-        target.setRGB(244 / 255 + micro * 0.15, 180 / 255 + micro * 0.15, 208 / 255 + micro * 0.15);
-      } else if (r < 0.92) {
-        target.setRGB(249 / 255 + micro * 0.15, 211 / 255 + micro * 0.15, 227 / 255 + micro * 0.15);
-      } else {
-        target.setRGB(253 / 255, 239 / 255, 245 / 255);
-      }
-      return;
-    } else if (customHex === '#02983b' || customHex === '#00ac7a' || customHex === '#40ad5a' || (this.season === 1 && this.customStrength <= 0.01)) {
-      // ☀️ Summer Traditional Japanese Palette (033 立夏 萬葉集綠意配色)
-      // ④ 翠玉 (#02983B) + ⑤ 若苗色 (#99CC81) + ③ 深綠 (#00785E) + ① 青竹色 (#00AC7A)
-      if (r < 0.28) {
-        // ③ 深綠 Deep Forest Canopy Shadow (grounding depth)
-        target.setRGB(micro * 0.08, 121 / 255 + micro * 0.08, 95 / 255 + micro * 0.08);
-      } else if (r < 0.65) {
-        // ④ 翠玉 Soothing Rich Emerald Body
-        target.setRGB(2 / 255 + micro * 0.08, 153 / 255 + micro * 0.08, 59 / 255 + micro * 0.08);
-      } else if (r < 0.86) {
-        // ① 青竹色 Fresh Bamboo Accent
-        target.setRGB(micro * 0.08, 173 / 255 + micro * 0.08, 122 / 255 + micro * 0.08);
-      } else {
-        // ⑤ 若苗色 Tender Warm Sprout Tip (gentle natural warm green highlight)
-        target.setRGB(154 / 255 + micro * 0.08, 204 / 255 + micro * 0.08, 130 / 255 + micro * 0.08);
-      }
-      return;
-    } else if (customHex === '#e2451e' || customHex === '#d32f2f' || (this.season === 2 && this.customStrength <= 0.01)) {
-      // 🍂 Autumn Traditional Japanese Palette (京都清水寺 楓葉配色)
-      // ① 紅葉 (#E2451E: 226, 69, 31) + ② 楓 (#E77433: 231, 117, 52) + ③ 紅絹 (#BD3528: 189, 53, 41) + ④ 小春日和 (#F4A358: 244, 164, 88)
-      if (r < 0.22) {
-        // ③ 紅絹 Deep Crimson Shadow
-        target.setRGB(189 / 255 + micro * 0.15, 53 / 255 + micro * 0.15, 41 / 255 + micro * 0.15);
-      } else if (r < 0.55) {
-        // ① 紅葉 Hero Flaming Red
-        target.setRGB(226 / 255 + micro * 0.15, 69 / 255 + micro * 0.15, 31 / 255 + micro * 0.15);
-      } else if (r < 0.82) {
-        // ② 楓 Warm Maple Orange
-        target.setRGB(231 / 255 + micro * 0.15, 117 / 255 + micro * 0.15, 52 / 255 + micro * 0.15);
-      } else {
-        // ④ 小春日和 Sunlit Golden Amber
-        target.setRGB(244 / 255 + micro * 0.15, 164 / 255 + micro * 0.15, 88 / 255 + micro * 0.15);
-      }
-      return;
-    } else if (customHex === '#d8e5f0' || (this.season === 3 && this.customStrength <= 0.01)) {
-      // ❄️ Winter Frosted Crystal Palette
-      if (r < 0.18) target.setRGB(0.38 + micro * 0.5, 0.52 + micro * 0.5, 0.65 + micro * 0.5);
-      else if (r < 0.44) target.setRGB(0.55 + micro * 0.5, 0.68 + micro * 0.5, 0.82 + micro * 0.5);
-      else if (r < 0.72) target.setRGB(0.74 + micro * 0.5, 0.84 + micro * 0.5, 0.94 + micro * 0.5);
-      else if (r < 0.90) target.setRGB(0.96, 0.98 + micro * 0.5, 1.0);
-      else target.setRGB(0.65 + micro * 0.5, 0.84 + micro * 0.5, 0.90 + micro * 0.5);
-      return;
-    }
-
-    if (this.customStrength > 0.01) {
-      const hsl = { h: 0, s: 0, l: 0 };
-      this.customColor.getHSL(hsl);
-
-      let hShift = 0;
-      let sShift = 0;
-      let lShift = 0;
-
-      if (r < 0.16) {
-        // Soft Gentle Shadow
-        hShift = -0.008; sShift = 0.04; lShift = -0.09;
-      } else if (r < 0.38) {
-        // Rich Body
-        hShift = -0.004; sShift = 0.02; lShift = -0.04;
-      } else if (r < 0.62) {
-        // Pure Midtone
-        hShift = 0.0; sShift = 0.0; lShift = 0.01;
-      } else if (r < 0.82) {
-        // Soft Sunlit
-        hShift = 0.008; sShift = -0.02; lShift = 0.06;
-      } else if (r < 0.94) {
-        // Luminous Highlight
-        hShift = 0.014; sShift = -0.03; lShift = 0.10;
-      } else {
-        // Warm Accent
-        hShift = 0.020; sShift = 0.03; lShift = 0.04;
-      }
-
-      const finalH = (hsl.h + hShift + 1.0) % 1.0;
-      const finalS = Math.max(0.15, Math.min(1.0, hsl.s + sShift));
-      const finalL = Math.max(0.12, Math.min(0.94, hsl.l + lShift + micro * 0.5 + (yRatio - 0.5) * 0.05));
-      target.setHSL(finalH, finalS, finalL);
-      return;
-    }
-
-    if (this.season === 0) {
-      if (r < 0.35) {
-        target.setRGB(217 / 255 + micro * 0.15, 142 / 255 + micro * 0.15, 176 / 255 + micro * 0.15);
-      } else if (r < 0.70) {
-        target.setRGB(244 / 255 + micro * 0.15, 180 / 255 + micro * 0.15, 208 / 255 + micro * 0.15);
-      } else if (r < 0.92) {
-        target.setRGB(249 / 255 + micro * 0.15, 211 / 255 + micro * 0.15, 227 / 255 + micro * 0.15);
-      } else {
-        target.setRGB(253 / 255, 239 / 255, 245 / 255);
-      }
-    } else if (this.season === 1) {
-      if (r < 0.16) target.setRGB(0.18 + micro * 0.5, 0.48 + micro * 0.5, 0.20 + micro * 0.5);
-      else if (r < 0.38) target.setRGB(0.28 + micro * 0.5, 0.62 + micro * 0.5, 0.22 + micro * 0.5);
-      else if (r < 0.64) target.setRGB(0.42 + micro * 0.5, 0.74 + micro * 0.5, 0.20 + micro * 0.5);
-      else if (r < 0.82) target.setRGB(0.58 + micro * 0.5, 0.82 + micro * 0.5, 0.18 + micro * 0.5);
-      else if (r < 0.92) target.setRGB(0.74 + micro * 0.5, 0.86 + micro * 0.5, 0.20 + micro * 0.5);
-      else target.setRGB(0.90 + micro * 0.5, 0.84 + micro * 0.5, 0.24);
-    } else if (this.season === 2) {
-      if (r < 0.22) {
-        target.setRGB(189 / 255 + micro * 0.15, 53 / 255 + micro * 0.15, 41 / 255 + micro * 0.15);
-      } else if (r < 0.55) {
-        target.setRGB(226 / 255 + micro * 0.15, 69 / 255 + micro * 0.15, 31 / 255 + micro * 0.15);
-      } else if (r < 0.82) {
-        target.setRGB(231 / 255 + micro * 0.15, 117 / 255 + micro * 0.15, 52 / 255 + micro * 0.15);
-      } else {
-        target.setRGB(244 / 255 + micro * 0.15, 164 / 255 + micro * 0.15, 88 / 255 + micro * 0.15);
-      }
-    } else {
-      if (r < 0.18) target.setRGB(0.38 + micro * 0.5, 0.52 + micro * 0.5, 0.65 + micro * 0.5);
-      else if (r < 0.44) target.setRGB(0.55 + micro * 0.5, 0.68 + micro * 0.5, 0.82 + micro * 0.5);
-      else if (r < 0.72) target.setRGB(0.74 + micro * 0.5, 0.84 + micro * 0.5, 0.94 + micro * 0.5);
-      else if (r < 0.90) target.setRGB(0.96, 0.98 + micro * 0.5, 1.0);
-      else target.setRGB(0.65 + micro * 0.5, 0.84 + micro * 0.5, 0.90 + micro * 0.5);
-    }
+    const palettePosition = (n1 * 0.65 + n2 * 0.35 + seed * 0.20) % 1;
+    const micro = (
+      Math.sin(col * 19.3 + row * 37.1 + seed * 41.7) * 43758.5453 % 1 - 0.5
+    ) * this.activeTheme.foliageColorVariation;
+    const verticalLift = (yRatio - 0.5) * this.activeTheme.foliageVerticalLift;
+    const palette = this.activeTheme.foliagePaletteColors;
+    const paletteIndex = this.getPaletteIndex(
+      palettePosition,
+      this.activeTheme.foliagePaletteStops
+    );
+    const [r, g, b] = hexToRgbTuple(palette[paletteIndex]);
+    target.setRGB(
+      THREE.MathUtils.clamp(r + micro + verticalLift, 0, 1),
+      THREE.MathUtils.clamp(g + micro + verticalLift, 0, 1),
+      THREE.MathUtils.clamp(b + micro + verticalLift, 0, 1)
+    );
   }
 
-  // 1. Rich Multi-Tonal Foliage & Blossom Color Generator (Center Tree Canopy Dark Modules)
+  // Rich multi-tonal foliage colors for the center QR modules.
   private getFoliageQRColor(b: VoxelBlock, target: THREE.Color) {
-    const customHex = this.activeCustomTheme?.foliageColor?.toLowerCase();
     const noise = this.getModuleClusterNoise(b.col, b.row, 4.2);
-    const micro = (Math.sin(b.col * 17.3 + b.row * 31.7) * 43758.5453 % 1 - 0.5) * 0.03;
-
-    // 🎨 Custom Theme: Support full 4-color harmonic custom palette if provided
-    if (this.activeCustomTheme?.foliageHighlightColor || this.activeCustomTheme?.foliageShadowColor) {
-      const cShadow = hexToRgbTuple(this.activeCustomTheme.foliageShadowColor || this.activeCustomTheme.foliageColor);
-      const cMain = hexToRgbTuple(this.activeCustomTheme.foliageColor);
-      const cMid = hexToRgbTuple(this.activeCustomTheme.foliageMidtoneColor || this.activeCustomTheme.foliageColor);
-      const cHigh = hexToRgbTuple(this.activeCustomTheme.foliageHighlightColor || this.activeCustomTheme.foliageColor);
-
-      if (noise < 0.22) target.setRGB(cShadow[0] + micro, cShadow[1] + micro, cShadow[2]);
-      else if (noise < 0.52) target.setRGB(cMain[0] + micro, cMain[1] + micro, cMain[2]);
-      else if (noise < 0.80) target.setRGB(cMid[0] + micro, cMid[1] + micro, cMid[2]);
-      else target.setRGB(cHigh[0] + micro, cHigh[1] + micro, cHigh[2]);
-      return;
-    }
-
-    if (customHex === '#f4b4cf' || (this.season === 0 && this.customStrength <= 0.01)) {
-      if (noise < 0.22) {
-        target.setRGB(0.55 + micro, 0.24 + micro, 0.35 + micro);
-      } else if (noise < 0.48) {
-        target.setRGB(0.66 + micro, 0.30 + micro, 0.40 + micro);
-      } else if (noise < 0.78) {
-        target.setRGB(0.74 + micro, 0.34 + micro, 0.48 + micro);
-      } else {
-        target.setRGB(0.82 + micro, 0.40 + micro, 0.54 + micro);
-      }
-      return;
-    } else if (customHex === '#00ac7a' || customHex === '#40ad5a' || (this.season === 1 && this.customStrength <= 0.01)) {
-      // ☀️ Summer (033 立夏): ③ 深綠 + ④ 翠玉 + ① 青竹色 + ② 薄綠
-      if (noise < 0.22) target.setRGB(micro, 90 / 255 + micro, 70 / 255);
-      else if (noise < 0.52) target.setRGB(micro, 121 / 255 + micro, 95 / 255);
-      else if (noise < 0.80) target.setRGB(2 / 255 + micro, 153 / 255 + micro, 59 / 255);
-      else target.setRGB(micro, 173 / 255 + micro, 122 / 255);
-      return;
-    } else if (customHex === '#e2451e' || customHex === '#d32f2f' || (this.season === 2 && this.customStrength <= 0.01)) {
-      if (noise < 0.22) target.setRGB(140 / 255 + micro, 32 / 255 + micro, 22 / 255);
-      else if (noise < 0.52) target.setRGB(189 / 255 + micro, 53 / 255 + micro, 41 / 255);
-      else if (noise < 0.80) target.setRGB(226 / 255 + micro, 69 / 255 + micro, 31 / 255);
-      else target.setRGB(231 / 255 + micro, 117 / 255 + micro, 52 / 255);
-      return;
-    } else if (customHex === '#d8e5f0' || (this.season === 3 && this.customStrength <= 0.01)) {
-      if (noise < 0.22) target.setRGB(0.24 + micro, 0.40 + micro, 0.56 + micro);
-      else if (noise < 0.56) target.setRGB(0.36 + micro, 0.52 + micro, 0.68 + micro);
-      else if (noise < 0.82) target.setRGB(0.48 + micro, 0.64 + micro, 0.78 + micro);
-      else target.setRGB(0.60 + micro, 0.74 + micro, 0.86 + micro);
-      return;
-    }
-
-    if (this.customStrength > 0.01) {
-      const hsl = { h: 0, s: 0, l: 0 };
-      this.customColor.getHSL(hsl);
-      const finalL = Math.max(0.18, Math.min(0.48, hsl.l * 0.70 + (noise - 0.5) * 0.12));
-      target.setHSL(hsl.h, Math.min(1.0, hsl.s * 1.1), finalL);
-      return;
-    }
-
-    if (this.season === 0) {
-      if (noise < 0.22) {
-        target.setRGB(0.55 + micro, 0.24 + micro, 0.35 + micro);
-      } else if (noise < 0.48) {
-        target.setRGB(0.66 + micro, 0.30 + micro, 0.40 + micro);
-      } else if (noise < 0.78) {
-        target.setRGB(0.74 + micro, 0.34 + micro, 0.48 + micro);
-      } else {
-        target.setRGB(0.82 + micro, 0.40 + micro, 0.54 + micro);
-      }
-    } else if (this.season === 1) {
-      if (noise < 0.22) target.setRGB(micro, 90 / 255 + micro, 70 / 255);
-      else if (noise < 0.52) target.setRGB(micro, 121 / 255 + micro, 95 / 255);
-      else if (noise < 0.80) target.setRGB(2 / 255 + micro, 153 / 255 + micro, 59 / 255);
-      else target.setRGB(micro, 173 / 255 + micro, 122 / 255);
-    } else if (this.season === 2) {
-      if (noise < 0.22) target.setRGB(140 / 255 + micro, 32 / 255 + micro, 22 / 255);
-      else if (noise < 0.52) target.setRGB(189 / 255 + micro, 53 / 255 + micro, 41 / 255);
-      else if (noise < 0.80) target.setRGB(226 / 255 + micro, 69 / 255 + micro, 31 / 255);
-      else target.setRGB(231 / 255 + micro, 117 / 255 + micro, 52 / 255);
-    } else {
-      if (noise < 0.22) target.setRGB(0.24 + micro, 0.40 + micro, 0.56 + micro);
-      else if (noise < 0.56) target.setRGB(0.36 + micro, 0.52 + micro, 0.68 + micro);
-      else if (noise < 0.82) target.setRGB(0.48 + micro, 0.64 + micro, 0.78 + micro);
-      else target.setRGB(0.60 + micro, 0.74 + micro, 0.86 + micro);
-    }
+    const micro = (
+      Math.sin(b.col * 17.3 + b.row * 31.7) * 43758.5453 % 1 - 0.5
+    ) * this.activeTheme.qrFoliageColorVariation;
+    const palette = this.activeTheme.qrFoliagePaletteColors;
+    const paletteIndex = this.getPaletteIndex(noise, this.activeTheme.qrFoliagePaletteStops);
+    const [r, g, blue] = hexToRgbTuple(palette[paletteIndex]);
+    target.setRGB(
+      THREE.MathUtils.clamp(r + micro, 0, 1),
+      THREE.MathUtils.clamp(g + micro, 0, 1),
+      THREE.MathUtils.clamp(blue, 0, 1)
+    );
   }
 
-  // 2. Rich Multi-Tonal Lawn & Grass Finder Pattern Generator (4 Corners QR Eyes & Turf)
-  private getGrassFinderColor(b: VoxelBlock, target: THREE.Color) {
-    const gNoise = this.getModuleClusterNoise(b.col, b.row, 8.7);
-    const micro = (Math.sin(b.col * 29.1 + b.row * 13.9) * 43758.5453 % 1 - 0.5) * 0.035;
+  private getPaletteIndex(value: number, stops: readonly number[]): number {
+    const index = stops.findIndex((stop) => value < stop);
+    return index === -1 ? stops.length : index;
+  }
 
-    // Check if this module is in the center 3x3 eye of any finder pattern
-    const gridSize = this.treeData ? this.treeData.gridSize : 29;
+  private getFinderQRColor(b: VoxelBlock, target: THREE.Color) {
+    const gridSize = this.treeData?.gridSize ?? 29;
     const isTopLeftEye = b.row >= 2 && b.row <= 4 && b.col >= 2 && b.col <= 4;
-    const isTopRightEye = b.row >= 2 && b.row <= 4 && b.col >= gridSize - 5 && b.col <= gridSize - 3;
-    const isBottomLeftEye = b.row >= gridSize - 5 && b.row <= gridSize - 3 && b.col >= 2 && b.col <= 4;
-    const isCenterEye = isTopLeftEye || isTopRightEye || isBottomLeftEye;
-
-    if (this.activeCustomTheme?.groundFeatureColor) {
-      const [cr, cg, cb] = hexToRgbTuple(this.activeCustomTheme.groundFeatureColor);
-      if (isCenterEye) {
-        target.setRGB(
-          Math.max(0, cr * 0.70 + micro * 0.1),
-          Math.max(0, cg * 0.70 + micro * 0.1),
-          Math.max(0, cb * 0.70 + micro * 0.1)
-        );
-      } else if (gNoise < 0.35) {
-        target.setRGB(
-          Math.max(0, cr * 0.85 + micro * 0.1),
-          Math.max(0, cg * 0.85 + micro * 0.1),
-          Math.max(0, cb * 0.85 + micro * 0.1)
-        );
-      } else if (gNoise < 0.75) {
-        target.setRGB(
-          Math.min(1, Math.max(0, cr + micro * 0.1)),
-          Math.min(1, Math.max(0, cg + micro * 0.1)),
-          Math.min(1, Math.max(0, cb + micro * 0.1))
-        );
-      } else {
-        target.setRGB(
-          Math.min(1, cr * 1.15 + micro * 0.1),
-          Math.min(1, cg * 1.15 + micro * 0.1),
-          Math.min(1, cb * 1.15 + micro * 0.1)
-        );
-      }
-      return;
-    }
-
-    if (this.season === 0) {
-      // 🌸 Spring Swatch Finder Patterns: ③  + ④  + ⑤
-      // Deep contrast for guaranteed camera scanner detection
-      if (isCenterEye) {
-        // ③  center eye deep anchor
-        target.setRGB(0.20 + micro * 0.1, 0.48 + micro * 0.1, 0.14 + micro * 0.1);
-      } else if (gNoise < 0.35) {
-        // ③  outer border dark green
-        target.setRGB(0.26 + micro * 0.1, 0.54 + micro * 0.1, 0.18 + micro * 0.1);
-      } else if (gNoise < 0.75) {
-        // ④  fresh spring yellow-green
-        target.setRGB(0.38 + micro * 0.1, 0.62 + micro * 0.1, 0.22 + micro * 0.1);
-      } else if (gNoise < 0.90) {
-        // ③
-        target.setRGB(0.28 + micro * 0.1, 0.56 + micro * 0.1, 0.18 + micro * 0.1);
-      } else {
-        // ⑤  warm golden sprout accent
-        target.setRGB(0.58 + micro * 0.1, 0.64 + micro * 0.1, 0.18 + micro * 0.1);
-      }
-    } else if (this.season === 1) {
-      // ☀️ Summer (033 立夏): ④ 翠玉 (#02983B) + ⑤ 若苗色 (#99CC81) + ⑨ 利休鼠 (#6B9277) + ⑦ 嬰兒 (#D7DE8A)
-      if (isCenterEye) {
-        // ④ 翠玉 Center Eye Emerald Anchor
-        target.setRGB(2 / 255 + micro * 0.1, 153 / 255 + micro * 0.1, 59 / 255 + micro * 0.1);
-      } else if (gNoise < 0.35) {
-        // ⑨ 利休鼠 Outer Border Tea-Gray Green
-        target.setRGB(108 / 255 + micro * 0.1, 147 / 255 + micro * 0.1, 119 / 255 + micro * 0.1);
-      } else if (gNoise < 0.75) {
-        // ⑤ 若苗色 Tender Sprout Lawn Green
-        target.setRGB(154 / 255 + micro * 0.1, 204 / 255 + micro * 0.1, 130 / 255 + micro * 0.1);
-      } else {
-        // ⑦ 嬰兒 Warm Sprout Golden Highlight
-        target.setRGB(216 / 255 + micro * 0.1, 222 / 255 + micro * 0.1, 138 / 255 + micro * 0.1);
-      }
-    } else if (this.season === 2) {
-      // 🍂 Autumn: ⑨ 山眠 (#5D4C35) + ⑧ 冬草 (#9D8C73) + ⑤ 酒林 (#BD956E) + ④ 小春日和 (#F4A358)
-      if (isCenterEye) {
-        // ⑨ 山眠 Deep Antique Wood Dark Core
-        target.setRGB(94 / 255 + micro * 0.1, 77 / 255 + micro * 0.1, 54 / 255 + micro * 0.1);
-      } else if (gNoise < 0.35) {
-        // ⑧ 冬草 Withered Autumn Grass
-        target.setRGB(158 / 255 + micro * 0.1, 140 / 255 + micro * 0.1, 115 / 255 + micro * 0.1);
-      } else if (gNoise < 0.75) {
-        // ⑤ 酒林 Cedar Brown
-        target.setRGB(190 / 255 + micro * 0.1, 150 / 255 + micro * 0.1, 110 / 255 + micro * 0.1);
-      } else {
-        // ④ 小春日和 Warm Golden Accent
-        target.setRGB(244 / 255 + micro * 0.1, 164 / 255 + micro * 0.1, 88 / 255 + micro * 0.1);
-      }
-    } else {
-      // ❄️ Winter:  (Frosted Slate + Deep Ice Shadow)
-      if (isCenterEye) {
-        target.setRGB(0.20 + micro, 0.32 + micro, 0.44 + micro);
-      } else if (gNoise < 0.35) {
-        target.setRGB(0.28 + micro, 0.42 + micro, 0.56 + micro);
-      } else if (gNoise < 0.75) {
-        target.setRGB(0.38 + micro, 0.52 + micro, 0.66 + micro);
-      } else {
-        target.setRGB(0.48 + micro, 0.62 + micro, 0.74 + micro);
-      }
-    }
+    const isTopRightEye = b.row >= 2
+      && b.row <= 4
+      && b.col >= gridSize - 5
+      && b.col <= gridSize - 3;
+    const isBottomLeftEye = b.row >= gridSize - 5
+      && b.row <= gridSize - 3
+      && b.col >= 2
+      && b.col <= 4;
+    const micro = (
+      Math.sin(b.col * 29.1 + b.row * 13.9) * 43758.5453 % 1 - 0.5
+    ) * this.activeTheme.qrFinderColorVariation;
+    const color = isTopLeftEye || isTopRightEye || isBottomLeftEye
+      ? this.activeTheme.qrFinderEyeColor
+      : this.activeTheme.qrFinderPaletteColors[this.getPaletteIndex(
+        this.getModuleClusterNoise(b.col, b.row, 8.7),
+        this.activeTheme.qrFinderPaletteStops
+      )];
+    const [r, g, blue] = hexToRgbTuple(color);
+    target.setRGB(
+      THREE.MathUtils.clamp(r + micro, 0, 1),
+      THREE.MathUtils.clamp(g + micro, 0, 1),
+      THREE.MathUtils.clamp(blue + micro, 0, 1)
+    );
   }
 
-  // 3. Main Ground Tile Shader with Continuous Real-time 3D-to-2D Color Blending
+  // Ground tiles blend from the explicit 3D surface roles into the 2D QR roles.
   private getGroundTileColorWithProgress(
     b: VoxelBlock,
     target: THREE.Color,
     progress: number
   ) {
-    const bgNoise = this.getModuleClusterNoise(b.col, b.row, 1.9);
-    const tileJitter = (bgNoise - 0.5) * 0.04 * Math.max(0, 1.0 - progress);
-    // Continuous responsive color masking curve (mask emerges right from the start of rotation)
-    const ease = Math.min(1.0, Math.max(0.0, Math.pow(progress, 0.85)));
+    const ease = THREE.MathUtils.clamp(Math.pow(progress, 0.85), 0, 1);
+    const isLightModule = b.type === TreeBlockType.Dirt;
+    const noise = this.getModuleClusterNoise(b.col, b.row, isLightModule ? 1.9 : 6.1);
+    const sourceHex = isLightModule
+      ? this.activeTheme.groundSurfaceColor
+      : this.activeTheme.groundSurfaceShadowColor;
+    const sourceVariation = isLightModule
+      ? this.activeTheme.groundSurfaceVariation
+      : this.activeTheme.groundSurfaceShadowVariation;
+    const tileJitter = (noise - 0.5)
+      * sourceVariation
+      * Math.max(0, 1 - progress);
+    const source = new THREE.Color(sourceHex);
+    source.setRGB(
+      THREE.MathUtils.clamp(source.r + tileJitter, 0, 1),
+      THREE.MathUtils.clamp(source.g + tileJitter, 0, 1),
+      THREE.MathUtils.clamp(source.b + tileJitter, 0, 1)
+    );
 
-    // Light QR Module (TreeBlockType.Dirt):
-    // In 3D (progress = 0): Custom ground stone paver or seasonal stone
-    // In 2D Scan (progress = 1): Seamlessly blends into website atmosphere background
-    if (b.type === TreeBlockType.Dirt) {
-      let stone3D_R = 0.66 + tileJitter;
-      let stone3D_G = 0.66 + tileJitter;
-      let stone3D_B = 0.64 + tileJitter;
-
-      if (this.activeCustomTheme) {
-        const [cr, cg, cb] = hexToRgbTuple(this.activeCustomTheme.groundColor);
-        const [sr, sg, sb] = this.activeCustomTheme.groundShadowColor
-          ? hexToRgbTuple(this.activeCustomTheme.groundShadowColor)
-          : [cr * 0.88, cg * 0.88, cb * 0.88];
-        stone3D_R = sr * 0.95 + tileJitter * 0.3;
-        stone3D_G = sg * 0.95 + tileJitter * 0.3;
-        stone3D_B = sb * 0.95 + tileJitter * 0.3;
-      } else if (this.season === 0) {
-        // ①  (#F0CCBD: R241 G205 B189) warm peach-sand stone paver
-        stone3D_R = (241 / 255) * 0.88 + tileJitter * 0.4;
-        stone3D_G = (205 / 255) * 0.88 + tileJitter * 0.4;
-        stone3D_B = (189 / 255) * 0.88 + tileJitter * 0.4;
-      } else if (this.season === 1) {
-        // ⑧ 素鼠 (#8A987C: R139 G153 B124) Neutral Slate Stone Paver
-        stone3D_R = (139 / 255) * 0.95 + tileJitter * 0.4;
-        stone3D_G = (153 / 255) * 0.95 + tileJitter * 0.4;
-        stone3D_B = (124 / 255) * 0.95 + tileJitter * 0.4;
-      } else if (this.season === 2) {
-        // ⑦ 檜舞台 (#C6AE8D: R198 G175 B142) Cypress Stage Warm Paver
-        stone3D_R = (198 / 255) * 0.90 + tileJitter * 0.4;
-        stone3D_G = (175 / 255) * 0.90 + tileJitter * 0.4;
-        stone3D_B = (142 / 255) * 0.90 + tileJitter * 0.4;
-      }
-
-      let target2D_R = 0.98;
-      let target2D_G = 0.95;
-      let target2D_B = 0.965;
-
-      if (this.activeCustomTheme) {
-        const [cr, cg, cb] = hexToRgbTuple(this.activeCustomTheme.groundColor);
-        target2D_R = cr;
-        target2D_G = cg;
-        target2D_B = cb;
-      } else if (this.season === 3) {
-        target2D_R = 0.96; target2D_G = 0.97; target2D_B = 0.985;
-      } else if (this.season === 2) {
-        // ⑥ 初雪 (#F8F0EC: R248 G240 B236) First Snow Warm Off-White Canvas
-        target2D_R = 248 / 255; target2D_G = 240 / 255; target2D_B = 236 / 255;
-      } else if (this.season === 1) {
-        // ⑥ 花水木 (#F6F4D7: R246 G244 B216) Soft Sunlight Canvas
-        target2D_R = 246 / 255; target2D_G = 244 / 255; target2D_B = 216 / 255;
-      } else {
-        // ①  (Irone #F0CCBD: R241 G205 B189)
-        target2D_R = 241 / 255; target2D_G = 205 / 255; target2D_B = 189 / 255;
-      }
-
-      target.setRGB(
-        stone3D_R + (target2D_R - stone3D_R) * ease,
-        stone3D_G + (target2D_G - stone3D_G) * ease,
-        stone3D_B + (target2D_B - stone3D_B) * ease
-      );
+    if (isLightModule) {
+      target.copy(source).lerp(this.qrLightDisplayColor, ease);
       return;
-    }
-
-    // Corner Dark QR Modules (TreeBlockType.Grass / Finder Patterns 4)
-    if (b.type === TreeBlockType.Grass) {
-      // In 3D (progress = 0): Deep stone gray paver matching the courtyard stone floor
-      // In 2D Scan (progress = 1): Rich multi-tonal lawn & grass finder color
-      const stoneNoise = this.getModuleClusterNoise(b.col, b.row, 6.1);
-      let grayR = 0.52 + (stoneNoise - 0.5) * 0.05;
-      let grayG = 0.52 + (stoneNoise - 0.5) * 0.05;
-      let grayB = 0.50 + (stoneNoise - 0.5) * 0.05;
-
-      if (this.activeCustomTheme) {
-        const [cr, cg, cb] = this.activeCustomTheme.groundShadowColor
-          ? hexToRgbTuple(this.activeCustomTheme.groundShadowColor)
-          : hexToRgbTuple(this.activeCustomTheme.groundColor).map(v => v * 0.68) as [number, number, number];
-        grayR = cr * 0.85 + (stoneNoise - 0.5) * 0.04;
-        grayG = cg * 0.85 + (stoneNoise - 0.5) * 0.04;
-        grayB = cb * 0.85 + (stoneNoise - 0.5) * 0.04;
-      } else if (this.season === 0) {
-        // ②  (#C38F95: R195 G144 B150) & ③   warm rose-plum shadow paver
-        grayR = (195 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-        grayG = (144 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-        grayB = (150 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-      } else if (this.season === 1) {
-        // ⑨ 利休鼠 (#6B9277) & ⑧ 素鼠 (#8A987C)
-        grayR = (108 / 255) * 0.85 + (stoneNoise - 0.5) * 0.04;
-        grayG = (147 / 255) * 0.85 + (stoneNoise - 0.5) * 0.04;
-        grayB = (119 / 255) * 0.85 + (stoneNoise - 0.5) * 0.04;
-      } else if (this.season === 2) {
-        // ⑨ 山眠 (#5D4C35) & ⑧ 冬草 (#9D8C73)
-        grayR = (158 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-        grayG = (140 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-        grayB = (115 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-      }
-
-      const grassColor = new THREE.Color();
-      this.getGrassFinderColor(b, grassColor);
-
-      target.setRGB(
-        grayR + (grassColor.r - grayR) * ease,
-        grayG + (grassColor.g - grayG) * ease,
-        grayB + (grassColor.b - grayB) * ease
-      );
-      return;
-    }
-
-    // Dark QR modules under tree canopy (TreeBlockType.FallenPetals):
-    // In 3D (progress = 0): Deep slate stone gray paver with natural texture
-    // In 2D Scan (progress = 1): Rich multi-tonal watercolor blossom/foliage color
-    const stoneNoise = this.getModuleClusterNoise(b.col, b.row, 6.1);
-    let grayR = 0.52 + (stoneNoise - 0.5) * 0.05;
-    let grayG = 0.52 + (stoneNoise - 0.5) * 0.05;
-    let grayB = 0.50 + (stoneNoise - 0.5) * 0.05;
-
-    if (this.activeCustomTheme) {
-      const [cr, cg, cb] = this.activeCustomTheme.groundShadowColor
-        ? hexToRgbTuple(this.activeCustomTheme.groundShadowColor)
-        : hexToRgbTuple(this.activeCustomTheme.groundColor).map(v => v * 0.68) as [number, number, number];
-      grayR = cr * 0.85 + (stoneNoise - 0.5) * 0.04;
-      grayG = cg * 0.85 + (stoneNoise - 0.5) * 0.04;
-      grayB = cb * 0.85 + (stoneNoise - 0.5) * 0.04;
-    } else if (this.season === 0) {
-      // ②  (#C38F95: R195 G144 B150) & ③   warm rose-plum shadow paver
-      grayR = (195 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-      grayG = (144 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-      grayB = (150 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-    } else if (this.season === 1) {
-      // ⑨ 利休鼠 (#6B9277) & ⑧ 素鼠 (#8A987C)
-      grayR = (108 / 255) * 0.85 + (stoneNoise - 0.5) * 0.04;
-      grayG = (147 / 255) * 0.85 + (stoneNoise - 0.5) * 0.04;
-      grayB = (119 / 255) * 0.85 + (stoneNoise - 0.5) * 0.04;
-    } else if (this.season === 2) {
-      // ⑨ 山眠 (#5D4C35) & ⑧ 冬草 (#9D8C73)
-      grayR = (158 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-      grayG = (140 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
-      grayB = (115 / 255) * 0.82 + (stoneNoise - 0.5) * 0.04;
     }
 
     const qrColor = new THREE.Color();
-    this.getFoliageQRColor(b, qrColor);
+    const qrModuleRole = resolveTreeQRDarkModuleRole(
+      this.activeTheme.groundFeature,
+      b.type === TreeBlockType.Grass
+    );
+    if (qrModuleRole === 'finder') {
+      this.getFinderQRColor(b, qrColor);
+    } else {
+      this.getFoliageQRColor(b, qrColor);
+    }
+    qrColor.getHSL(this.qrDepthHsl);
+    qrColor.setHSL(
+      this.qrDepthHsl.h,
+      THREE.MathUtils.clamp(
+        this.qrDepthHsl.s * QR_2D_DEPTH_FILTER.saturationScale,
+        0,
+        1
+      ),
+      THREE.MathUtils.clamp(
+        this.qrDepthHsl.l
+          * QR_2D_DEPTH_FILTER.lightnessScale,
+        0,
+        1
+      )
+    );
+    target.copy(source).lerp(qrColor, ease);
+  }
 
-    // Seamlessly interpolate color from natural stone gray into rich watercolor QR mosaic
+  private getGroundFeatureColor(seed: number, index: number, target: THREE.Color) {
+    const hash = Math.sin(seed * 43.17 + index * 19.31) * 43758.5453;
+    const position = hash - Math.floor(hash);
+    const paletteIndex = this.getPaletteIndex(
+      position,
+      this.activeTheme.groundFeaturePaletteStops
+    );
+    const lowerStop = paletteIndex === 0
+      ? 0
+      : this.activeTheme.groundFeaturePaletteStops[paletteIndex - 1];
+    const upperStop = paletteIndex === 3
+      ? 1
+      : this.activeTheme.groundFeaturePaletteStops[paletteIndex];
+    const bandProgress = THREE.MathUtils.clamp(
+      (position - lowerStop) / Math.max(0.0001, upperStop - lowerStop),
+      0,
+      1
+    );
+    const startColor = hexToRgbTuple(
+      this.activeTheme.groundFeaturePaletteStartColors[paletteIndex]
+    );
+    const endColor = hexToRgbTuple(
+      this.activeTheme.groundFeaturePaletteEndColors[paletteIndex]
+    );
+    const bandColor = new THREE.Color().setRGB(...startColor).lerp(
+      new THREE.Color().setRGB(...endColor),
+      bandProgress
+    );
+    const micro = (
+      Math.sin(seed * 11.7 + index * 3.3) * 43758.5453 % 1 - 0.5
+    ) * this.activeTheme.groundFeaturePaletteVariations[paletteIndex];
     target.setRGB(
-      grayR + (qrColor.r - grayR) * ease,
-      grayG + (qrColor.g - grayR) * ease,
-      grayB + (qrColor.b - grayB) * ease
+      THREE.MathUtils.clamp(bandColor.r + micro, 0, 1),
+      THREE.MathUtils.clamp(bandColor.g + micro, 0, 1),
+      THREE.MathUtils.clamp(bandColor.b + micro, 0, 1)
     );
   }
 
-  private getGrassBladeColor(seed: number, index: number, target: THREE.Color) {
-    const hash = Math.sin(seed * 43.17 + index * 19.31) * 43758.5453;
-    const r = hash - Math.floor(hash);
-    const micro = (Math.sin(seed * 11.7 + index * 3.3) * 43758.5453 % 1 - 0.5) * 0.04;
-
-    if (this.activeCustomTheme?.groundFeatureColor) {
-      const cLawn = hexToRgbTuple(this.activeCustomTheme.groundFeatureColor);
-      const cTip = hexToRgbTuple(this.activeCustomTheme.groundFeatureHighlightColor || this.activeCustomTheme.groundFeatureColor);
-      const cShadow = hexToRgbTuple(this.activeCustomTheme.groundFeatureShadowColor || this.activeCustomTheme.groundFeatureColor);
-
-      if (r < 0.35) {
-        target.setRGB(
-          Math.max(0, Math.min(1, cShadow[0] + micro)),
-          Math.max(0, Math.min(1, cShadow[1] + micro)),
-          Math.max(0, Math.min(1, cShadow[2] + micro))
-        );
-      } else if (r < 0.75) {
-        target.setRGB(
-          Math.max(0, Math.min(1, cLawn[0] + micro)),
-          Math.max(0, Math.min(1, cLawn[1] + micro)),
-          Math.max(0, Math.min(1, cLawn[2] + micro))
-        );
-      } else {
-        target.setRGB(
-          Math.max(0, Math.min(1, cTip[0] + micro)),
-          Math.max(0, Math.min(1, cTip[1] + micro)),
-          Math.max(0, Math.min(1, cTip[2] + micro))
-        );
-      }
-      return;
-    }
-
-    if (this.season === 0) {
-      // 🌸 Spring 3D Grass: ③  + ④  + ⑤  + ①
-      if (r < 0.42) {
-        // ③  Fresh Meadow Green
-        target.setRGB(134 / 255 + micro, 182 / 255 + micro, 104 / 255 + micro);
-      } else if (r < 0.72) {
-        // ④  Tender Sprout Yellow-Green
-        target.setRGB(192 / 255 + micro, 213 / 255 + micro, 123 / 255 + micro);
-      } else if (r < 0.88) {
-        // ⑤  Golden Pistil Wildflower Accent
-        target.setRGB(247 / 255, 234 / 255, 94 / 255);
-      } else {
-        // ①  Hanagumori Ambient Tone
-        target.setRGB(208 / 255, 212 / 255, 227 / 255);
-      }
-    } else if (this.season === 1) {
-      // ☀️ Summer:  +  +  +
-      if (r < 0.40) {
-        // Rich Emerald Meadow Green
-        target.setRGB(0.12 + (r / 0.40) * 0.08, 0.62 + (r / 0.40) * 0.14, 0.14);
-      } else if (r < 0.70) {
-        // Bright Vibrant Chartreuse / Lime Green
-        const t = (r - 0.40) / 0.30;
-        target.setRGB(0.42 + t * 0.18, 0.88 + t * 0.08, 0.12);
-      } else if (r < 0.88) {
-        // Sunlit Yellow / Summer Golden Wildflower Blade
-        const t = (r - 0.70) / 0.18;
-        target.setRGB(0.94, 0.82 + t * 0.10, 0.20 + t * 0.15);
-      } else {
-        // Deep Forest Shadow Green
-        target.setRGB(0.06, 0.38, 0.08);
-      }
-    } else if (this.season === 2) {
-      // 🍂 Autumn 3D Grass: ⑧ 冬草 (#9D8C73) + ⑤ 酒林 (#BD956E) + ④ 小春日和 (#F4A358) + ⑨ 山眠 (#5D4C35)
-      if (r < 0.40) {
-        // ⑧ 冬草 Withered Autumn Grass
-        target.setRGB(158 / 255 + micro * 0.1, 140 / 255 + micro * 0.1, 115 / 255 + micro * 0.1);
-      } else if (r < 0.70) {
-        // ⑤ 酒林 Cedar Brown
-        target.setRGB(190 / 255 + micro * 0.1, 150 / 255 + micro * 0.1, 110 / 255 + micro * 0.1);
-      } else if (r < 0.88) {
-        // ④ 小春日和 Warm Amber Golden Wildflower Blade
-        target.setRGB(244 / 255 + micro * 0.1, 164 / 255 + micro * 0.1, 88 / 255 + micro * 0.1);
-      } else {
-        // ⑨ 山眠 Deep Soil Bronze Base
-        target.setRGB(94 / 255, 77 / 255, 54 / 255);
-      }
-    } else {
-      // ❄️ Winter:
-      target.setRGB(0.96, 0.98, 1.0);
-    }
-  }
-
-  public setSeason(season: number) {
-    this.season = season;
-    this.activeCustomTheme = null;
-    this.customStrength = 0;
+  public setTheme(theme: ResolvedTreeTheme) {
+    this.activeTheme = { ...theme };
     this.scene.background = null;
-    this.rebuildMeshes();
-  }
-
-  public setCustomTheme(theme: TreeTheme | null) {
-    this.activeCustomTheme = theme;
-    if (theme) {
-      const [r, g, b] = hexToRgbTuple(theme.foliageColor);
-      this.customColor.setRGB(r, g, b);
-      this.customStrength = 1.0;
-    } else {
-      this.customStrength = 0.0;
-    }
+    this.updateQRLightDisplayColor();
     this.lastGroundProgress = -1;
-    this.rebuildMeshes();
-  }
-
-  public setCustomColor(rgb: [number, number, number], strength: number = 1.0) {
-    this.customColor.setRGB(rgb[0], rgb[1], rgb[2]);
-    this.customStrength = strength;
     this.rebuildMeshes();
   }
 
   public resize(width: number, height: number) {
     if (width <= 0 || height <= 0) return;
-    this.camera.aspect = width / height;
-    if (this.camera.aspect < 1.0) {
-      const hFovRad = (QR_SCAN_MOBILE_HORIZONTAL_FOV * Math.PI) / 180;
-      const vFovRad = 2 * Math.atan(Math.tan(hFovRad / 2) / this.camera.aspect);
-      this.camera.fov = (vFovRad * 180) / Math.PI;
-    } else {
-      this.camera.fov = QR_SCAN_DESKTOP_VERTICAL_FOV;
-    }
+    this.viewportProjection = resolveQRViewportProjection(width, height);
+    this.camera.aspect = this.viewportProjection.aspect;
+    this.camera.fov = this.viewportProjection.verticalFov;
     this.camera.updateProjectionMatrix();
     this.renderer.setPixelRatio(this.resolvePixelRatio());
     this.renderer.setSize(width, height);
   }
 
-  public setQuality(quality: DesignQRQuality) {
-    this.quality = quality;
-    this.renderer.setPixelRatio(this.resolvePixelRatio());
-    const canvas = this.renderer.domElement;
-    this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-  }
-
   private resolvePixelRatio(): number {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    if (this.quality === 'low') return 1;
     return Math.min(devicePixelRatio, 2);
   }
 
@@ -2239,6 +2018,7 @@ export class ThreeFallbackRenderer {
 
   public resume() {
     if (this.isDestroyed || this.isRunning) return;
+    this.lastFrameTime = performance.now();
     this.isRunning = true;
 
     const render = () => {
@@ -2262,6 +2042,8 @@ export class ThreeFallbackRenderer {
 
   private update() {
     const now = performance.now();
+    const deltaSeconds = Math.min(0.1, Math.max(0, (now - this.lastFrameTime) * 0.001));
+    this.lastFrameTime = now;
     const elapsed = (now - this.startTime) * 0.001;
     const spawnElapsed = (now - this.spawnStartTime) * 0.001;
     const envConfig = this.getEnvConfig();
@@ -2269,9 +2051,9 @@ export class ThreeFallbackRenderer {
     if (this.isTransitioning) {
       const elapsedSec = (now - this.transitionStartTime) * 0.001;
       const u = Math.min(1.0, elapsedSec / this.transitionDuration);
-      // Symmetric smoothstep keeps both ends at zero velocity. The previous
-      // strongly front-loaded curve made the first frames read as a jump.
-      const easedProgress = u * u * (3.0 - 2.0 * u);
+      // Give the first rendered frames visible motion without bringing back a
+      // front-loaded jump, then decelerate smoothly into the destination.
+      const easedProgress = resolveViewTransitionProgress(u);
       this.currentProgress = this.transitionStartVal +
         (this._targetProgress - this.transitionStartVal) * easedProgress;
       if (u >= 1.0) {
@@ -2287,7 +2069,8 @@ export class ThreeFallbackRenderer {
     }
 
     const progress = this.currentProgress;
-    // `progress` already carries the symmetric transition easing. Keep the
+    const foliageMorph = resolveTreeFoliageMorph(progress);
+    // `progress` already carries the responsive transition easing. Keep the
     // organic artwork alive across that whole interval so its collapse does
     // not finish in the first few frames of a fast transition.
     const canopyCollapse = THREE.MathUtils.clamp(1.0 - progress, 0.0, 1.0);
@@ -2314,7 +2097,10 @@ export class ThreeFallbackRenderer {
         this.isResettingRotation = false;
       }
     } else if (this.isTurntable && this.targetProgress === 0) {
-      this.yaw = (this.yaw + 0.005) % (Math.PI * 2);
+      this.yaw = (
+        this.yaw
+        + getAutoRotateDelta(this.turntableDirection, deltaSeconds)
+      ) % (Math.PI * 2);
     } else {
       this.yaw = ((this.yaw % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
     }
@@ -2322,13 +2108,14 @@ export class ThreeFallbackRenderer {
     const nearestYaw = this.yaw > Math.PI ? Math.PI * 2 : 0;
     const targetYaw = THREE.MathUtils.lerp(this.yaw, nearestYaw, progress);
     const targetPitch = THREE.MathUtils.lerp(this.pitch, -Math.PI / 2 + 0.0001, progress);
-    const isPortrait = this.camera.aspect < 1.0;
-    const baseScanDist = isPortrait
-      ? QR_SCAN_MOBILE_DISTANCE
-      : QR_SCAN_DESKTOP_DISTANCE;
-    const baseTreeDist = isPortrait
-      ? TREE_MOBILE_DISTANCE
-      : TREE_DESKTOP_DISTANCE;
+    const baseScanDist = this.viewportProjection.scanDistance;
+    const compactTreeDistance =
+      TREE_MOBILE_DISTANCE * this.viewportProjection.compactDistanceScale;
+    const baseTreeDist = THREE.MathUtils.lerp(
+      compactTreeDistance,
+      TREE_DESKTOP_DISTANCE,
+      this.viewportProjection.landscapeBlend
+    );
     // QR versions add modules as content grows. Move the camera by the same
     // ratio so denser QR matrices keep one stable on-screen footprint.
     const contentScale =
@@ -2344,15 +2131,15 @@ export class ThreeFallbackRenderer {
     // Keep the tree's vertical composition normalized with the camera distance.
     // Without this, larger QR versions make the scaled tree drift upward.
     const lookTargetY = THREE.MathUtils.lerp(0.2 * contentScale, 0.0, progress);
-    this.camera.position.set(cx, cy, cz);
-    this.camera.lookAt(0, lookTargetY, 0);
-
     // Dynamic camera up-vector for square QR alignment
     if (progress > 0.01) {
       this.camera.up.set(0, Math.max(0.001, 1.0 - progress), -progress).normalize();
     } else {
       this.camera.up.set(0, 1, 0);
     }
+    this.camera.position.set(cx, cy, cz);
+    this.camera.lookAt(0, lookTargetY, 0);
+    this.updateLogoTransform(progress);
 
     // Dynamic real-time ground color blending
     if (Math.abs(progress - this.lastGroundProgress) > 0.001) {
@@ -2360,20 +2147,11 @@ export class ThreeFallbackRenderer {
 
       // Island base slab color blending (slate stone in 3D -> seamless website background in 2D)
       if (this.islandBaseMesh) {
-        const base3D =
-          this.season === 0
-            ? new THREE.Color(101 / 255, 89 / 255, 93 / 255) // ⑦
-            : new THREE.Color(0.44, 0.44, 0.48);
-        const base2D =
-          this.season === 3
-            ? new THREE.Color(0.96, 0.97, 0.985)
-            : this.season === 2
-            ? new THREE.Color(0.97, 0.95, 0.92)
-            : this.season === 1
-            ? new THREE.Color(0.965, 0.975, 0.955)
-            : new THREE.Color(241 / 255, 205 / 255, 189 / 255); // ①
+        const base3D = new THREE.Color(this.activeTheme.pedestalColor);
         const ease = Math.min(1.0, Math.max(0.0, Math.pow(progress, 0.85)));
-        (this.islandBaseMesh.material as THREE.MeshBasicMaterial).color.copy(base3D).lerp(base2D, ease);
+        (this.islandBaseMesh.material as THREE.MeshBasicMaterial).color
+          .copy(base3D)
+          .lerp(this.qrLightDisplayColor, ease);
         this.islandBaseMesh.visible = progress < 0.999;
       }
 
@@ -2397,7 +2175,7 @@ export class ThreeFallbackRenderer {
       const branchScaleY = Math.max(0.001, Math.pow(canopyCollapse, 1.35));
       const branchScaleXZ = Math.max(0.001, 0.2 + canopyCollapse * 0.8);
       this.branchesGroup.scale.set(branchScaleXZ, branchScaleY, branchScaleXZ);
-      this.branchesGroup.visible = canopyCollapse > 0.001;
+      this.branchesGroup.visible = foliageMorph.organicVisible && canopyCollapse > 0.001;
     }
     // Ground fallen leaves & falling petals visibility (graceful progressive collapse):
     const isReturningTo3D = this._targetProgress === 0;
@@ -2409,9 +2187,9 @@ export class ThreeFallbackRenderer {
       this.groundFallenLeavesMesh.visible = isGroundLeavesActive;
     }
     if (this.petalsInstancedMesh) this.petalsInstancedMesh.visible = isParticlesActive;
-    if (this.grassMesh) {
-      this.grassMesh.scale.set(1.0, Math.max(0.001, canopyCollapse), 1.0);
-      this.grassMesh.visible = progress < 0.999;
+    if (this.groundDecorMesh) {
+      this.groundDecorMesh.scale.set(1.0, Math.max(0.001, canopyCollapse), 1.0);
+      this.groundDecorMesh.visible = progress < 0.999;
     }
     if (this.rainMesh) this.rainMesh.visible = isReturningTo3D ? (progress < 0.85) : (progress < 0.20);
     if (this.snowMesh) this.snowMesh.visible = isReturningTo3D ? (progress < 0.85) : (progress < 0.20);
@@ -2420,7 +2198,7 @@ export class ThreeFallbackRenderer {
 
     // 1. Canopy Wind Swaying & Organic-to-Voxel  Transition
     const flowerMorphScale = canopyCollapse;
-    const isFlowerVisible = flowerMorphScale > 0.001;
+    const isFlowerVisible = foliageMorph.organicVisible && flowerMorphScale > 0.001;
 
     if (this.canopyFlowersMesh && this.flowerBaseData.length > 0) {
       this.canopyFlowersMesh.visible = isFlowerVisible;
@@ -2469,8 +2247,12 @@ export class ThreeFallbackRenderer {
             const swayMag = 0.0035 * (fl.y / 0.4);
             const swayX = Math.sin(elapsed * 2.2 + fl.y * 6.0) * swayMag;
             const swayZ = Math.cos(elapsed * 1.8 + fl.y * 5.0) * swayMag * 0.5;
-            fEuler.set(fl.normX, fl.angle + swayX * 10, fl.normZ);
-            fQuat.setFromEuler(fEuler);
+            if (this.activeTheme.foliageShape === 'pixel') {
+              fQuat.identity();
+            } else {
+              fEuler.set(fl.normX, fl.angle + swayX * 10, fl.normZ);
+              fQuat.setFromEuler(fEuler);
+            }
             fPos.set(fl.x + swayX, fl.y, fl.z + swayZ);
             fScale.set(scale, scale, scale);
             fMatrix.compose(fPos, fQuat, fScale);
@@ -2482,18 +2264,20 @@ export class ThreeFallbackRenderer {
     }
 
     // 1b. 3D Voxel Cubes ( & ): Tree dissolves into cubes and cascades down to 2D ground
-    const isVoxelActive = progress > 0.01 && progress < 0.999;
+    const isVoxelActive = foliageMorph.voxelVisible;
     if (this.morphVoxelMesh && this.morphBlocks.length > 0) {
       this.morphVoxelMesh.visible = isVoxelActive;
 
-      if (isVoxelActive) {
+      if (
+        isVoxelActive
+        && Math.abs(progress - this.lastVoxelProgress) > 0.0005
+      ) {
+        this.lastVoxelProgress = progress;
         const vMatrix = new THREE.Matrix4();
         // Reveal the falling QR voxels throughout the complete turn. The
-        // quarter-sine profile overlaps naturally with the inverse canopy
-        // scale and avoids the former first-quarter scale pop.
-        const voxelScaleIn = Math.sin(
-          THREE.MathUtils.clamp(progress, 0.0, 1.0) * Math.PI * 0.5
-        );
+        // quarter-sine profile overlaps with the inverse canopy scale for a
+        // continuous handoff.
+        const voxelScaleIn = foliageMorph.voxelScale;
 
         for (let i = 0; i < this.morphBlocks.length; i++) {
           const b = this.morphBlocks[i];
@@ -2501,7 +2285,9 @@ export class ThreeFallbackRenderer {
           const noiseOffset = (this.getModuleClusterNoise(b.col, b.row, 3.7) - 0.5) * 0.16;
           // Staggered cascade delay: upper canopy blocks drop with a natural ripple
           const blockDelay = (1.0 - heightNorm) * 0.22 + noiseOffset;
-          const p = Math.max(0, Math.min(1.0, (progress - blockDelay) / 0.78));
+          const p = progress <= 0.001
+            ? 0
+            : Math.max(0, Math.min(1.0, (progress - blockDelay) / 0.78));
 
           // Physical gravity drop with micro bounce-settle:
           const dropEase = Math.pow(p, 1.85);
@@ -2523,8 +2309,9 @@ export class ThreeFallbackRenderer {
 
     // 2. 3D Grass Blades Wind Sway
     if (
-      this.grassMesh
+      this.groundDecorMesh
       && this.treeData
+      && this.activeTheme.groundFeature === 'grass'
       && this.currentProgress < 0.001
       && !this.isTransitioning
     ) {
@@ -2542,9 +2329,9 @@ export class ThreeFallbackRenderer {
         const s = g.height / h;
         gScale.set(1, s, 1);
         gMatrix.compose(new THREE.Vector3(g.x, g.y, g.z), gQuat, gScale);
-        this.grassMesh.setMatrixAt(i, gMatrix);
+        this.groundDecorMesh.setMatrixAt(i, gMatrix);
       }
-      this.grassMesh.instanceMatrix.needsUpdate = true;
+      this.groundDecorMesh.instanceMatrix.needsUpdate = true;
     }
 
     // 3. Parameterized Falling Petals / Leaves Animation (Falling strictly from tree crown down to ground)
@@ -2591,11 +2378,11 @@ export class ThreeFallbackRenderer {
     }
 
     // 4. Summer Rain Animation (180 falling vertical rain streaks)
-    if (this.rainMesh && !this.activeCustomTheme && this.season === 1) {
+    if (this.rainMesh && envConfig.rainCount > 0) {
       const rMatrix = new THREE.Matrix4();
       const rPos = new THREE.Vector3();
 
-      for (let i = 0; i < this.rainData.length; i++) {
+      for (let i = 0; i < this.rainMesh.count; i++) {
         const r = this.rainData[i];
         let ry = (r.y - elapsed * r.speed) % 1.8;
         if (ry < 0) ry += 1.8;
@@ -2615,7 +2402,7 @@ export class ThreeFallbackRenderer {
       const sEuler = new THREE.Euler();
       const sScale = new THREE.Vector3();
 
-      for (let i = 0; i < this.snowData.length; i++) {
+      for (let i = 0; i < this.snowMesh.count; i++) {
         const sn = this.snowData[i];
         let sy = (sn.y - elapsed * sn.speed) % 1.9;
         if (sy < 0) sy += 1.9;
@@ -2716,6 +2503,7 @@ export class ThreeFallbackRenderer {
     if (this.isDestroyed) return;
     this.isDestroyed = true;
     this.pause();
+    this.cancelLogoLoad();
 
     disposeObjectResources(this.scene);
     this.scene.clear();
@@ -2723,5 +2511,6 @@ export class ThreeFallbackRenderer {
     this.renderer.dispose();
     this.onProgressUpdate = undefined;
     this.onAfterRender = undefined;
+    this.onError = undefined;
   }
 }

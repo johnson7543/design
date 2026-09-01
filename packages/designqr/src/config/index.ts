@@ -7,19 +7,22 @@ export {
   DESIGN_QR_MAX_ENCODED_LENGTH,
   DESIGN_QR_MAX_TITLE_CHARACTERS,
   DESIGN_QR_MAX_VALUE_BYTES,
+  DESIGN_QR_LOGO_MAX_ALT_CHARACTERS,
+  DESIGN_QR_LOGO_MAX_IMAGE_BYTES,
+  DESIGN_QR_LOGO_MAX_SOURCE_CHARACTERS,
+  DESIGN_QR_LOGO_SIZE_DEFAULT,
+  DESIGN_QR_LOGO_SIZE_MAX,
+  DESIGN_QR_LOGO_SIZE_MIN,
   DESIGN_QR_SCHEMA_VERSION,
 } from './defaults.ts';
 export { decodeDesignQRConfig, encodeDesignQRConfig } from './codec.ts';
-export {
-  decodeCompatibleDesignQRConfig,
-  decodeLegacyDesignQRConfig,
-} from './legacy.ts';
 export {
   normalizeDesignQRConfig,
   normalizeHexColor,
   parseDesignQRConfig,
 } from './normalize.ts';
 export type {
+  AutoRotateDirection,
   DesignQRConfigV1,
   DesignQRConfigInput,
   DesignQRDesignName,
@@ -27,11 +30,29 @@ export type {
   DesignQRError,
   DesignQRErrorCode,
   DesignQRInteractionOptions,
-  DesignQRQuality,
+  DesignQRLogoOptions,
   DesignQRThemePreset,
   DesignQRView,
+  ResolvedTreeTheme,
   Result,
+  TreeAmbientParticleType,
+  TreeBranchStyle,
   TreeDesignOptions,
+  TreeFoliageShape,
+  TreeGroundFeature,
+  TreePaletteColors4,
+  TreePaletteColors5,
+  TreePaletteStops3,
+  TreePaletteStops4,
+  TreePaletteVariations4,
+  TreeParticleType,
   TreeTheme,
+  TreeWeatherType,
 } from './types.ts';
 export { DesignQRConfigError } from './types.ts';
+export {
+  VIEW_TRANSITION_SPEED_DEFAULT,
+  VIEW_TRANSITION_SPEED_MAX,
+  VIEW_TRANSITION_SPEED_MIN,
+  VIEW_TRANSITION_SPEED_STEP,
+} from '../designs/tree/constants.ts';

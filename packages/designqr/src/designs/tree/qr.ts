@@ -8,6 +8,12 @@ export interface QRMatrixData {
   errorCorrectionLevel: string;
 }
 
+export function resolveQRErrorCorrectionLevel(
+  hasLogo: boolean
+): 'M' | 'H' {
+  return hasLogo ? 'H' : 'M';
+}
+
 export function generateQRMatrix(
   text: string,
   errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H' = 'M'

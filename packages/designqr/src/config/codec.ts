@@ -1,4 +1,5 @@
 import { decodeBase64UrlText, encodeBase64UrlText } from './base64url.ts';
+import { DESIGN_QR_MAX_ENCODED_LENGTH } from './defaults.ts';
 import { normalizeDesignQRConfig, parseDesignQRConfig } from './normalize.ts';
 import {
   DesignQRConfigError,
@@ -7,22 +8,17 @@ import {
   type Result,
 } from './types.ts';
 
-function migrateRemovedQuality(input: unknown): unknown {
-  if (
-    typeof input === 'object'
-    && input !== null
-    && !Array.isArray(input)
-    && 'quality' in input
-    && input.quality === 'auto'
-  ) {
-    return { ...input, quality: 'high' };
-  }
-
-  return input;
-}
-
 export function encodeDesignQRConfig(input: unknown): string {
-  return encodeBase64UrlText(JSON.stringify(normalizeDesignQRConfig(input)));
+  const encoded = encodeBase64UrlText(
+    JSON.stringify(normalizeDesignQRConfig(input))
+  );
+  if (encoded.length > DESIGN_QR_MAX_ENCODED_LENGTH) {
+    throw new DesignQRConfigError(
+      'INVALID_CONFIG',
+      'The encoded DesignQR configuration is too large to share.'
+    );
+  }
+  return encoded;
 }
 
 export function decodeDesignQRConfig(
@@ -30,8 +26,7 @@ export function decodeDesignQRConfig(
 ): Result<DesignQRConfigV1, DesignQRError> {
   try {
     const decoded = decodeBase64UrlText(encoded);
-    const parsed = migrateRemovedQuality(JSON.parse(decoded));
-    return parseDesignQRConfig(parsed);
+    return parseDesignQRConfig(JSON.parse(decoded));
   } catch (cause) {
     if (cause instanceof DesignQRConfigError) {
       return { ok: false, error: cause };

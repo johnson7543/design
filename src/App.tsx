@@ -1,19 +1,29 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
+  createTreeTheme,
+  resolveTreeTheme,
+  TREE_THEME_PRESETS,
+} from 'designqr';
+import {
   DesignQRCanvas as TreeCanvas,
   type DesignQRCanvasHandle as TreeCanvasHandle,
   RenderManager,
   build3DTree,
   generateQRMatrix,
+  resolveQRErrorCorrectionLevel,
   QR_BORDER_PADDING_DEFAULT,
-  SEASONS,
-  SEASON_ENV_CONFIGS,
   VIEW_TRANSITION_SPEED_DEFAULT,
   VIEW_TRANSITION_SPEED_MAX,
   VIEW_TRANSITION_SPEED_MIN,
   type TreeData,
 } from 'designqr/editor';
 import type { CustomTheme } from './editor/types';
+import { THEME_PRESET_OPTIONS } from './editor/theme-presets';
+import {
+  normalizeDesignQRConfig,
+  type AutoRotateDirection,
+  type DesignQRConfigV1,
+} from 'designqr/config';
 import { downloadImageBlob } from './utils/export';
 import {
   createDesignQREmbedUrl,
@@ -28,31 +38,70 @@ import {
 import {
   createDesignQRAdvancedReactSnippet,
   createDesignQRReactSnippet,
+  createDesignQRThemeReactSnippet,
+  getRecommendedDesignQRReactExample,
 } from './utils/integration';
+import {
+  loadEditorLogoSource,
+  prepareEditorLogoSource,
+  type EditorLogoCrop,
+  type EditorLogoSource,
+} from './utils/logo';
 
 import { Header } from './components/Header';
 import { ControlsOverlay } from './components/ControlsOverlay';
 import { ShareModal } from './components/ShareModal';
 import { CustomThemeModal } from './components/CustomThemeModal';
+import { LogoCropDialog } from './components/LogoCropDialog';
 
 const CUSTOM_THEMES_STORAGE_KEY = 'magic_tree_custom_themes';
 const SHARED_CUSTOM_THEME_ID = 'shared-designqr-theme';
-const SCAN_EXIT_DETAILS_DELAY_MS = 120;
 const DEFAULT_URL = 'https://design.johnson7543.com';
-
-function rgbTupleToHex(rgb: [number, number, number]): string {
-  const r = Math.round(rgb[0] * 255).toString(16).padStart(2, '0');
-  const g = Math.round(rgb[1] * 255).toString(16).padStart(2, '0');
-  const b = Math.round(rgb[2] * 255).toString(16).padStart(2, '0');
-  return `#${r}${g}${b}`;
-}
 
 function loadSavedCustomThemes(): CustomTheme[] {
   try {
     const raw = localStorage.getItem(CUSTOM_THEMES_STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
+      const parsed: unknown = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed.flatMap((candidate): CustomTheme[] => {
+          if (
+            typeof candidate !== 'object'
+            || candidate === null
+            || Array.isArray(candidate)
+            || !('id' in candidate)
+            || typeof candidate.id !== 'string'
+            || !('label' in candidate)
+            || typeof candidate.label !== 'string'
+            || candidate.isCustom !== true
+            || (
+              candidate.treeShape !== undefined
+              && candidate.treeShape !== 'dome'
+              && candidate.treeShape !== 'wide'
+              && candidate.treeShape !== 'pine'
+            )
+          ) {
+            return [];
+          }
+
+          try {
+            const config = normalizeDesignQRConfig({
+              value: DEFAULT_URL,
+              theme: { type: 'custom', value: candidate },
+            });
+            if (config.theme.type !== 'custom') return [];
+            return [{
+              ...config.theme.value,
+              id: candidate.id,
+              label: candidate.label,
+              isCustom: true,
+              treeShape: candidate.treeShape,
+            }];
+          } catch {
+            return [];
+          }
+        });
+      }
     }
   } catch (e) {
     console.error('Failed to load custom themes', e);
@@ -72,7 +121,6 @@ export const App: React.FC = () => {
     return {
       url: DEFAULT_URL,
       season: 0, // Spring default
-      palette: 0,
       viewMode: '3d' as const,
       title: '',
       showContent: false,
@@ -108,8 +156,12 @@ export const App: React.FC = () => {
   const preModalThemeIdRef = useRef<string>('0');
 
   const [viewMode, setViewMode] = useState<'3d' | 'scan'>(initialConfig.viewMode ?? '3d');
-  const [isDetailsEditorOpen, setIsDetailsEditorOpen] = useState<boolean>(false);
+  const [openStageEditor, setOpenStageEditor] =
+    useState<'details' | 'logo' | null>(null);
   const [qrTitle, setQrTitle] = useState<string>(initialConfig.title ?? '');
+  const [transparentBackground, setTransparentBackground] = useState<boolean>(
+    initialConfig.transparentBackground ?? false
+  );
   const [showQrContent, setShowQrContent] = useState<boolean>(
     initialConfig.showContent ?? false
   );
@@ -123,24 +175,42 @@ export const App: React.FC = () => {
     initialConfig.interaction?.motionBlur ?? true
   );
   const [transitionSpeed, setTransitionSpeed] = useState<number>(
-    VIEW_TRANSITION_SPEED_DEFAULT
+    initialConfig.interaction?.transitionSpeed ?? VIEW_TRANSITION_SPEED_DEFAULT
   );
   const [isTurntable, setIsTurntable] = useState<boolean>(
     initialConfig.interaction?.autoRotate ?? false
   );
+  const [autoRotateDirection, setAutoRotateDirection] =
+    useState<AutoRotateDirection>(
+      initialConfig.interaction?.autoRotateDirection ?? 'clockwise'
+    );
+  const [logo, setLogo] = useState<DesignQRConfigV1['logo']>(
+    () => createDesignQRConfig(initialConfig).logo
+  );
+  const [logoRuntimeError, setLogoRuntimeError] = useState('');
+  const [logoEditorError, setLogoEditorError] = useState('');
+  const [isPreparingLogo, setIsPreparingLogo] = useState(false);
+  const [pendingLogoSource, setPendingLogoSource] =
+    useState<EditorLogoSource | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
-  const [isExitingScan, setIsExitingScan] = useState<boolean>(false);
 
   const renderManagerRef = useRef<RenderManager | null>(null);
   const treeCanvasRef = useRef<TreeCanvasHandle | null>(null);
-  const scanExitTimeoutRef = useRef<number | null>(null);
+  const pendingLogoSourceRef = useRef<EditorLogoSource | null>(null);
+  const logoUploadRequestRef = useRef(0);
 
-  useEffect(() => {
-    return () => {
-      if (scanExitTimeoutRef.current !== null) {
-        window.clearTimeout(scanExitTimeoutRef.current);
-      }
-    };
+  const replacePendingLogoSource = useCallback((next: EditorLogoSource | null) => {
+    const previous = pendingLogoSourceRef.current;
+    if (previous === next) return;
+    previous?.close();
+    pendingLogoSourceRef.current = next;
+    setPendingLogoSource(next);
+  }, []);
+
+  useEffect(() => () => {
+    logoUploadRequestRef.current += 1;
+    pendingLogoSourceRef.current?.close();
+    pendingLogoSourceRef.current = null;
   }, []);
 
   // Debounce tree & QR code regeneration (220ms) so typing in the URL input bar remains 60fps instant and lag-free
@@ -178,25 +248,43 @@ export const App: React.FC = () => {
     return isNaN(parsed) ? 0 : parsed;
   }, [activeThemeId]);
 
-  const currentSeasonPreset = SEASONS[seasonId] || SEASONS[0];
+  const currentSeasonPreset = THEME_PRESET_OPTIONS[seasonId]
+    ?? THEME_PRESET_OPTIONS[0];
+  const currentPresetTheme = TREE_THEME_PRESETS[currentSeasonPreset.name];
+  const rendererTheme = useMemo(() => {
+    if (activeCustomTheme) {
+      return resolveTreeTheme({ type: 'custom', value: activeCustomTheme });
+    }
+    return resolveTreeTheme({
+      type: 'preset',
+      preset: currentSeasonPreset.name,
+    });
+  }, [activeCustomTheme, currentSeasonPreset.name]);
 
   // Dynamic Background Gradient
   const backgroundStyle = useMemo(() => {
     if (activeCustomTheme) {
       return `radial-gradient(circle at 50% 30%, ${activeCustomTheme.skyTop} 0%, ${activeCustomTheme.skyBottom} 100%)`;
     }
-    return `radial-gradient(circle at 50% 30%, rgb(${Math.round(currentSeasonPreset.skyTop[0] * 255)}, ${Math.round(currentSeasonPreset.skyTop[1] * 255)}, ${Math.round(currentSeasonPreset.skyTop[2] * 255)}) 0%, rgb(${Math.round(currentSeasonPreset.skyBottom[0] * 255)}, ${Math.round(currentSeasonPreset.skyBottom[1] * 255)}, ${Math.round(currentSeasonPreset.skyBottom[2] * 255)}) 100%)`;
-  }, [activeCustomTheme, currentSeasonPreset]);
+    return `radial-gradient(circle at 50% 30%, ${currentPresetTheme.skyTop} 0%, ${currentPresetTheme.skyBottom} 100%)`;
+  }, [activeCustomTheme, currentPresetTheme]);
 
   // Sync background directly to body for instant smooth updates
   useEffect(() => {
+    const previousBackground = document.body.style.background;
     document.body.style.background = backgroundStyle;
+    return () => {
+      document.body.style.background = previousBackground;
+    };
   }, [backgroundStyle]);
 
   // 1. Generate QR Matrix and 3D Tree Data (from debounced URL)
   const qrMatrix = useMemo(() => {
-    return generateQRMatrix(debouncedUrl || DEFAULT_URL, 'M');
-  }, [debouncedUrl]);
+    return generateQRMatrix(
+      debouncedUrl || DEFAULT_URL,
+      resolveQRErrorCorrectionLevel(logo !== false)
+    );
+  }, [debouncedUrl, logo]);
 
   const treeData: TreeData = useMemo(() => {
     return build3DTree(qrMatrix.modules, 0.5, activeCustomTheme?.treeShape || 'dome');
@@ -218,70 +306,15 @@ export const App: React.FC = () => {
         label: `${activeCustomTheme.label} Copy`,
       };
     } else {
-      const season = SEASONS[seasonId] || SEASONS[0];
-      const env = SEASON_ENV_CONFIGS[seasonId] || SEASON_ENV_CONFIGS[0];
-
-      let particleType: CustomTheme['particleType'] = 'leaf';
-      if (seasonId === 0) particleType = 'sakura';
-      else if (seasonId === 1) particleType = 'fireflies';
-      else if (seasonId === 2) particleType = 'leaf';
-      else if (seasonId === 3) particleType = 'snow';
-
-      let foliageHighlight = '#FDF0F5';
-      let foliageShadow = '#D98EB0';
-      let foliageMidtone = '#F9D3E3';
-      let groundShadow = '#C38F95';
-      let grassHighlight = '#C2D65C';
-      let grassShadow = '#286018';
-
-      if (seasonId === 1) {
-        // Summer (033 立夏)
-        foliageHighlight = '#99CC81'; // ⑤ 若苗色 (Gentle natural sprout tip)
-        foliageShadow = '#00785E';    // ③ 深綠 (Deep forest shadow)
-        foliageMidtone = '#00AC7A';   // ① 青竹色 (Fresh bamboo accent)
-        groundShadow = '#8A987C';     // ⑧ 素鼠
-        grassHighlight = '#D7DE8A';   // ⑦ 嬰兒
-        grassShadow = '#02983B';      // ④ 翠玉
-      } else if (seasonId === 2) {
-        // Autumn (京都清水寺 楓葉)
-        foliageHighlight = '#F4A358'; // ④ 小春日和
-        foliageShadow = '#BD3528';    // ③ 紅絹
-        foliageMidtone = '#E77433';   // ② 楓
-        groundShadow = '#C6AE8D';     // ⑦ 檜舞台
-        grassHighlight = '#BD956E';   // ⑤ 酒林
-        grassShadow = '#5D4C35';      // ⑨ 山眠
-      } else if (seasonId === 3) {
-        // Winter
-        foliageHighlight = '#F5F8FC';
-        foliageShadow = '#6084A7';
-        foliageMidtone = '#8CAECC';
-        groundShadow = '#8DA1B5';
-        grassHighlight = '#D9EBF8';
-        grassShadow = '#305E88';
-      }
+      const season = THEME_PRESET_OPTIONS[seasonId]
+        ?? THEME_PRESET_OPTIONS[0];
 
       templateTheme = {
+        ...createTreeTheme(season.name),
         id: '',
         label: `${season.label} Custom`,
         isCustom: true,
-        foliageColor: season.foliageHex,
-        foliageHighlightColor: foliageHighlight,
-        foliageShadowColor: foliageShadow,
-        foliageMidtoneColor: foliageMidtone,
-        foliageShape: (seasonId === 0 || seasonId === 3) ? 'blossom' : 'leaf',
         treeShape: 'dome',
-        canopyDensity: Math.round((env.canopyDensity ?? 1.0) * 100),
-        groundColor: rgbTupleToHex(season.dirtColor),
-        groundShadowColor: groundShadow,
-        groundFeature: seasonId === 3 ? 'snow' : 'grass',
-        groundFeatureColor: seasonId === 3 ? '#FFFFFF' : rgbTupleToHex(season.grassColor),
-        groundFeatureHighlightColor: grassHighlight,
-        groundFeatureShadowColor: grassShadow,
-        skyTop: rgbTupleToHex(season.skyTop),
-        skyBottom: rgbTupleToHex(season.skyBottom),
-        particleType,
-        particleAmount: env.fallingLeavesCount || (seasonId === 3 ? 0 : 40),
-        groundLeavesAmount: env.groundLeafCount || 0,
       };
     }
 
@@ -302,6 +335,7 @@ export const App: React.FC = () => {
   const handleCloseThemeModal = () => {
     setPreviewTheme(null);
     setActiveThemeId(preModalThemeIdRef.current);
+    setEditingTheme(null);
     setThemeModalOpen(false);
   };
 
@@ -317,6 +351,8 @@ export const App: React.FC = () => {
       return [...prev, theme];
     });
     setActiveThemeId(theme.id);
+    setEditingTheme(null);
+    setThemeModalOpen(false);
   };
 
   const handleDeleteCustomTheme = (themeId: string) => {
@@ -328,14 +364,18 @@ export const App: React.FC = () => {
 
   // 3. Handle Turntable Toggle
   const handleToggleTurntable = () => {
-    const next = !isTurntable;
-    setIsTurntable(next);
-    renderManagerRef.current?.toggleTurntable(next);
+    setIsTurntable((enabled) => !enabled);
   };
 
   const handleResetRotation = () => {
     setIsTurntable(false);
     renderManagerRef.current?.resetRotation();
+  };
+
+  const handleToggleAutoRotateDirection = () => {
+    setAutoRotateDirection((direction) => (
+      direction === 'clockwise' ? 'counterclockwise' : 'clockwise'
+    ));
   };
 
   const handleTransitionSpeedChange = (speed: number) => {
@@ -346,6 +386,80 @@ export const App: React.FC = () => {
     setTransitionSpeed(nextSpeed);
     renderManagerRef.current?.setTransitionSpeed(nextSpeed);
   };
+
+  const handleLogoChange = useCallback((nextLogo: DesignQRConfigV1['logo']) => {
+    setLogoRuntimeError('');
+    setLogoEditorError('');
+    setLogo(nextLogo);
+  }, []);
+
+  const handleLogoFileSelect = useCallback(async (file: File) => {
+    const request = ++logoUploadRequestRef.current;
+    replacePendingLogoSource(null);
+    setLogoEditorError('');
+    setIsPreparingLogo(true);
+
+    try {
+      const source = await loadEditorLogoSource(file);
+      if (request !== logoUploadRequestRef.current) {
+        source.close();
+        return;
+      }
+      pendingLogoSourceRef.current = source;
+      setPendingLogoSource(source);
+    } catch (cause) {
+      if (request === logoUploadRequestRef.current) {
+        setLogoEditorError(
+          cause instanceof Error ? cause.message : 'The logo could not be opened.'
+        );
+      }
+    } finally {
+      if (request === logoUploadRequestRef.current) setIsPreparingLogo(false);
+    }
+  }, [replacePendingLogoSource]);
+
+  const handleCancelLogoCrop = useCallback(() => {
+    if (isPreparingLogo) return;
+    logoUploadRequestRef.current += 1;
+    replacePendingLogoSource(null);
+    setLogoEditorError('');
+  }, [isPreparingLogo, replacePendingLogoSource]);
+
+  const handleApplyLogoCrop = useCallback(async (crop: EditorLogoCrop) => {
+    const source = pendingLogoSourceRef.current;
+    if (!source || isPreparingLogo) return;
+    const request = ++logoUploadRequestRef.current;
+    setLogoEditorError('');
+    setIsPreparingLogo(true);
+
+    try {
+      const prepared = await prepareEditorLogoSource(source, crop);
+      if (request !== logoUploadRequestRef.current) return;
+      handleLogoChange(prepared);
+      replacePendingLogoSource(null);
+    } catch (cause) {
+      if (request === logoUploadRequestRef.current) {
+        setLogoEditorError(
+          cause instanceof Error ? cause.message : 'The logo could not be cropped.'
+        );
+      }
+    } finally {
+      if (request === logoUploadRequestRef.current) setIsPreparingLogo(false);
+    }
+  }, [handleLogoChange, isPreparingLogo, replacePendingLogoSource]);
+
+  const handleRendererError = useCallback((cause: unknown) => {
+    if (
+      typeof cause === 'object'
+      && cause !== null
+      && 'code' in cause
+      && cause.code === 'LOGO_LOAD_FAILED'
+    ) {
+      setLogoRuntimeError(
+        'The logo could not be loaded. Check the file or hosted image access.'
+      );
+    }
+  }, []);
 
   // 4. Download the same committed presentation canvas shown in the editor.
   const handleDownload = async () => {
@@ -358,30 +472,36 @@ export const App: React.FC = () => {
   const currentShareConfig = useMemo<ShareConfig>(() => ({
     url: url || DEFAULT_URL,
     season: seasonId,
-    palette: 0,
     viewMode,
     title: qrTitle,
     showContent: showQrContent,
     borderEnabled: qrBorderEnabled,
     borderPadding: qrBorderPadding,
+    transparentBackground,
     customTheme: activeCustomTheme ?? undefined,
     treeShape: activeCustomTheme?.treeShape,
     interaction: {
       dragToRotate: true,
       tapToToggleView: true,
       autoRotate: isTurntable,
+      autoRotateDirection,
       motionBlur: enableMotionBlur,
+      transitionSpeed,
     },
-    quality: 'high',
+    logo,
   }), [
     activeCustomTheme,
+    autoRotateDirection,
     enableMotionBlur,
     isTurntable,
+    logo,
     qrBorderEnabled,
     qrBorderPadding,
     qrTitle,
     seasonId,
     showQrContent,
+    transparentBackground,
+    transitionSpeed,
     url,
     viewMode,
   ]);
@@ -390,18 +510,23 @@ export const App: React.FC = () => {
     () => encodeShareConfig(currentShareConfig),
     [currentShareConfig]
   );
+  const shareConfigurationError = encodedShareConfig
+    ? ''
+    : 'This design is too large for an editable link. Use a simpler logo or shorter content.';
   const designQRConfig = useMemo(
     () => createDesignQRConfig(currentShareConfig),
     [currentShareConfig]
   );
   const shareUrl = useMemo(() => {
-    return `${window.location.origin}/qr?q=${encodedShareConfig}`;
+    return encodedShareConfig
+      ? `${window.location.origin}/qr?q=${encodedShareConfig}`
+      : '';
   }, [encodedShareConfig]);
-  const embedUrl = useMemo(() => createDesignQREmbedUrl(designQRConfig, {
-    origin: window.location.origin,
-  }), [designQRConfig]);
+  const embedUrl = useMemo(() => encodedShareConfig
+    ? createDesignQREmbedUrl(designQRConfig, { origin: window.location.origin })
+    : '', [designQRConfig, encodedShareConfig]);
   const embedCode = useMemo(
-    () => createDesignQRIframeMarkup(embedUrl),
+    () => embedUrl ? createDesignQRIframeMarkup(embedUrl) : '',
     [embedUrl]
   );
   const reactCode = useMemo(
@@ -410,6 +535,14 @@ export const App: React.FC = () => {
   );
   const reactAdvancedCode = useMemo(
     () => createDesignQRAdvancedReactSnippet(designQRConfig),
+    [designQRConfig]
+  );
+  const reactThemeCode = useMemo(
+    () => createDesignQRThemeReactSnippet(designQRConfig),
+    [designQRConfig]
+  );
+  const recommendedReactExampleMode = useMemo(
+    () => getRecommendedDesignQRReactExample(designQRConfig),
     [designQRConfig]
   );
 
@@ -421,40 +554,20 @@ export const App: React.FC = () => {
     encodedShareConfig,
   ]);
 
-  const beginScanExit = useCallback(() => {
-    if (isExitingScan || scanExitTimeoutRef.current !== null) return;
-
-    setIsDetailsEditorOpen(false);
-    setIsExitingScan(true);
-    scanExitTimeoutRef.current = window.setTimeout(() => {
-      setViewMode('3d');
-      setIsExitingScan(false);
-      scanExitTimeoutRef.current = null;
-    }, SCAN_EXIT_DETAILS_DELAY_MS);
-  }, [isExitingScan]);
-
   const handleToggleScanMode = useCallback(() => {
-    if (viewMode === '3d') {
-      setIsExitingScan(false);
-      setViewMode('scan');
-    } else {
-      beginScanExit();
+    if (viewMode === 'scan') {
+      setOpenStageEditor((editor) => editor === 'details' ? null : editor);
     }
-  }, [beginScanExit, viewMode]);
+    setViewMode(viewMode === '3d' ? 'scan' : '3d');
+  }, [viewMode]);
 
   const handleSetViewMode = useCallback((mode: '3d' | 'scan') => {
-    if (mode === '3d' && viewMode === 'scan') {
-      beginScanExit();
-      return;
+    if (mode === viewMode) return;
+    if (mode === '3d') {
+      setOpenStageEditor((editor) => editor === 'details' ? null : editor);
     }
-
-    if (scanExitTimeoutRef.current !== null) {
-      window.clearTimeout(scanExitTimeoutRef.current);
-      scanExitTimeoutRef.current = null;
-    }
-    setIsExitingScan(false);
     setViewMode(mode);
-  }, [beginScanExit, viewMode]);
+  }, [viewMode]);
 
   return (
     <div
@@ -466,38 +579,41 @@ export const App: React.FC = () => {
         onSetViewMode={handleSetViewMode}
       />
 
-      <main className="main-viewport">
+      <main className={`main-viewport${transparentBackground ? ' transparency-preview' : ''}`}>
         <TreeCanvas
           ref={treeCanvasRef}
+          className="designqr-editor-player"
           treeData={treeData}
-          seasonId={seasonId}
-          customTheme={activeCustomTheme}
-          customColor={[0.91, 0.63, 0.69]}
-          customStrength={activeCustomTheme ? 1.0 : 0.0}
+          theme={rendererTheme}
           viewMode={viewMode}
           onToggleScanMode={handleToggleScanMode}
           onRendererReady={(manager) => {
             renderManagerRef.current = manager;
             manager.setTransitionSpeed(transitionSpeed);
           }}
+          onRendererError={handleRendererError}
           enableMotionBlur={enableMotionBlur}
           autoRotate={isTurntable}
+          autoRotateDirection={autoRotateDirection}
+          logo={logo}
+          transparentBackground={transparentBackground}
           backgroundTop={
-            activeCustomTheme?.skyTop ?? rgbTupleToHex(currentSeasonPreset.skyTop)
+            activeCustomTheme?.skyTop ?? currentPresetTheme.skyTop
           }
           backgroundBottom={
-            activeCustomTheme?.skyBottom ?? rgbTupleToHex(currentSeasonPreset.skyBottom)
+            activeCustomTheme?.skyBottom ?? currentPresetTheme.skyBottom
           }
-          showQrDetails={viewMode === 'scan' && !isExitingScan}
+          showQrDetails={viewMode === 'scan'}
           qrTitle={qrTitle}
           showQrContent={showQrContent}
           qrValue={url}
           qrBorderEnabled={qrBorderEnabled}
           qrBorderPadding={qrBorderPadding}
           qrTitleColor={
-            activeCustomTheme?.foliageShadowColor
+            activeCustomTheme?.titleColor
+            || activeCustomTheme?.foliageShadowColor
             || activeCustomTheme?.foliageColor
-            || currentSeasonPreset.titleHex
+            || currentPresetTheme.titleColor
           }
         />
       </main>
@@ -513,20 +629,35 @@ export const App: React.FC = () => {
         onShare={() => setShareModalOpen(true)}
         isTurntable={isTurntable}
         onToggleTurntable={handleToggleTurntable}
+        autoRotateDirection={autoRotateDirection}
+        onToggleAutoRotateDirection={handleToggleAutoRotateDirection}
         onResetRotation={handleResetRotation}
         viewMode={viewMode}
         onToggleScanMode={handleToggleScanMode}
-        hideScanDetails={isExitingScan}
-        isDetailsEditorOpen={isDetailsEditorOpen}
-        onToggleDetailsEditor={() => setIsDetailsEditorOpen((open) => !open)}
+        isDetailsEditorOpen={openStageEditor === 'details'}
+        onToggleDetailsEditor={() => setOpenStageEditor((editor) => (
+          editor === 'details' ? null : 'details'
+        ))}
+        isLogoEditorOpen={openStageEditor === 'logo'}
+        onToggleLogoEditor={() => setOpenStageEditor((editor) => (
+          editor === 'logo' ? null : 'logo'
+        ))}
         qrTitle={qrTitle}
         onQrTitleChange={setQrTitle}
+        transparentBackground={transparentBackground}
+        onToggleTransparentBackground={setTransparentBackground}
         showQrContent={showQrContent}
         onToggleShowContent={setShowQrContent}
         qrBorderEnabled={qrBorderEnabled}
         onToggleQrBorder={setQrBorderEnabled}
         qrBorderPadding={qrBorderPadding}
         onQrBorderPaddingChange={setQrBorderPadding}
+        logo={logo}
+        onLogoChange={handleLogoChange}
+        onLogoFileSelect={(file) => void handleLogoFileSelect(file)}
+        isPreparingLogo={isPreparingLogo}
+        logoEditorError={logoEditorError}
+        shareConfigurationError={logoRuntimeError || shareConfigurationError}
         enableMotionBlur={enableMotionBlur}
         onToggleMotionBlur={setEnableMotionBlur}
         transitionSpeed={transitionSpeed}
@@ -552,8 +683,22 @@ export const App: React.FC = () => {
           embedCode={embedCode}
           reactCode={reactCode}
           reactAdvancedCode={reactAdvancedCode}
+          reactThemeCode={reactThemeCode}
+          recommendedReactExampleMode={recommendedReactExampleMode}
+          configurationError={shareConfigurationError}
           onClose={() => setShareModalOpen(false)}
           onDownload={handleDownload}
+        />
+      )}
+
+      {pendingLogoSource && (
+        <LogoCropDialog
+          key={`${pendingLogoSource.file.name}-${pendingLogoSource.file.size}-${pendingLogoSource.file.lastModified}`}
+          source={pendingLogoSource}
+          isPreparing={isPreparingLogo}
+          error={logoEditorError}
+          onCancel={handleCancelLogoCrop}
+          onApply={(crop) => void handleApplyLogoCrop(crop)}
         />
       )}
     </div>

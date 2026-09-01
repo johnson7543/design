@@ -23,6 +23,7 @@ test('builds a canonical hosted-player URL without browser globals', () => {
       theme: 'winter',
       view: 'qr',
       details: { title: 'Embedded QR', showValue: true },
+      logo: { src: '/brand.webp', alt: 'Embedded brand', size: 0.14 },
     },
     {
       origin: 'http://127.0.0.1:4175/some/ignored/path',
@@ -42,6 +43,11 @@ test('builds a canonical hosted-player URL without browser globals', () => {
   if (decoded.ok) {
     assert.equal(decoded.value.view.initial, 'qr');
     assert.deepEqual(decoded.value.theme, { type: 'preset', preset: 'winter' });
+    assert.deepEqual(decoded.value.logo, {
+      src: '/brand.webp',
+      alt: 'Embedded brand',
+      size: 0.14,
+    });
   }
 });
 
@@ -149,5 +155,13 @@ test('validates child events and structured-cloned PNG payload shape', () => {
       })
     ),
     false
+  );
+  assert.equal(
+    isDesignQRChildMessage(
+      createDesignQRMessage(instanceId, 'designqr:error', {
+        error: { code: 'LOGO_LOAD_FAILED', message: 'Logo could not load.' },
+      })
+    ),
+    true
   );
 });

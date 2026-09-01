@@ -18,6 +18,7 @@
     "design-docs:check": "node scripts/check-design-docs.mjs",
     "color:check": "node scripts/check-colors.mjs",
     "style:check": "node scripts/check-design-qr-styles.mjs",
+    "check:designqr-react-snippets": "node --experimental-strip-types scripts/check-designqr-react-snippets.mjs",
     "test:designqr": "npm run test --workspace designqr",
     "typecheck:designqr": "npm run typecheck --workspace designqr",
     "release:designqr:check": "node scripts/check-designqr-release.mjs",
@@ -30,7 +31,7 @@
     "smoke:production": "node scripts/smoke-production.mjs",
     "smoke:designqr-consumer": "node scripts/smoke-designqr-consumer.mjs",
     "smoke:designqr-embed": "node scripts/smoke-designqr-embed.mjs",
-    "check": "npm run lint && npm run test:designqr && npm run typecheck:designqr && npm run docs:check && npm run design-docs:check && npm run color:check && npm run style:check && npm run build && npm run build:designqr-consumer && npm run build:designqr-iframe-consumer && npm run smoke:designqr-consumer && npm run smoke:designqr-embed && npm run smoke:production",
+    "check": "npm run lint && npm run test:designqr && npm run typecheck:designqr && npm run docs:check && npm run design-docs:check && npm run color:check && npm run style:check && npm run build && npm run check:designqr-react-snippets && npm run build:designqr-consumer && npm run build:designqr-iframe-consumer && npm run smoke:designqr-consumer && npm run smoke:designqr-embed && npm run smoke:production",
     "deploy": "npm run check && wrangler deploy"
   },
   "dependencies": {
@@ -51,6 +52,7 @@
     "@types/react-dom": "^19.2.4",
     "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "jsqr": "^1.4.0",
     "oxlint": "^1.79.0",
     "puppeteer-core": "^25.9.0",
     "typescript": "~6.0.2",

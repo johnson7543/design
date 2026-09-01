@@ -14,16 +14,26 @@ import {
 import confetti from 'canvas-confetti';
 
 type ShareMode = 'share' | 'embed' | 'react';
-type ReactExampleMode = 'simple' | 'advanced';
+type ReactExampleMode = 'simple' | 'advanced' | 'theme';
 type CodeLanguage = 'html' | 'shell' | 'tsx';
 type CopyTarget =
   | 'share-link'
   | 'embed-code'
   | 'embed-url'
   | 'react-install'
-  | 'react-code';
+  | 'react-code-simple'
+  | 'react-code-advanced'
+  | 'react-code-theme';
 
 const DESIGN_QR_INSTALL_COMMAND = 'npm install designqr';
+const REACT_EXAMPLE_OPTIONS = [
+  { mode: 'simple', label: 'Simple' },
+  { mode: 'advanced', label: 'Advanced' },
+  { mode: 'theme', label: 'Custom Theme' },
+] as const satisfies ReadonlyArray<{
+  mode: ReactExampleMode;
+  label: string;
+}>;
 const CODE_TOKEN_PATTERN = /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|<\/?[A-Za-z][A-Za-z0-9.-]*|\b[A-Za-z_$][A-Za-z0-9_$-]*\b|\b\d+(?:\.\d+)?\b|[{}[\]()<>=:;,.?/+*-]/g;
 const CODE_KEYWORDS = new Set([
   'async',
@@ -52,6 +62,9 @@ interface ShareModalProps {
   embedCode: string;
   reactCode: string;
   reactAdvancedCode: string;
+  reactThemeCode: string;
+  recommendedReactExampleMode: ReactExampleMode;
+  configurationError?: string;
   onClose: () => void;
   onDownload: () => void;
 }
@@ -165,11 +178,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   embedCode,
   reactCode,
   reactAdvancedCode,
+  reactThemeCode,
+  recommendedReactExampleMode,
+  configurationError = '',
   onClose,
   onDownload,
 }) => {
   const [activeMode, setActiveMode] = useState<ShareMode>('share');
-  const [reactExampleMode, setReactExampleMode] = useState<ReactExampleMode>('simple');
+  const [reactExampleMode, setReactExampleMode] = useState<ReactExampleMode>(
+    recommendedReactExampleMode
+  );
   const [copyFeedback, setCopyFeedback] = useState<CopyFeedback | null>(null);
   const feedbackTimerRef = useRef<number | null>(null);
 
@@ -244,6 +262,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         type="button"
         className={`share-copy-icon-btn ${copyFeedback?.target === target && copyFeedback.status === 'copied' ? 'copied' : ''}`}
         onClick={() => handleCopy(target, value)}
+        disabled={!value}
         aria-label={label}
         title={label}
         aria-live="polite"
@@ -255,7 +274,24 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
   const activeReactCode = reactExampleMode === 'simple'
     ? reactCode
-    : reactAdvancedCode;
+    : reactExampleMode === 'advanced'
+      ? reactAdvancedCode
+      : reactThemeCode;
+  const activeReactExampleLabel = reactExampleMode === 'simple'
+    ? 'Simple'
+    : reactExampleMode === 'advanced'
+      ? 'Advanced'
+      : 'Custom Theme';
+  const activeReactCopyTarget: CopyTarget = `react-code-${reactExampleMode}`;
+
+  const selectReactExample = (mode: ReactExampleMode) => {
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
+    }
+    if (copyFeedback !== null) setCopyFeedback(null);
+    setReactExampleMode(mode);
+  };
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -285,6 +321,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         <p className="modal-desc" id="share-modal-description">
           Download, share, or embed this DesignQR in your application.
         </p>
+
+        {configurationError && (
+          <p className="share-configuration-error" role="alert">
+            {configurationError}
+          </p>
+        )}
 
         <div className="share-mode-switcher" aria-label="Share format">
           <button
@@ -344,6 +386,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                   type="button"
                   className="share-action-item"
                   onClick={handleSystemShare}
+                  disabled={Boolean(configurationError)}
                 >
                   <div className="share-action-icon-wrap">
                     <Share2 size={20} />
@@ -404,10 +447,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 onClick={(event) => event.currentTarget.select()}
               />
               <a
-                className="share-open-btn"
-                href={embedUrl}
+                className={`share-open-btn${embedUrl ? '' : ' disabled'}`}
+                href={embedUrl || undefined}
                 target="_blank"
                 rel="noreferrer"
+                aria-disabled={!embedUrl}
+                tabIndex={embedUrl ? 0 : -1}
               >
                 <ExternalLink size={16} />
                 <span>Open</span>
@@ -422,8 +467,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             <div className="share-integration-summary">
               <Braces size={18} />
               <div>
-                <strong>React Component</strong>
-                <span>Resize or style it directly through the DesignQR style prop.</span>
+                <strong>React component</strong>
+                <span>Copy runnable TSX for the current design.</span>
               </div>
             </div>
 
@@ -445,27 +490,48 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
             <div className="share-code-card">
               <div className="share-code-header react-code-header">
-                <div className="react-example-switcher" aria-label="React example type">
-                  <button
-                    type="button"
-                    data-react-example="simple"
-                    className={reactExampleMode === 'simple' ? 'active' : ''}
-                    aria-pressed={reactExampleMode === 'simple'}
-                    onClick={() => setReactExampleMode('simple')}
-                  >
-                    Simple
-                  </button>
-                  <button
-                    type="button"
-                    data-react-example="advanced"
-                    className={reactExampleMode === 'advanced' ? 'active' : ''}
-                    aria-pressed={reactExampleMode === 'advanced'}
-                    onClick={() => setReactExampleMode('advanced')}
-                  >
-                    Advance
-                  </button>
+                <div
+                  className="react-example-switcher"
+                  role="group"
+                  aria-label="React example type"
+                >
+                  {REACT_EXAMPLE_OPTIONS.map(({ mode, label }) => {
+                    const isActive = reactExampleMode === mode;
+                    const isRecommended = recommendedReactExampleMode === mode;
+                    const recommendationLabel = `${label}, recommended for the current editor setup`;
+
+                    return (
+                      <button
+                        type="button"
+                        key={mode}
+                        data-react-example={mode}
+                        data-recommended={isRecommended}
+                        className={[
+                          isActive ? 'active' : '',
+                          isRecommended ? 'recommended' : '',
+                        ].filter(Boolean).join(' ')}
+                        aria-label={isRecommended ? recommendationLabel : label}
+                        aria-pressed={isActive}
+                        title={isRecommended ? recommendationLabel : undefined}
+                        onClick={() => selectReactExample(mode)}
+                      >
+                        {isRecommended && (
+                          <Sparkles
+                            size={11}
+                            className="react-example-recommended-icon"
+                            aria-hidden="true"
+                          />
+                        )}
+                        <span>{label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-                {renderCopyButton('react-code', activeReactCode, 'Copy React code')}
+                {renderCopyButton(
+                  activeReactCopyTarget,
+                  activeReactCode,
+                  `Copy ${activeReactExampleLabel} React code`
+                )}
               </div>
               <CodeView
                 code={activeReactCode}

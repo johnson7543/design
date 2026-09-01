@@ -9,7 +9,9 @@ export {
   type RegisteredDesignName,
 } from './designs/registry.ts';
 export {
-  resolveTreeTitleColor,
-  TREE_NEUTRAL_TITLE_COLOR,
-  TREE_PRESET_TITLE_COLORS,
+  createTreeTheme,
+  createTreeParticleOverrides,
+  resolveTreeTheme,
+  TREE_THEME_PRESETS,
+  type TreeThemeOverrides,
 } from './designs/tree/themes.ts';

@@ -1,4 +1,8 @@
-import type { DesignQRQuality, TreeTheme } from '../config/types.ts';
+import type {
+  AutoRotateDirection,
+  DesignQRLogoOptions,
+  ResolvedTreeTheme,
+} from '../config/types.ts';
 import type { TreeData } from '../designs/tree/treeBuilder.ts';
 import { ThreeFallbackRenderer } from './webgl/ThreeFallbackRenderer.ts';
 
@@ -7,22 +11,23 @@ export class RenderManager {
   private renderer: ThreeFallbackRenderer | null = null;
   public onProgressUpdate?: (progress: number, blurIntensity: number) => void;
   public onAfterRender?: () => void;
+  public onError?: (error: unknown) => void;
 
-  constructor(
-    canvas: HTMLCanvasElement,
-    private quality: DesignQRQuality = 'high'
-  ) {
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
   }
 
   public init(): boolean {
     try {
-      this.renderer = new ThreeFallbackRenderer(this.canvas, this.quality);
+      this.renderer = new ThreeFallbackRenderer(this.canvas);
       this.renderer.onProgressUpdate = (progress, blurIntensity) => {
         this.onProgressUpdate?.(progress, blurIntensity);
       };
       this.renderer.onAfterRender = () => {
         this.onAfterRender?.();
+      };
+      this.renderer.onError = (error) => {
+        this.onError?.(error);
       };
       return true;
     } catch (error) {
@@ -35,16 +40,8 @@ export class RenderManager {
     this.renderer?.setTreeData(data);
   }
 
-  public setSeason(season: number) {
-    this.renderer?.setSeason(season);
-  }
-
-  public setCustomTheme(theme: TreeTheme | null) {
-    this.renderer?.setCustomTheme(theme);
-  }
-
-  public setCustomColor(rgb: [number, number, number], strength: number = 1.0) {
-    this.renderer?.setCustomColor(rgb, strength);
+  public setTheme(theme: ResolvedTreeTheme) {
+    this.renderer?.setTheme(theme);
   }
 
   public setTargetProgress(progress: number) {
@@ -61,11 +58,6 @@ export class RenderManager {
     this.renderer?.setTransitionSpeed(speed);
   }
 
-  public setQuality(quality: DesignQRQuality) {
-    this.quality = quality;
-    this.renderer?.setQuality(quality);
-  }
-
   public handleDrag(deltaX: number, deltaY: number) {
     if (!this.renderer) return;
 
@@ -75,7 +67,6 @@ export class RenderManager {
       -1.45,
       Math.min(-0.1, this.renderer.pitch + deltaY * 0.006)
     );
-    this.renderer.isTurntable = false;
   }
 
   public setMousePosition(ndcX: number, ndcY: number, isHovering: boolean) {
@@ -87,6 +78,14 @@ export class RenderManager {
 
     this.renderer.cancelRotationReset();
     this.renderer.isTurntable = enabled ?? !this.renderer.isTurntable;
+  }
+
+  public setTurntableDirection(direction: AutoRotateDirection) {
+    this.renderer?.setTurntableDirection(direction);
+  }
+
+  public setLogo(logo: false | Required<DesignQRLogoOptions>) {
+    this.renderer?.setLogo(logo);
   }
 
   public resetRotation() {
@@ -114,5 +113,6 @@ export class RenderManager {
     this.renderer = null;
     this.onProgressUpdate = undefined;
     this.onAfterRender = undefined;
+    this.onError = undefined;
   }
 }

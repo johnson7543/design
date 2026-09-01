@@ -9,7 +9,13 @@
   --stage-transform: none;
   --designqr-background-top: #f6e2d5;
   --designqr-background-bottom: #f1cdbd;
-  --designqr-title-color: #98596e;
+  --designqr-title-font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --designqr-body-font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --designqr-content-color: #3F352B;
+  --designqr-border-color: rgba(95, 78, 61, 0.25);
+  --designqr-border-highlight-color: rgba(255, 255, 255, 0.45);
+  --designqr-focus-color: #3F352B;
+  --designqr-focus-contrast-color: #FFFFFF;
   position: relative;
   display: block;
   width: 100%;
@@ -19,21 +25,32 @@
   min-height: 0;
   overflow: hidden;
   isolation: isolate;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--designqr-body-font-family);
 }
 
 .designqr-canvas-wrapper {
+  touch-action: auto;
+  cursor: default;
+}
+
+.designqr-can-toggle {
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.designqr-can-drag {
   touch-action: none;
   cursor: grab;
 }
 
-.designqr-canvas-wrapper:active {
+.designqr-can-drag:active {
   cursor: grabbing;
 }
 
-.designqr-canvas-wrapper.view-scan,
-.designqr-canvas-wrapper.view-scan:active {
-  cursor: pointer;
+.designqr-can-toggle:focus-visible {
+  outline: 2px solid var(--designqr-focus-contrast-color);
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 6px var(--designqr-focus-color);
 }
 
 .designqr-webgl-canvas,

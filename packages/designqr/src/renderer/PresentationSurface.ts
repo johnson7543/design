@@ -1,15 +1,17 @@
 import {
   BLOCK_SIZE,
-  QR_SCAN_DESKTOP_DISTANCE,
-  QR_SCAN_DESKTOP_VERTICAL_FOV,
-  QR_SCAN_MOBILE_DISTANCE,
-  QR_SCAN_MOBILE_HORIZONTAL_FOV,
+  resolveQR2DLightDisplayRgb,
+  resolveQRViewportProjection,
   QR_VISUAL_REFERENCE_GRID_SIZE,
 } from '../designs/tree/constants.ts';
+import { resolveDesignQRPresentationStyles } from './presentationStyles.ts';
 
 export interface PresentationSurfaceState {
   backgroundTop: string;
   backgroundBottom: string;
+  transparentBackground: boolean;
+  qrGridSize: number;
+  qrLightColor: string;
   showQrDetails: boolean;
   title: string;
   showValue: boolean;
@@ -17,6 +19,7 @@ export interface PresentationSurfaceState {
   borderEnabled: boolean;
   borderPadding: number;
   titleColor: string;
+  prefersReducedMotion: boolean;
 }
 
 interface RgbColor {
@@ -26,6 +29,8 @@ interface RgbColor {
 }
 
 const BACKGROUND_TRANSITION_MS = 800;
+export const QR_QUIET_ZONE_MODULES = 4;
+const QR_QUIET_ZONE_FADE_START_PROGRESS = 0.82;
 
 function parseHexColor(value: string): RgbColor {
   const normalized = value.trim().replace('#', '');
@@ -67,6 +72,83 @@ function projectedQrViewportSize(
   return (qrWorldSize / visibleWorldSize) * 100;
 }
 
+export interface QRPresentationGeometry {
+  qrSize: number;
+  quietZoneSize: number;
+  quietZoneX: number;
+  quietZoneY: number;
+}
+
+export interface QRBackgroundPlateGeometry {
+  size: number;
+  x: number;
+  y: number;
+}
+
+export function resolveQRPresentationGeometry(
+  width: number,
+  height: number,
+  gridSize: number
+): QRPresentationGeometry {
+  const viewportProjection = resolveQRViewportProjection(width, height);
+  const qrSize = projectedQrViewportSize(
+    QR_VISUAL_REFERENCE_GRID_SIZE,
+    viewportProjection.scanDistance,
+    viewportProjection.verticalFov
+  ) * height / 100;
+  const safeGridSize = Number.isFinite(gridSize) && gridSize > 0
+    ? gridSize
+    : QR_VISUAL_REFERENCE_GRID_SIZE;
+  const quietZoneSize = qrSize * (
+    (safeGridSize + QR_QUIET_ZONE_MODULES * 2) / safeGridSize
+  );
+
+  return {
+    qrSize,
+    quietZoneSize,
+    quietZoneX: (width - quietZoneSize) * 0.5,
+    quietZoneY: (height - quietZoneSize) * 0.5,
+  };
+}
+
+export function resolveQRBackgroundPlateGeometry(
+  width: number,
+  height: number,
+  geometry: QRPresentationGeometry,
+  borderEnabled: boolean,
+  borderPadding: number
+): QRBackgroundPlateGeometry {
+  const availablePadding = Math.max(
+    0,
+    (geometry.quietZoneSize - geometry.qrSize) * 0.5
+  );
+  const requestedPadding = borderEnabled && Number.isFinite(borderPadding)
+    ? Math.max(0, borderPadding)
+    : 0;
+  const platePadding = Math.min(availablePadding, requestedPadding);
+  const size = geometry.qrSize + platePadding * 2;
+
+  return {
+    size,
+    x: (width - size) * 0.5,
+    y: (height - size) * 0.5,
+  };
+}
+
+export function resolveQRQuietZoneOpacity(progress: number): number {
+  const normalized = Math.max(0, Math.min(
+    1,
+    (progress - QR_QUIET_ZONE_FADE_START_PROGRESS)
+      / (1 - QR_QUIET_ZONE_FADE_START_PROGRESS)
+  ));
+  return normalized * normalized * (3 - 2 * normalized);
+}
+
+function qrLightColorString(color: string): string {
+  const [r, g, b] = resolveQR2DLightDisplayRgb(color);
+  return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+}
+
 function fitText(
   context: CanvasRenderingContext2D,
   text: string,
@@ -99,6 +181,10 @@ function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 
 export class PresentationSurface {
   private readonly context: CanvasRenderingContext2D;
+  private readonly sourceCanvas: HTMLCanvasElement;
+  private readonly presentationCanvas: HTMLCanvasElement;
+  private readonly host: HTMLElement;
+  private readonly transformProbe: HTMLElement;
   private state: PresentationSurfaceState;
   private blurIntensity = 0;
   private backgroundFromTop: RgbColor;
@@ -106,12 +192,13 @@ export class PresentationSurface {
   private backgroundToTop: RgbColor;
   private backgroundToBottom: RgbColor;
   private backgroundTransitionStartedAt = 0;
+  private viewProgress = 0;
 
   constructor(
-    private readonly sourceCanvas: HTMLCanvasElement,
-    private readonly presentationCanvas: HTMLCanvasElement,
-    private readonly host: HTMLElement,
-    private readonly transformProbe: HTMLElement,
+    sourceCanvas: HTMLCanvasElement,
+    presentationCanvas: HTMLCanvasElement,
+    host: HTMLElement,
+    transformProbe: HTMLElement,
     initialState: PresentationSurfaceState
   ) {
     const context = presentationCanvas.getContext('2d');
@@ -120,6 +207,10 @@ export class PresentationSurface {
     }
 
     this.context = context;
+    this.sourceCanvas = sourceCanvas;
+    this.presentationCanvas = presentationCanvas;
+    this.host = host;
+    this.transformProbe = transformProbe;
     this.state = initialState;
     this.backgroundFromTop = parseHexColor(initialState.backgroundTop);
     this.backgroundFromBottom = parseHexColor(initialState.backgroundBottom);
@@ -132,15 +223,37 @@ export class PresentationSurface {
       nextState.backgroundTop !== this.state.backgroundTop
       || nextState.backgroundBottom !== this.state.backgroundBottom
     ) {
-      const current = this.currentBackground(performance.now());
-      this.backgroundFromTop = current.top;
-      this.backgroundFromBottom = current.bottom;
-      this.backgroundToTop = parseHexColor(nextState.backgroundTop);
-      this.backgroundToBottom = parseHexColor(nextState.backgroundBottom);
-      this.backgroundTransitionStartedAt = performance.now();
+      const nextTop = parseHexColor(nextState.backgroundTop);
+      const nextBottom = parseHexColor(nextState.backgroundBottom);
+      if (nextState.prefersReducedMotion) {
+        this.backgroundFromTop = nextTop;
+        this.backgroundFromBottom = nextBottom;
+        this.backgroundToTop = nextTop;
+        this.backgroundToBottom = nextBottom;
+        this.backgroundTransitionStartedAt = 0;
+      } else {
+        const current = this.currentBackground(performance.now());
+        this.backgroundFromTop = current.top;
+        this.backgroundFromBottom = current.bottom;
+        this.backgroundToTop = nextTop;
+        this.backgroundToBottom = nextBottom;
+        this.backgroundTransitionStartedAt = performance.now();
+      }
+    } else if (nextState.prefersReducedMotion && !this.state.prefersReducedMotion) {
+      this.backgroundFromTop = this.backgroundToTop;
+      this.backgroundFromBottom = this.backgroundToBottom;
+      this.backgroundTransitionStartedAt = 0;
     }
 
     this.state = nextState;
+    // Configuration can change while the renderer is manually paused, outside
+    // the viewport, or in a hidden document. Redraw the presentation directly
+    // so background alpha and exported pixels never wait for a WebGL frame.
+    this.draw();
+  }
+
+  setViewProgress(progress: number): void {
+    this.viewProgress = Math.max(0, Math.min(1, progress));
   }
 
   setBlurIntensity(intensity: number): void {
@@ -176,10 +289,13 @@ export class PresentationSurface {
     const context = this.context;
     context.setTransform(scaleX, 0, 0, scaleY, 0, 0);
     context.clearRect(0, 0, width, height);
-    this.drawBackground(width, height);
+    if (!this.state.transparentBackground) {
+      this.drawBackground(width, height);
+    }
 
     context.save();
     this.applyStageTransform(width, height);
+    this.drawQrQuietZone(width, height);
     context.filter = this.blurIntensity > 0.01
       ? `blur(${this.blurIntensity * 2.2}px)`
       : 'none';
@@ -251,6 +367,54 @@ export class PresentationSurface {
     this.context.fillRect(0, 0, width, height);
   }
 
+  private drawQrQuietZone(width: number, height: number): void {
+    if (!this.state.transparentBackground) return;
+
+    const opacity = resolveQRQuietZoneOpacity(this.viewProgress);
+    if (opacity <= 0) return;
+
+    const geometry = resolveQRPresentationGeometry(
+      width,
+      height,
+      this.state.qrGridSize
+    );
+    const plate = resolveQRBackgroundPlateGeometry(
+      width,
+      height,
+      geometry,
+      this.state.borderEnabled,
+      this.state.borderPadding
+    );
+    this.context.save();
+    this.context.globalAlpha = opacity;
+    this.context.fillStyle = qrLightColorString(this.state.qrLightColor);
+    if (this.state.borderEnabled) {
+      const padding = Number.isFinite(this.state.borderPadding)
+        ? Math.max(0, this.state.borderPadding)
+        : 0;
+      const frameSize = geometry.qrSize + padding * 2;
+      const frameRadius = Math.min(26, 15 + padding * 0.35);
+      const plateInset = Math.max(0, (frameSize - plate.size) * 0.5);
+      this.context.beginPath();
+      this.context.roundRect(
+        plate.x,
+        plate.y,
+        plate.size,
+        plate.size,
+        Math.max(0, frameRadius - plateInset)
+      );
+      this.context.fill();
+    } else {
+      this.context.fillRect(
+        plate.x,
+        plate.y,
+        plate.size,
+        plate.size
+      );
+    }
+    this.context.restore();
+  }
+
   private applyStageTransform(width: number, height: number): void {
     const matrix = this.stageMatrix(width, height);
     this.context.transform(
@@ -276,18 +440,24 @@ export class PresentationSurface {
 
   private drawQrDetails(width: number, height: number): void {
     const isMobile = width <= 640;
-    const isPortrait = width < height;
-    const qrSize = isPortrait
-      ? projectedQrViewportSize(
-          QR_VISUAL_REFERENCE_GRID_SIZE,
-          QR_SCAN_MOBILE_DISTANCE,
-          QR_SCAN_MOBILE_HORIZONTAL_FOV
-        ) * width / 100
-      : projectedQrViewportSize(
-          QR_VISUAL_REFERENCE_GRID_SIZE,
-          QR_SCAN_DESKTOP_DISTANCE,
-          QR_SCAN_DESKTOP_VERTICAL_FOV
-        ) * height / 100;
+    const geometry = resolveQRPresentationGeometry(
+      width,
+      height,
+      this.state.qrGridSize
+    );
+    const qrSize = geometry.qrSize;
+    // Transparent mode must not enlarge the established border footprint.
+    // Its local background plate is independently capped inside this frame.
+    const artworkSize = qrSize;
+    const detailAnchorSize = this.state.transparentBackground
+      ? resolveQRBackgroundPlateGeometry(
+          width,
+          height,
+          geometry,
+          this.state.borderEnabled,
+          this.state.borderPadding
+        ).size
+      : qrSize;
     const centerX = width * 0.5;
     const centerY = height * 0.5;
     const title = this.state.title.trim().toUpperCase();
@@ -303,24 +473,20 @@ export class PresentationSurface {
       + infoGap;
     const padding = this.state.borderEnabled ? this.state.borderPadding : 0;
     const infoTopGap = this.state.borderEnabled ? 12 : (isMobile ? 18 : 30);
-    const computedStyle = getComputedStyle(this.presentationCanvas);
-    const titleFont = computedStyle.getPropertyValue('--font-sans').trim() || 'sans-serif';
-    const bodyFont = computedStyle.getPropertyValue('--font-body').trim() || 'sans-serif';
-    const mutedColor = computedStyle.getPropertyValue('--qr-ink-muted').trim();
+    const presentationStyles = resolveDesignQRPresentationStyles(
+      getComputedStyle(this.presentationCanvas)
+    );
 
     if (this.state.borderEnabled) {
-      const frameX = centerX - qrSize * 0.5 - padding;
-      const frameY = centerY - qrSize * 0.5 - padding;
-      const frameWidth = qrSize + padding * 2;
-      const frameHeight = qrSize + padding * 2 + (hasInfo ? infoTopGap + infoHeight : 0);
+      const frameX = centerX - artworkSize * 0.5 - padding;
+      const frameY = centerY - artworkSize * 0.5 - padding;
+      const frameWidth = artworkSize + padding * 2;
+      const frameHeight = artworkSize + padding * 2 + (hasInfo ? infoTopGap + infoHeight : 0);
       const radius = Math.min(26, 15 + padding * 0.35);
-      const borderColor = computedStyle.getPropertyValue('--qr-border-hover').trim();
-      const highlightColor = computedStyle.getPropertyValue('--qr-surface-subtle').trim();
-
       this.context.save();
-      this.context.strokeStyle = borderColor;
+      this.context.strokeStyle = presentationStyles.borderColor;
       this.context.lineWidth = 1;
-      this.context.shadowColor = borderColor;
+      this.context.shadowColor = presentationStyles.borderColor;
       this.context.shadowBlur = 24;
       this.context.shadowOffsetY = 10;
       this.context.beginPath();
@@ -334,7 +500,7 @@ export class PresentationSurface {
       this.context.stroke();
 
       this.context.shadowColor = 'transparent';
-      this.context.strokeStyle = highlightColor;
+      this.context.strokeStyle = presentationStyles.borderHighlightColor;
       this.context.lineWidth = 2;
       this.context.beginPath();
       this.context.roundRect(
@@ -350,9 +516,9 @@ export class PresentationSurface {
 
     if (!hasInfo) return;
 
-    let lineCenterY = centerY + qrSize * 0.5 + infoTopGap;
+    let lineCenterY = centerY + detailAnchorSize * 0.5 + infoTopGap;
     const maxTextWidth = this.state.borderEnabled
-      ? qrSize
+      ? artworkSize
       : Math.min(isMobile ? 260 : 320, width - (isMobile ? 80 : 40));
     this.context.textAlign = 'center';
     this.context.textBaseline = 'middle';
@@ -360,7 +526,7 @@ export class PresentationSurface {
     if (title) {
       this.context.save();
       this.context.fillStyle = this.state.titleColor;
-      this.context.font = `700 ${titleFontSize}px ${titleFont}`;
+      this.context.font = `700 ${titleFontSize}px ${presentationStyles.titleFontFamily}`;
       const letterSpacingContext = this.context as CanvasRenderingContext2D & {
         letterSpacing?: string;
       };
@@ -383,8 +549,8 @@ export class PresentationSurface {
         ? maxTextWidth
         : Math.min(isMobile ? 260 : 280, width - (isMobile ? 80 : 40));
       this.context.save();
-      this.context.fillStyle = mutedColor;
-      this.context.font = `500 ${contentFontSize}px ${bodyFont}`;
+      this.context.fillStyle = presentationStyles.contentColor;
+      this.context.font = `500 ${contentFontSize}px ${presentationStyles.bodyFontFamily}`;
       lineCenterY += contentLineHeight * 0.5;
       this.context.fillText(
         fitText(this.context, content, contentMaxWidth),

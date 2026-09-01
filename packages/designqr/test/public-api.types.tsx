@@ -4,7 +4,12 @@ import {
   connectDesignQREmbed,
   createDesignQREmbedUrl,
   createDesignQRIframeMarkup,
+  createTreeTheme,
   DesignQR,
+  TREE_THEME_PRESETS,
+  VIEW_TRANSITION_SPEED_DEFAULT,
+  VIEW_TRANSITION_SPEED_MAX,
+  VIEW_TRANSITION_SPEED_MIN,
   type DesignQRHandle,
   type DesignQRProps,
 } from '../src/index.ts';
@@ -26,10 +31,29 @@ export const designQRProps = {
     dragToRotate: true,
     tapToToggleView: true,
     autoRotate: false,
+    autoRotateDirection: 'clockwise',
+    transitionSpeed: 1.5,
     motionBlur: true,
   },
-  quality: 'high',
+  logo: {
+    src: '/logo.webp',
+    alt: 'Logo',
+    size: 0.16,
+  },
+  transparentBackground: true,
 } satisfies DesignQRProps;
+
+export const transitionSpeedRange = {
+  min: VIEW_TRANSITION_SPEED_MIN,
+  default: VIEW_TRANSITION_SPEED_DEFAULT,
+  max: VIEW_TRANSITION_SPEED_MAX,
+};
+
+export const customTreeTheme = createTreeTheme('summer', {
+  foliageShape: 'pixel',
+  groundFeature: 'pixel',
+  titleColor: TREE_THEME_PRESETS.summer.titleColor,
+});
 
 export const designQRConsumerFixture = (
   <DesignQR ref={designQRHandle} {...designQRProps} />

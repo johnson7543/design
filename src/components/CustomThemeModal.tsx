@@ -4,9 +4,19 @@ import {
   Palette,
   Sparkles,
   Leaf,
+  Box,
   Snowflake,
 } from 'lucide-react';
-import type { TreeShapeStyle } from 'designqr/editor';
+import {
+  createTreeParticleOverrides,
+  TREE_THEME_PRESETS,
+} from 'designqr';
+import {
+  type TreeShapeStyle,
+} from 'designqr/editor';
+import type {
+  DesignQRThemePreset,
+} from 'designqr/config';
 import type { CustomTheme } from '../editor/types';
 
 interface CustomThemeModalProps {
@@ -19,6 +29,7 @@ interface CustomThemeModalProps {
 }
 
 interface MultiFoliagePreset {
+  preset: DesignQRThemePreset;
   emoji: string;
   name: string;
   main: string;
@@ -27,14 +38,20 @@ interface MultiFoliagePreset {
   midtone: string;
 }
 
+const SPRING_THEME = TREE_THEME_PRESETS.spring;
+const SUMMER_THEME = TREE_THEME_PRESETS.summer;
+const AUTUMN_THEME = TREE_THEME_PRESETS.autumn;
+const WINTER_THEME = TREE_THEME_PRESETS.winter;
+
 const MULTI_FOLIAGE_PRESETS: MultiFoliagePreset[] = [
-  { emoji: '🌸', name: 'Spring Sakura (春・花衣與吉野櫻)', main: '#F4B4CF', highlight: '#FCEEF5', shadow: '#D98EAF', midtone: '#F8D2E3' },
-  { emoji: '☀️', name: 'Summer Bamboo (033 立夏・翠玉與若苗)', main: '#02983B', highlight: '#99CC81', shadow: '#00785E', midtone: '#00AC7A' },
-  { emoji: '🍂', name: 'Autumn Maple (京都清水寺・紅葉與楓橘)', main: '#E2451E', highlight: '#F4A358', shadow: '#BD3528', midtone: '#E77433' },
-  { emoji: '❄️', name: 'Winter Frost (冬・冰晶雪景)', main: '#D8E5F0', highlight: '#F4F8FC', shadow: '#577A9E', midtone: '#A3CAE8' },
+  { preset: 'spring', emoji: '🌸', name: 'Spring Sakura', main: SPRING_THEME.foliageColor, highlight: SPRING_THEME.foliageHighlightColor, shadow: SPRING_THEME.foliageShadowColor, midtone: SPRING_THEME.foliageMidtoneColor },
+  { preset: 'summer', emoji: '☀️', name: 'Summer Bamboo', main: SUMMER_THEME.foliageColor, highlight: SUMMER_THEME.foliageHighlightColor, shadow: SUMMER_THEME.foliageShadowColor, midtone: SUMMER_THEME.foliageMidtoneColor },
+  { preset: 'autumn', emoji: '🍂', name: 'Autumn Maple', main: AUTUMN_THEME.foliageColor, highlight: AUTUMN_THEME.foliageHighlightColor, shadow: AUTUMN_THEME.foliageShadowColor, midtone: AUTUMN_THEME.foliageMidtoneColor },
+  { preset: 'winter', emoji: '❄️', name: 'Winter Frost', main: WINTER_THEME.foliageColor, highlight: WINTER_THEME.foliageHighlightColor, shadow: WINTER_THEME.foliageShadowColor, midtone: WINTER_THEME.foliageMidtoneColor },
 ];
 
 interface MultiGroundPreset {
+  preset: DesignQRThemePreset;
   emoji: string;
   name: string;
   base: string;
@@ -42,13 +59,14 @@ interface MultiGroundPreset {
 }
 
 const MULTI_GROUND_PRESETS: MultiGroundPreset[] = [
-  { emoji: '🌸', name: 'Spring Peach & Plum (028 春分・色音與終日石板)', base: '#F0CCBD', shadow: '#C38F95' },
-  { emoji: '☀️', name: 'Summer Sunlight & Slate (033 立夏・花水木與素鼠石板)', base: '#F6F4D7', shadow: '#8A987C' },
-  { emoji: '🍂', name: 'Autumn Hatsuyuki & Cypress (秋・初雪與檜舞台石板)', base: '#F8F0EC', shadow: '#C6AE8D' },
-  { emoji: '❄️', name: 'Winter Snow & Frost Stone (冬・冰白與霜石地板)', base: '#F5F7FA', shadow: '#9AA6B3' },
+  { preset: 'spring', emoji: '🌸', name: 'Spring Peach & Plum', base: SPRING_THEME.groundColor, shadow: SPRING_THEME.groundShadowColor },
+  { preset: 'summer', emoji: '☀️', name: 'Summer Sunlight & Slate', base: SUMMER_THEME.groundColor, shadow: SUMMER_THEME.groundShadowColor },
+  { preset: 'autumn', emoji: '🍂', name: 'Autumn Hatsuyuki & Cypress', base: AUTUMN_THEME.groundColor, shadow: AUTUMN_THEME.groundShadowColor },
+  { preset: 'winter', emoji: '❄️', name: 'Winter Snow & Frost Stone', base: WINTER_THEME.groundColor, shadow: WINTER_THEME.groundShadowColor },
 ];
 
 interface MultiGrassPreset {
+  preset: DesignQRThemePreset;
   emoji: string;
   name: string;
   lawn: string;
@@ -57,11 +75,118 @@ interface MultiGrassPreset {
 }
 
 const MULTI_GRASS_PRESETS: MultiGrassPreset[] = [
-  { emoji: '🌸', name: 'Spring Meadow (春・若草色、萌黃與常盤綠)', lawn: '#85B667', tip: '#BFD47B', eye: '#286018' },
-  { emoji: '☀️', name: 'Summer Sprout (033 立夏・若苗色、嬰兒與翠玉)', lawn: '#99CC81', tip: '#D7DE8A', eye: '#02983B' },
-  { emoji: '🍂', name: 'Autumn Grass (秋・冬草、酒林與山眠)', lawn: '#9D8C73', tip: '#BD956E', eye: '#5D4C35' },
-  { emoji: '❄️', name: 'Winter Snow (冬・純白雪、冰晶藍與深霜石)', lawn: '#FFFFFF', tip: '#A3CAE8', eye: '#305E88' },
+  { preset: 'spring', emoji: '🌸', name: 'Spring Meadow', lawn: SPRING_THEME.groundFeatureColor, tip: SPRING_THEME.groundFeatureHighlightColor, eye: SPRING_THEME.groundFeatureShadowColor },
+  { preset: 'summer', emoji: '☀️', name: 'Summer Sprout', lawn: SUMMER_THEME.groundFeatureColor, tip: SUMMER_THEME.groundFeatureHighlightColor, eye: SUMMER_THEME.groundFeatureShadowColor },
+  { preset: 'autumn', emoji: '🍂', name: 'Autumn Grass', lawn: AUTUMN_THEME.groundFeatureColor, tip: AUTUMN_THEME.groundFeatureHighlightColor, eye: AUTUMN_THEME.groundFeatureShadowColor },
+  { preset: 'winter', emoji: '❄️', name: 'Winter Pixel Frost', lawn: WINTER_THEME.groundFeatureColor, tip: WINTER_THEME.groundFeatureHighlightColor, eye: WINTER_THEME.groundFeatureShadowColor },
 ];
+
+function resolveInitialGroundFeature(
+  value: unknown
+): NonNullable<CustomTheme['groundFeature']> {
+  if (value === 'pixel' || value === 'snow') return 'pixel';
+  if (value === 'none') return 'none';
+  return 'grass';
+}
+
+function resolveInitialParticleIntensity(theme: CustomTheme | null | undefined): number {
+  if (!theme) return 16;
+  if (theme.particleType === 'fireflies') {
+    return theme.ambientParticleAmount ?? theme.particleAmount ?? 12;
+  }
+  if (theme.particleType === 'snow') {
+    return Math.round((theme.snowflakeAmount ?? 300) / 5);
+  }
+  return theme.particleAmount ?? 16;
+}
+
+const DERIVE_FOLIAGE_COLOR_ROLES = {
+  foliagePaletteColors: undefined,
+  qrFoliageColor: undefined,
+  qrFoliageHighlightColor: undefined,
+  qrFoliageShadowColor: undefined,
+  qrFoliageMidtoneColor: undefined,
+  qrFoliagePaletteColors: undefined,
+  titleColor: undefined,
+} satisfies Partial<CustomTheme>;
+
+const DERIVE_GROUND_COLOR_ROLES = {
+  groundSurfaceColor: undefined,
+  groundSurfaceShadowColor: undefined,
+  pedestalColor: undefined,
+} satisfies Partial<CustomTheme>;
+
+const DERIVE_GROUND_FEATURE_COLOR_ROLES = {
+  groundFeaturePaletteStartColors: undefined,
+  groundFeaturePaletteEndColors: undefined,
+  qrFinderColor: undefined,
+  qrFinderHighlightColor: undefined,
+  qrFinderShadowColor: undefined,
+  qrFinderEyeColor: undefined,
+  qrFinderPaletteColors: undefined,
+} satisfies Partial<CustomTheme>;
+
+function getFoliagePresetRoles(
+  preset: DesignQRThemePreset
+): Partial<CustomTheme> {
+  const theme = TREE_THEME_PRESETS[preset];
+  return {
+    foliageColor: theme.foliageColor,
+    foliageHighlightColor: theme.foliageHighlightColor,
+    foliageShadowColor: theme.foliageShadowColor,
+    foliageMidtoneColor: theme.foliageMidtoneColor,
+    foliagePaletteColors: theme.foliagePaletteColors,
+    foliagePaletteStops: theme.foliagePaletteStops,
+    foliageColorVariation: theme.foliageColorVariation,
+    foliageVerticalLift: theme.foliageVerticalLift,
+    qrFoliageColor: theme.qrFoliageColor,
+    qrFoliageHighlightColor: theme.qrFoliageHighlightColor,
+    qrFoliageShadowColor: theme.qrFoliageShadowColor,
+    qrFoliageMidtoneColor: theme.qrFoliageMidtoneColor,
+    qrFoliagePaletteColors: theme.qrFoliagePaletteColors,
+    qrFoliagePaletteStops: theme.qrFoliagePaletteStops,
+    qrFoliageColorVariation: theme.qrFoliageColorVariation,
+    blossomCenterColor: theme.blossomCenterColor,
+    titleColor: theme.titleColor,
+  };
+}
+
+function getGroundPresetRoles(
+  preset: DesignQRThemePreset
+): Partial<CustomTheme> {
+  const theme = TREE_THEME_PRESETS[preset];
+  return {
+    groundColor: theme.groundColor,
+    groundShadowColor: theme.groundShadowColor,
+    groundSurfaceColor: theme.groundSurfaceColor,
+    groundSurfaceShadowColor: theme.groundSurfaceShadowColor,
+    groundSurfaceVariation: theme.groundSurfaceVariation,
+    groundSurfaceShadowVariation: theme.groundSurfaceShadowVariation,
+    pedestalColor: theme.pedestalColor,
+  };
+}
+
+function getGroundFeaturePresetRoles(
+  preset: DesignQRThemePreset
+): Partial<CustomTheme> {
+  const theme = TREE_THEME_PRESETS[preset];
+  return {
+    groundFeatureColor: theme.groundFeatureColor,
+    groundFeatureHighlightColor: theme.groundFeatureHighlightColor,
+    groundFeatureShadowColor: theme.groundFeatureShadowColor,
+    groundFeaturePaletteStartColors: theme.groundFeaturePaletteStartColors,
+    groundFeaturePaletteEndColors: theme.groundFeaturePaletteEndColors,
+    groundFeaturePaletteStops: theme.groundFeaturePaletteStops,
+    groundFeaturePaletteVariations: theme.groundFeaturePaletteVariations,
+    qrFinderColor: theme.qrFinderColor,
+    qrFinderHighlightColor: theme.qrFinderHighlightColor,
+    qrFinderShadowColor: theme.qrFinderShadowColor,
+    qrFinderEyeColor: theme.qrFinderEyeColor,
+    qrFinderPaletteColors: theme.qrFinderPaletteColors,
+    qrFinderPaletteStops: theme.qrFinderPaletteStops,
+    qrFinderColorVariation: theme.qrFinderColorVariation,
+  };
+}
 
 export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
   isOpen,
@@ -78,7 +203,9 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
   const [foliageShadowColor, setFoliageShadowColor] = useState(initialTheme?.foliageShadowColor ?? '#00785E');
   const [foliageMidtoneColor, setFoliageMidtoneColor] = useState(initialTheme?.foliageMidtoneColor ?? '#00AC7A');
 
-  const [foliageShape, setFoliageShape] = useState<'blossom' | 'leaf'>(initialTheme?.foliageShape ?? 'leaf');
+  const [foliageShape, setFoliageShape] = useState<
+    NonNullable<CustomTheme['foliageShape']>
+  >(initialTheme?.foliageShape ?? 'leaf');
   const [treeShape, setTreeShape] = useState<TreeShapeStyle>(initialTheme?.treeShape ?? 'dome');
   const [canopyDensity, setCanopyDensity] = useState<number>(initialTheme?.canopyDensity ?? 100);
 
@@ -86,8 +213,10 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
   const [groundColor, setGroundColor] = useState(initialTheme?.groundColor ?? '#F6F4D7');
   const [groundShadowColor, setGroundShadowColor] = useState(initialTheme?.groundShadowColor ?? '#8A987C');
 
-  // Grass / Ground Decor Multi-Colors (Lawn Body, Sprout Tip, QR Center Eye Anchor)
-  const [groundFeature, setGroundFeature] = useState<'grass' | 'snow' | 'none'>(initialTheme?.groundFeature ?? 'grass');
+  // Ground Decor Multi-Colors (Grass/Pixel Body, Highlight, QR Center Eye Anchor)
+  const [groundFeature, setGroundFeature] = useState<
+    NonNullable<CustomTheme['groundFeature']>
+  >(resolveInitialGroundFeature(initialTheme?.groundFeature));
   const [groundFeatureColor, setGroundFeatureColor] = useState<string>(initialTheme?.groundFeatureColor ?? '#99CC81');
   const [groundFeatureHighlightColor, setGroundFeatureHighlightColor] = useState<string>(initialTheme?.groundFeatureHighlightColor ?? '#D7DE8A');
   const [groundFeatureShadowColor, setGroundFeatureShadowColor] = useState<string>(initialTheme?.groundFeatureShadowColor ?? '#02983B');
@@ -98,11 +227,16 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
 
   // Particles
   const [particleType, setParticleType] = useState<'sakura' | 'leaf' | 'fireflies' | 'snow' | 'none'>(initialTheme?.particleType ?? 'fireflies');
-  const [particleAmount, setParticleAmount] = useState<number>(initialTheme?.particleAmount ?? 16);
-  const groundLeavesAmount = initialTheme?.groundLeavesAmount ?? 44;
+  const [particleAmount, setParticleAmount] = useState<number>(
+    resolveInitialParticleIntensity(initialTheme)
+  );
+  const [themeRoleOverrides, setThemeRoleOverrides] = useState<
+    Partial<CustomTheme>
+  >({});
 
   // Build a preview theme from current state
   const buildPreviewTheme = (overrides?: Partial<CustomTheme>): CustomTheme => ({
+    ...(initialTheme ?? {}),
     id: initialTheme && initialTheme.id ? initialTheme.id : '__preview__',
     label: label.trim() || 'Custom Theme',
     isCustom: true,
@@ -122,8 +256,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
     skyTop,
     skyBottom,
     particleType,
-    particleAmount,
-    groundLeavesAmount,
+    ...themeRoleOverrides,
     ...overrides,
   });
 
@@ -134,6 +267,10 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
     }
   };
 
+  const rememberThemeRoleOverrides = (overrides: Partial<CustomTheme>) => {
+    setThemeRoleOverrides((current) => ({ ...current, ...overrides }));
+  };
+
   if (!isOpen) return null;
 
   const handleSave = (e: React.FormEvent) => {
@@ -141,73 +278,123 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
     onSaveTheme(buildPreviewTheme({
       id: initialTheme && initialTheme.id ? initialTheme.id : `custom-${Date.now()}`,
     }));
-    onClose();
   };
 
   // Wrapped setters that also fire preview
-  const updateFoliageMain = (hex: string) => { setFoliageColor(hex); previewWith({ foliageColor: hex }); };
-  const updateFoliageHighlight = (hex: string) => { setFoliageHighlightColor(hex); previewWith({ foliageHighlightColor: hex }); };
-  const updateFoliageShadow = (hex: string) => { setFoliageShadowColor(hex); previewWith({ foliageShadowColor: hex }); };
-  const updateFoliageMidtone = (hex: string) => { setFoliageMidtoneColor(hex); previewWith({ foliageMidtoneColor: hex }); };
+  const updateFoliageMain = (hex: string) => {
+    setFoliageColor(hex);
+    rememberThemeRoleOverrides(DERIVE_FOLIAGE_COLOR_ROLES);
+    previewWith({ foliageColor: hex, ...DERIVE_FOLIAGE_COLOR_ROLES });
+  };
+  const updateFoliageHighlight = (hex: string) => {
+    setFoliageHighlightColor(hex);
+    rememberThemeRoleOverrides(DERIVE_FOLIAGE_COLOR_ROLES);
+    previewWith({ foliageHighlightColor: hex, ...DERIVE_FOLIAGE_COLOR_ROLES });
+  };
+  const updateFoliageShadow = (hex: string) => {
+    setFoliageShadowColor(hex);
+    rememberThemeRoleOverrides(DERIVE_FOLIAGE_COLOR_ROLES);
+    previewWith({ foliageShadowColor: hex, ...DERIVE_FOLIAGE_COLOR_ROLES });
+  };
+  const updateFoliageMidtone = (hex: string) => {
+    setFoliageMidtoneColor(hex);
+    rememberThemeRoleOverrides(DERIVE_FOLIAGE_COLOR_ROLES);
+    previewWith({ foliageMidtoneColor: hex, ...DERIVE_FOLIAGE_COLOR_ROLES });
+  };
 
   const applyFoliagePreset = (p: MultiFoliagePreset) => {
     setFoliageColor(p.main);
     setFoliageHighlightColor(p.highlight);
     setFoliageShadowColor(p.shadow);
     setFoliageMidtoneColor(p.midtone);
-    previewWith({
-      foliageColor: p.main,
-      foliageHighlightColor: p.highlight,
-      foliageShadowColor: p.shadow,
-      foliageMidtoneColor: p.midtone,
-    });
+    const roles = getFoliagePresetRoles(p.preset);
+    rememberThemeRoleOverrides(roles);
+    previewWith(roles);
   };
 
-  const updateGroundBase = (hex: string) => { setGroundColor(hex); previewWith({ groundColor: hex }); };
-  const updateGroundShadow = (hex: string) => { setGroundShadowColor(hex); previewWith({ groundShadowColor: hex }); };
+  const updateGroundBase = (hex: string) => {
+    setGroundColor(hex);
+    rememberThemeRoleOverrides(DERIVE_GROUND_COLOR_ROLES);
+    previewWith({ groundColor: hex, ...DERIVE_GROUND_COLOR_ROLES });
+  };
+  const updateGroundShadow = (hex: string) => {
+    setGroundShadowColor(hex);
+    rememberThemeRoleOverrides(DERIVE_GROUND_COLOR_ROLES);
+    previewWith({ groundShadowColor: hex, ...DERIVE_GROUND_COLOR_ROLES });
+  };
 
   const applyGroundPreset = (p: MultiGroundPreset) => {
     setGroundColor(p.base);
     setGroundShadowColor(p.shadow);
-    previewWith({ groundColor: p.base, groundShadowColor: p.shadow });
+    const roles = getGroundPresetRoles(p.preset);
+    rememberThemeRoleOverrides(roles);
+    previewWith(roles);
   };
 
-  const updateGrassLawn = (hex: string) => { setGroundFeatureColor(hex); previewWith({ groundFeatureColor: hex }); };
-  const updateGrassTip = (hex: string) => { setGroundFeatureHighlightColor(hex); previewWith({ groundFeatureHighlightColor: hex }); };
-  const updateGrassEye = (hex: string) => { setGroundFeatureShadowColor(hex); previewWith({ groundFeatureShadowColor: hex }); };
+  const updateGrassLawn = (hex: string) => {
+    setGroundFeatureColor(hex);
+    rememberThemeRoleOverrides(DERIVE_GROUND_FEATURE_COLOR_ROLES);
+    previewWith({
+      groundFeatureColor: hex,
+      ...DERIVE_GROUND_FEATURE_COLOR_ROLES,
+    });
+  };
+  const updateGrassTip = (hex: string) => {
+    setGroundFeatureHighlightColor(hex);
+    rememberThemeRoleOverrides(DERIVE_GROUND_FEATURE_COLOR_ROLES);
+    previewWith({
+      groundFeatureHighlightColor: hex,
+      ...DERIVE_GROUND_FEATURE_COLOR_ROLES,
+    });
+  };
+  const updateGrassEye = (hex: string) => {
+    setGroundFeatureShadowColor(hex);
+    rememberThemeRoleOverrides(DERIVE_GROUND_FEATURE_COLOR_ROLES);
+    previewWith({
+      groundFeatureShadowColor: hex,
+      ...DERIVE_GROUND_FEATURE_COLOR_ROLES,
+    });
+  };
 
   const applyGrassPreset = (p: MultiGrassPreset) => {
     setGroundFeatureColor(p.lawn);
     setGroundFeatureHighlightColor(p.tip);
     setGroundFeatureShadowColor(p.eye);
-    previewWith({
-      groundFeatureColor: p.lawn,
-      groundFeatureHighlightColor: p.tip,
-      groundFeatureShadowColor: p.eye,
-    });
+    const roles = getGroundFeaturePresetRoles(p.preset);
+    rememberThemeRoleOverrides(roles);
+    previewWith(roles);
   };
 
-  const updateFoliageShape = (shape: 'blossom' | 'leaf') => { setFoliageShape(shape); previewWith({ foliageShape: shape }); };
+  const updateFoliageShape = (shape: NonNullable<CustomTheme['foliageShape']>) => {
+    setFoliageShape(shape);
+    previewWith({ foliageShape: shape });
+  };
   const updateTreeShape = (shape: TreeShapeStyle) => { setTreeShape(shape); previewWith({ treeShape: shape }); };
   const updateCanopyDensity = (density: number) => { setCanopyDensity(density); previewWith({ canopyDensity: density }); };
   const updateGroundFeature = (feat: CustomTheme['groundFeature']) => {
     const nextFeat = feat || 'grass';
     setGroundFeature(nextFeat);
-    let nextCol = groundFeatureColor;
-    if (nextFeat === 'snow' && (groundFeatureColor === '#99CC81' || groundFeatureColor === '#85B667')) {
-      nextCol = '#FFFFFF';
-      setGroundFeatureColor('#FFFFFF');
-    } else if (nextFeat === 'grass' && groundFeatureColor === '#FFFFFF') {
-      nextCol = '#99CC81';
-      setGroundFeatureColor('#99CC81');
-    }
-    previewWith({ groundFeature: nextFeat, groundFeatureColor: nextCol });
+    previewWith({ groundFeature: nextFeat });
   };
 
   const updateSkyTop = (hex: string) => { setSkyTop(hex); previewWith({ skyTop: hex }); };
   const updateSkyBottom = (hex: string) => { setSkyBottom(hex); previewWith({ skyBottom: hex }); };
-  const updateParticle = (p: CustomTheme['particleType']) => { setParticleType(p); previewWith({ particleType: p }); };
-  const updateParticleAmount = (amount: number) => { setParticleAmount(amount); previewWith({ particleAmount: amount }); };
+  const updateParticle = (p: CustomTheme['particleType']) => {
+    const roles = createTreeParticleOverrides(
+      p,
+      particleAmount > 0 ? particleAmount : undefined
+    );
+    setParticleType(p);
+    setParticleAmount(roles.particleAmount ?? 0);
+    rememberThemeRoleOverrides(roles);
+    previewWith(roles);
+  };
+  const updateParticleAmount = (amount: number) => {
+    const roles = createTreeParticleOverrides(particleType, amount);
+    setParticleAmount(amount);
+    rememberThemeRoleOverrides(roles);
+    previewWith(roles);
+  };
 
   return (
     <div className="custom-theme-aside-overlay">
@@ -240,36 +427,6 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
         </div>
 
         <form onSubmit={handleSave} className="theme-form aside-theme-form">
-          {/* Live Preview Card */}
-          <div
-            className="theme-live-preview-card"
-            style={{
-              background: `radial-gradient(circle at 50% 30%, ${skyTop} 0%, ${skyBottom} 100%)`,
-            }}
-          >
-            <div className="preview-decor-tree">
-              <div
-                className="preview-tree-crown"
-                style={{
-                  background: `radial-gradient(circle at 35% 30%, ${foliageHighlightColor} 0%, ${foliageColor} 55%, ${foliageShadowColor} 100%)`,
-                }}
-              />
-              <div
-                className="preview-ground-platform"
-                style={{ backgroundColor: groundColor }}
-              />
-            </div>
-            <div className="preview-info-pill">
-              <span className="preview-label">{label || 'Custom Theme'}</span>
-              <span className="preview-particle-badge">
-                {(particleType === 'leaf' || particleType === 'sakura') && `Leaves (${particleAmount})`}
-                {particleType === 'fireflies' && 'Fireflies'}
-                {particleType === 'snow' && 'Snow'}
-                {particleType === 'none' && 'None'}
-              </span>
-            </div>
-          </div>
-
           {/* Theme Name */}
           <div className="form-group">
             <label className="form-label">Theme Name</label>
@@ -284,16 +441,16 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
             />
           </div>
 
-          {/* 1. Tree Foliage Multi-Color Section (4 Harmonic Tones) */}
+          {/* 1. Tree Foliage Multi-Color Section */}
           <div className="form-group">
             <div className="form-label-row">
-              <label className="form-label">Tree Foliage Colors (4 Tones)</label>
+              <label className="form-label">Tree Foliage Colors</label>
             </div>
 
             {/* 4-Color Multi Tone Grid */}
             <div className="multi-color-tones-grid">
               <div className="tone-color-item">
-                <span className="tone-label">Main Body (主色)</span>
+                <span className="tone-label">Main Body</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -306,7 +463,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               </div>
 
               <div className="tone-color-item">
-                <span className="tone-label">Highlight (葉尖)</span>
+                <span className="tone-label">Highlight</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -319,7 +476,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               </div>
 
               <div className="tone-color-item">
-                <span className="tone-label">Shadow (陰影)</span>
+                <span className="tone-label">Shadow</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -332,7 +489,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               </div>
 
               <div className="tone-color-item">
-                <span className="tone-label">Midtone (中階)</span>
+                <span className="tone-label">Midtone</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -394,9 +551,10 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
           {/* Tree Foliage Shape */}
           <div className="form-group">
             <label className="form-label">Tree Foliage Shape</label>
-            <div className="particle-selector-grid option-grid-2">
+            <div className="particle-selector-grid option-grid-3">
               <button
                 type="button"
+                data-foliage-shape="blossom"
                 className={`particle-option-btn ${foliageShape === 'blossom' ? 'active' : ''}`}
                 onClick={() => updateFoliageShape('blossom')}
               >
@@ -405,11 +563,21 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               </button>
               <button
                 type="button"
+                data-foliage-shape="leaf"
                 className={`particle-option-btn ${foliageShape === 'leaf' ? 'active' : ''}`}
                 onClick={() => updateFoliageShape('leaf')}
               >
                 <span className="particle-option-symbol">🍃</span>
                 <span>Leaf</span>
+              </button>
+              <button
+                type="button"
+                data-foliage-shape="pixel"
+                className={`particle-option-btn ${foliageShape === 'pixel' ? 'active' : ''}`}
+                onClick={() => updateFoliageShape('pixel')}
+              >
+                <span className="particle-option-symbol" aria-hidden="true">▦</span>
+                <span>Pixel</span>
               </button>
             </div>
           </div>
@@ -448,14 +616,14 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
             </div>
           </div>
 
-          {/* 2. Ground & Paver Colors Section (2 Tones) */}
+          {/* 2. Ground & Paver Colors Section*/}
           <div className="form-group">
             <div className="form-label-row">
-              <label className="form-label">Ground & Stone Paver Colors (2 Tones)</label>
+              <label className="form-label">Ground & Stone Paver Colors</label>
             </div>
             <div className="multi-color-tones-grid">
               <div className="tone-color-item">
-                <span className="tone-label">Canvas Base (淺色底)</span>
+                <span className="tone-label">Canvas Base</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -468,7 +636,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               </div>
 
               <div className="tone-color-item">
-                <span className="tone-label">Stone Shadow (石板暗階)</span>
+                <span className="tone-label">Stone Shadow</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -504,7 +672,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
             </div>
           </div>
 
-          {/* 3. Grass & Lawn Multi-Color Section (3 Tones) */}
+          {/* 3. Ground Surface Decor Multi-Color Section*/}
           <div className="form-group">
             <label className="form-label">Ground Surface Decor</label>
             <div className="particle-selector-grid option-grid-3">
@@ -519,11 +687,11 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
 
               <button
                 type="button"
-                className={`particle-option-btn ${groundFeature === 'snow' ? 'active' : ''}`}
-                onClick={() => updateGroundFeature('snow')}
+                className={`particle-option-btn ${groundFeature === 'pixel' ? 'active' : ''}`}
+                onClick={() => updateGroundFeature('pixel')}
               >
-                <Snowflake size={16} />
-                <span>Snow</span>
+                <Box size={16} />
+                <span>Pixel</span>
               </button>
 
               <button
@@ -536,18 +704,22 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               </button>
             </div>
 
-            {/* Ground Feature Color Customization (3 Tones for Grass) */}
+            {/* Ground Feature Color Customization */}
             {groundFeature !== 'none' && (
               <div className="particle-slider-card nested-form-card">
                 <div className="form-label-row nested-form-heading">
                   <label className="form-label">
-                    {groundFeature === 'snow' ? 'Snow Palette' : 'Lawn & Finder Colors (3 Tones)'}
+                    {groundFeature === 'pixel'
+                      ? 'Pixel & Finder Colors'
+                      : 'Lawn & Finder Colors'}
                   </label>
                 </div>
 
                 <div className="multi-color-tones-grid tone-grid-3">
                   <div className="tone-color-item">
-                    <span className="tone-label">Lawn (草地主色)</span>
+                    <span className="tone-label">
+                      {groundFeature === 'pixel' ? 'Pixel Base' : 'Lawn'}
+                    </span>
                     <div className="color-value-badge">
                       <input
                         type="color"
@@ -560,7 +732,9 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
                   </div>
 
                   <div className="tone-color-item">
-                    <span className="tone-label">Tip (草尖高光)</span>
+                    <span className="tone-label">
+                      {groundFeature === 'pixel' ? 'Pixel Highlight' : 'Tip'}
+                    </span>
                     <div className="color-value-badge">
                       <input
                         type="color"
@@ -573,7 +747,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
                   </div>
 
                   <div className="tone-color-item">
-                    <span className="tone-label">QR Eye (碼眼暗核)</span>
+                    <span className="tone-label">QR Eye</span>
                     <div className="color-value-badge">
                       <input
                         type="color"
@@ -586,7 +760,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
                   </div>
                 </div>
 
-                {/* Quick Grass Presets (Emoji + Color Dot Only) */}
+                {/* Quick Ground Decor Presets (Emoji + Color Dot Only) */}
                 <div className="preset-palette-chip-grid">
                   {MULTI_GRASS_PRESETS.map((p) => (
                     <button
@@ -611,12 +785,12 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
             )}
           </div>
 
-          {/* 4. Sky Atmosphere Gradient (2 Tones) */}
+          {/* 4. Sky Atmosphere Gradient */}
           <div className="form-group">
-            <label className="form-label">Sky & Atmosphere Color (2 Tones)</label>
+            <label className="form-label">Sky & Atmosphere Color</label>
             <div className="sky-gradient-row">
               <div className="sky-color-input-block">
-                <span className="sky-label">Zenith Top (天頂)</span>
+                <span className="sky-label">Zenith Top</span>
                 <div className="color-value-badge">
                   <input
                     type="color"
@@ -631,7 +805,7 @@ export const CustomThemeModal: React.FC<CustomThemeModalProps> = ({
               <div className="sky-color-gradient-preview" style={{ background: `linear-gradient(90deg, ${skyTop}, ${skyBottom})` }} />
 
               <div className="sky-color-input-block">
-                <span className="sky-label">Horizon (地平線)</span>
+                <span className="sky-label">Horizon</span>
                 <div className="color-value-badge">
                   <input
                     type="color"

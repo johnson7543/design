@@ -1,10 +1,10 @@
 import {
-  decodeCompatibleDesignQRConfig,
+  decodeDesignQRConfig,
   encodeDesignQRConfig,
   normalizeDesignQRConfig,
   type DesignQRConfigV1,
   type DesignQRInteractionOptions,
-  type DesignQRQuality,
+  type DesignQRLogoOptions,
   type DesignQRThemePreset,
   type TreeDesignOptions,
   type TreeTheme,
@@ -21,18 +21,16 @@ const PRESET_BY_SEASON = [
 export interface ShareConfig {
   url: string;
   season: number;
-  palette: number;
   viewMode?: '3d' | 'scan';
-  /** Legacy master-details flag; retained only while decoding older links. */
-  detailsEnabled?: boolean;
   title?: string;
   showContent?: boolean;
   borderEnabled?: boolean;
   borderPadding?: number;
+  transparentBackground?: boolean;
   customTheme?: TreeTheme;
   treeShape?: TreeDesignOptions['shape'];
   interaction?: DesignQRInteractionOptions;
-  quality?: DesignQRQuality;
+  logo?: false | DesignQRLogoOptions;
 }
 
 function presetForSeason(season: number): DesignQRThemePreset {
@@ -68,7 +66,8 @@ export function createDesignQRConfig(config: ShareConfig): DesignQRConfigV1 {
         : false,
     },
     interaction: config.interaction,
-    quality: config.quality,
+    logo: config.logo,
+    transparentBackground: config.transparentBackground,
   });
 }
 
@@ -81,7 +80,7 @@ export function encodeShareConfig(config: ShareConfig): string {
 }
 
 export function decodeShareConfig(encoded: string): ShareConfig | null {
-  const decoded = decodeCompatibleDesignQRConfig(encoded);
+  const decoded = decodeDesignQRConfig(encoded);
   if (!decoded.ok) return null;
 
   const config = decoded.value;
@@ -95,9 +94,7 @@ export function decodeShareConfig(encoded: string): ShareConfig | null {
   return {
     url: config.value,
     season,
-    palette: 0,
     viewMode: config.view.initial === 'qr' ? 'scan' : '3d',
-    detailsEnabled: false,
     title: config.details.title,
     showContent: config.details.showValue,
     borderEnabled: config.details.border !== false,
@@ -107,6 +104,9 @@ export function decodeShareConfig(encoded: string): ShareConfig | null {
     customTheme,
     treeShape: config.design.options.shape,
     interaction: config.interaction,
-    quality: config.quality,
+    logo: config.logo,
+    ...(config.transparentBackground === true
+      ? { transparentBackground: true }
+      : {}),
   };
 }

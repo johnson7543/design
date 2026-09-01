@@ -12,20 +12,28 @@ import {
   Scan,
   Plus,
   RotateCcw,
+  RefreshCcw,
+  RefreshCw,
   Settings2,
   ChevronDown,
   Gauge,
+  Grid2X2,
+  Image as ImageIcon,
 } from 'lucide-react';
 import {
   QR_BORDER_PADDING_DEFAULT,
-  SEASONS,
   VIEW_TRANSITION_SPEED_DEFAULT,
   VIEW_TRANSITION_SPEED_MAX,
   VIEW_TRANSITION_SPEED_MIN,
   VIEW_TRANSITION_SPEED_STEP,
 } from 'designqr/editor';
+import type { AutoRotateDirection, DesignQRLogoOptions } from 'designqr/config';
 import type { CustomTheme } from '../editor/types';
-import { FloatingQRDetailsControls } from './FloatingFlatQRControls';
+import { THEME_PRESET_OPTIONS } from '../editor/theme-presets';
+import {
+  FloatingLogoControls,
+  FloatingQRDetailsControls,
+} from './FloatingFlatQRControls';
 
 interface ControlsOverlayProps {
   url: string;
@@ -38,20 +46,31 @@ interface ControlsOverlayProps {
   onShare: () => void;
   isTurntable: boolean;
   onToggleTurntable: () => void;
+  autoRotateDirection: AutoRotateDirection;
+  onToggleAutoRotateDirection: () => void;
   onResetRotation: () => void;
   viewMode: '3d' | 'scan';
   onToggleScanMode?: () => void;
-  hideScanDetails?: boolean;
   isDetailsEditorOpen?: boolean;
   onToggleDetailsEditor?: () => void;
+  isLogoEditorOpen?: boolean;
+  onToggleLogoEditor?: () => void;
   qrTitle?: string;
   onQrTitleChange?: (newTitle: string) => void;
+  transparentBackground?: boolean;
+  onToggleTransparentBackground?: (transparent: boolean) => void;
   showQrContent?: boolean;
   onToggleShowContent?: (show: boolean) => void;
   qrBorderEnabled?: boolean;
   onToggleQrBorder?: (enabled: boolean) => void;
   qrBorderPadding?: number;
   onQrBorderPaddingChange?: (padding: number) => void;
+  logo?: false | Required<DesignQRLogoOptions>;
+  onLogoChange?: (logo: false | Required<DesignQRLogoOptions>) => void;
+  onLogoFileSelect?: (file: File) => void;
+  isPreparingLogo?: boolean;
+  logoEditorError?: string;
+  shareConfigurationError?: string;
   enableMotionBlur?: boolean;
   onToggleMotionBlur?: (enabled: boolean) => void;
   transitionSpeed?: number;
@@ -73,20 +92,31 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   onShare,
   isTurntable,
   onToggleTurntable,
+  autoRotateDirection,
+  onToggleAutoRotateDirection,
   onResetRotation,
   viewMode,
   onToggleScanMode,
-  hideScanDetails = false,
   isDetailsEditorOpen = false,
   onToggleDetailsEditor,
+  isLogoEditorOpen = false,
+  onToggleLogoEditor,
   qrTitle = '',
   onQrTitleChange,
+  transparentBackground = false,
+  onToggleTransparentBackground,
   showQrContent = false,
   onToggleShowContent,
   qrBorderEnabled = false,
   onToggleQrBorder,
   qrBorderPadding = QR_BORDER_PADDING_DEFAULT,
   onQrBorderPaddingChange,
+  logo = false,
+  onLogoChange,
+  onLogoFileSelect,
+  isPreparingLogo = false,
+  logoEditorError = '',
+  shareConfigurationError = '',
   enableMotionBlur = true,
   onToggleMotionBlur,
   transitionSpeed = VIEW_TRANSITION_SPEED_DEFAULT,
@@ -113,7 +143,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
     <div className="controls-overlay">
       {/* Floating tools directly above the content input */}
       <div className="floating-tools-stack">
-        {viewMode === 'scan' && !hideScanDetails && isDetailsEditorOpen && (
+        {viewMode === 'scan' && isDetailsEditorOpen && (
           <FloatingQRDetailsControls
             title={qrTitle}
             onTitleChange={onQrTitleChange}
@@ -123,6 +153,17 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
             onToggleBorder={onToggleQrBorder}
             borderPadding={qrBorderPadding}
             onBorderPaddingChange={onQrBorderPaddingChange}
+          />
+        )}
+
+        {isLogoEditorOpen && (
+          <FloatingLogoControls
+            logo={logo}
+            onLogoChange={onLogoChange}
+            onLogoFileSelect={onLogoFileSelect}
+            isPreparingLogo={isPreparingLogo}
+            logoError={logoEditorError}
+            configurationError={shareConfigurationError}
           />
         )}
 
@@ -157,20 +198,35 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
           </div>
 
           <div className="floating-edge-tools floating-right-tools">
-            {viewMode === 'scan' && !hideScanDetails && (
+            {viewMode === 'scan' && (
               <button
                 type="button"
                 className={`floating-edit-toggle ${isDetailsEditorOpen ? 'open' : ''}`}
                 onClick={onToggleDetailsEditor}
                 aria-expanded={isDetailsEditorOpen}
                 aria-controls="qr-details-editor"
+                aria-label={isDetailsEditorOpen ? 'Hide QR editor' : 'Edit QR details'}
                 title={isDetailsEditorOpen ? 'Hide QR editor' : 'Edit QR details'}
               >
                 <Settings2 size={13} aria-hidden="true" />
-                <span>Edit</span>
+                <span className="floating-stage-tool-label">Edit</span>
                 <ChevronDown size={12} className="floating-edit-chevron" aria-hidden="true" />
               </button>
             )}
+
+            <button
+              type="button"
+              className={`floating-edit-toggle floating-logo-toggle ${isLogoEditorOpen ? 'open' : ''}`}
+              onClick={onToggleLogoEditor}
+              aria-expanded={isLogoEditorOpen}
+              aria-controls="logo-editor"
+              aria-label={isLogoEditorOpen ? 'Hide logo editor' : logo === false ? 'Add logo' : 'Edit logo'}
+              title={isLogoEditorOpen ? 'Hide logo editor' : logo === false ? 'Add logo' : 'Edit logo'}
+            >
+              <ImageIcon size={13} aria-hidden="true" />
+              <span className="floating-stage-tool-label">Logo</span>
+              <ChevronDown size={12} className="floating-edit-chevron" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </div>
@@ -206,7 +262,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
       <div className="customizer-card glass-panel">
         {/* 4 Season Selector Tabs + Compact '+' Add Theme button */}
         <div className="season-tabs">
-          {SEASONS.map((season) => (
+          {THEME_PRESET_OPTIONS.map((season) => (
             <button
               type="button"
               key={season.id}
@@ -283,6 +339,27 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
               {isTurntable ? <Pause size={16} /> : <Play size={16} />}
             </button>
 
+            <button
+              type="button"
+              className="drawer-icon-btn"
+              onClick={onToggleAutoRotateDirection}
+              title={
+                autoRotateDirection === 'clockwise'
+                  ? 'Change spin to counterclockwise'
+                  : 'Change spin to clockwise'
+              }
+              aria-label={
+                autoRotateDirection === 'clockwise'
+                  ? 'Change spin to counterclockwise'
+                  : 'Change spin to clockwise'
+              }
+              aria-pressed={autoRotateDirection === 'counterclockwise'}
+            >
+              {autoRotateDirection === 'clockwise'
+                ? <RefreshCw size={16} />
+                : <RefreshCcw size={16} />}
+            </button>
+
             {/* Reset the tree to its original viewing angle. */}
             <button
               type="button"
@@ -304,6 +381,22 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
               aria-pressed={enableMotionBlur}
             >
               <Blend size={16} />
+            </button>
+
+            {/* Keep transparency available in both 3D and 2D modes. */}
+            <button
+              type="button"
+              className={`drawer-icon-btn transparent-background-btn ${transparentBackground ? 'active' : ''}`}
+              onClick={() => onToggleTransparentBackground?.(!transparentBackground)}
+              title={
+                transparentBackground
+                  ? 'Disable transparent background'
+                  : 'Enable transparent background'
+              }
+              aria-label="Transparent background"
+              aria-pressed={transparentBackground}
+            >
+              <Grid2X2 size={16} aria-hidden="true" />
             </button>
 
             <label

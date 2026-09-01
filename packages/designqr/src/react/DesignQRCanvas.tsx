@@ -3,15 +3,22 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
+  useState,
 } from 'react';
-import type { DesignQRQuality, TreeTheme } from '../config/types.ts';
+import type {
+  AutoRotateDirection,
+  DesignQRLogoOptions,
+  ResolvedTreeTheme,
+} from '../config/types.ts';
 import { RenderManager } from '../renderer/RenderManager.ts';
 import {
   PresentationSurface,
   type PresentationSurfaceState,
 } from '../renderer/PresentationSurface.ts';
 import type { TreeData } from '../designs/tree/treeBuilder.ts';
+import { VIEW_TRANSITION_SPEED_DEFAULT } from '../designs/tree/constants.ts';
 
 export interface DesignQRCanvasHandle {
   exportImage(): Promise<Blob>;
@@ -22,19 +29,20 @@ export interface DesignQRCanvasHandle {
 
 export interface DesignQRCanvasProps {
   treeData: TreeData;
-  seasonId: number;
-  customTheme?: TreeTheme | null;
-  customColor: [number, number, number];
-  customStrength: number;
+  theme: ResolvedTreeTheme;
   viewMode: '3d' | 'scan';
   onToggleScanMode?: () => void;
   onRendererReady?: (manager: RenderManager) => void;
   onRendererError?: (error: unknown) => void;
+  prefersReducedMotion?: boolean;
   enableMotionBlur?: boolean;
   dragToRotate?: boolean;
   tapToToggleView?: boolean;
   autoRotate?: boolean;
-  quality?: DesignQRQuality;
+  autoRotateDirection?: AutoRotateDirection;
+  transitionSpeed?: number;
+  logo?: false | Required<DesignQRLogoOptions>;
+  transparentBackground?: boolean;
   backgroundTop: string;
   backgroundBottom: string;
   showQrDetails?: boolean;
@@ -49,23 +57,48 @@ export interface DesignQRCanvasProps {
   ariaLabel?: string;
 }
 
+interface PointerGesture {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  lastX: number;
+  lastY: number;
+  movedBeyondTapThreshold: boolean;
+  canDrag: boolean;
+  canToggle: boolean;
+}
+
+const TAP_MOVE_THRESHOLD = 8;
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+function getInitialReducedMotionPreference(): boolean {
+  return typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia(REDUCED_MOTION_QUERY).matches;
+}
+
+const useBrowserLayoutEffect = typeof window === 'undefined'
+  ? useEffect
+  : useLayoutEffect;
+
 export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasProps>(
   function DesignQRCanvas(
     {
       treeData,
-      seasonId,
-      customTheme,
-      customColor,
-      customStrength,
+      theme,
       viewMode,
       onToggleScanMode,
       onRendererReady,
       onRendererError,
+      prefersReducedMotion,
       enableMotionBlur = true,
       dragToRotate = true,
       tapToToggleView = true,
       autoRotate = false,
-      quality = 'high',
+      autoRotateDirection = 'clockwise',
+      transitionSpeed = VIEW_TRANSITION_SPEED_DEFAULT,
+      logo = false,
+      transparentBackground = false,
       backgroundTop,
       backgroundBottom,
       showQrDetails = false,
@@ -81,6 +114,11 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
     },
     ref
   ) {
+    const [systemPrefersReducedMotion, setSystemPrefersReducedMotion] = useState(
+      getInitialReducedMotionPreference
+    );
+    const shouldReduceMotion = prefersReducedMotion
+      ?? systemPrefersReducedMotion;
     const containerRef = useRef<HTMLDivElement>(null);
     const sourceCanvasRef = useRef<HTMLCanvasElement>(null);
     const presentationCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -89,19 +127,21 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
     const presentationSurfaceRef = useRef<PresentationSurface | null>(null);
     const initialRenderPropsRef = useRef({
       treeData,
-      seasonId,
-      customTheme,
-      customColor,
-      customStrength,
+      theme,
       viewMode,
       onRendererReady,
-      onRendererError,
+      prefersReducedMotion: shouldReduceMotion,
       autoRotate,
-      quality,
+      autoRotateDirection,
+      transitionSpeed,
+      logo,
     });
     const initialPresentationStateRef = useRef<PresentationSurfaceState>({
       backgroundTop,
       backgroundBottom,
+      transparentBackground,
+      qrGridSize: treeData.gridSize,
+      qrLightColor: theme.groundColor,
       showQrDetails,
       title: qrTitle,
       showValue: showQrContent,
@@ -109,22 +149,43 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       borderEnabled: qrBorderEnabled,
       borderPadding: qrBorderPadding,
       titleColor: qrTitleColor,
+      prefersReducedMotion: shouldReduceMotion,
     });
-    const enableMotionBlurRef = useRef(enableMotionBlur);
+    const enableMotionBlurRef = useRef(
+      enableMotionBlur && !shouldReduceMotion
+    );
     const onRendererErrorRef = useRef(onRendererError);
     const manuallyPausedRef = useRef(false);
+    const contextAvailableRef = useRef(true);
     const documentVisibleRef = useRef(
       typeof document === 'undefined' || document.visibilityState !== 'hidden'
     );
     const intersectingRef = useRef(true);
 
-    const isDragging = useRef(false);
-    const pointerStart = useRef<{ x: number; y: number; time: number }>({
-      x: 0,
-      y: 0,
-      time: 0,
-    });
-    const lastPointer = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const pointerGestureRef = useRef<PointerGesture | null>(null);
+
+    useEffect(() => {
+      if (
+        prefersReducedMotion !== undefined
+        || typeof window.matchMedia !== 'function'
+      ) {
+        return;
+      }
+
+      const media = window.matchMedia(REDUCED_MOTION_QUERY);
+      const updatePreference = () => {
+        setSystemPrefersReducedMotion(media.matches);
+      };
+      updatePreference();
+
+      if (typeof media.addEventListener === 'function') {
+        media.addEventListener('change', updatePreference);
+        return () => media.removeEventListener('change', updatePreference);
+      }
+
+      media.addListener(updatePreference);
+      return () => media.removeListener(updatePreference);
+    }, [prefersReducedMotion]);
 
     const syncPlayback = useCallback(() => {
       const manager = renderManagerRef.current;
@@ -132,6 +193,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
 
       if (
         manuallyPausedRef.current
+        || !contextAvailableRef.current
         || !documentVisibleRef.current
         || !intersectingRef.current
       ) {
@@ -193,16 +255,21 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         initialPresentationStateRef.current
       );
       const initial = initialRenderPropsRef.current;
-      const manager = new RenderManager(sourceCanvas, initial.quality);
+      const manager = new RenderManager(sourceCanvas);
       presentationSurfaceRef.current = surface;
       manager.onProgressUpdate = (_progress, blurIntensity) => {
+        surface.setViewProgress(_progress);
         surface.setBlurIntensity(enableMotionBlurRef.current ? blurIntensity : 0);
       };
       manager.onAfterRender = () => {
         surface.draw();
       };
+      manager.onError = (error) => {
+        onRendererErrorRef.current?.(error);
+      };
 
       if (!manager.init()) {
+        manager.destroy();
         presentationSurfaceRef.current = null;
         onRendererErrorRef.current?.(
           new Error('WebGL is unavailable for this DesignQR instance.')
@@ -212,19 +279,20 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
 
       renderManagerRef.current = manager;
       manager.setTreeData(initial.treeData);
-      manager.setSeason(initial.seasonId);
-      if (initial.customTheme) {
-        manager.setCustomTheme(initial.customTheme);
+      manager.setTheme(initial.theme);
+      manager.setTransitionSpeed(initial.transitionSpeed);
+      const initialProgress = initial.viewMode === 'scan' ? 1 : 0;
+      if (initial.prefersReducedMotion || initial.viewMode === 'scan') {
+        manager.setProgressImmediate(initialProgress);
       } else {
-        manager.setCustomColor(initial.customColor, initial.customStrength);
-      }
-      if (initial.viewMode === 'scan') {
-        manager.setProgressImmediate(1);
-      } else {
-        manager.setTargetProgress(0);
+        manager.setTargetProgress(initialProgress);
       }
       handleResize();
-      manager.toggleTurntable(initial.autoRotate);
+      manager.toggleTurntable(
+        initial.autoRotate && !initial.prefersReducedMotion
+      );
+      manager.setTurntableDirection(initial.autoRotateDirection);
+      manager.setLogo(initial.logo);
       manager.renderOnce();
       initial.onRendererReady?.(manager);
       syncPlayback();
@@ -240,10 +308,13 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       onRendererErrorRef.current = onRendererError;
     }, [onRendererError]);
 
-    useEffect(() => {
+    useBrowserLayoutEffect(() => {
       presentationSurfaceRef.current?.setState({
         backgroundTop,
         backgroundBottom,
+        transparentBackground,
+        qrGridSize: treeData.gridSize,
+        qrLightColor: theme.groundColor,
         showQrDetails,
         title: qrTitle,
         showValue: showQrContent,
@@ -251,6 +322,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         borderEnabled: qrBorderEnabled,
         borderPadding: qrBorderPadding,
         titleColor: qrTitleColor,
+        prefersReducedMotion: shouldReduceMotion,
       });
     }, [
       backgroundBottom,
@@ -260,47 +332,60 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       qrTitle,
       qrTitleColor,
       qrValue,
+      shouldReduceMotion,
       showQrContent,
       showQrDetails,
+      theme.groundColor,
+      transparentBackground,
+      treeData.gridSize,
     ]);
 
-    useEffect(() => {
-      enableMotionBlurRef.current = enableMotionBlur;
-      if (!enableMotionBlur) {
+    useBrowserLayoutEffect(() => {
+      enableMotionBlurRef.current = enableMotionBlur && !shouldReduceMotion;
+      if (!enableMotionBlurRef.current) {
         presentationSurfaceRef.current?.setBlurIntensity(0);
       }
-    }, [enableMotionBlur]);
+    }, [enableMotionBlur, shouldReduceMotion]);
 
-    useEffect(() => {
+    useBrowserLayoutEffect(() => {
       renderManagerRef.current?.setTreeData(treeData);
     }, [treeData]);
 
-    useEffect(() => {
-      renderManagerRef.current?.setSeason(seasonId);
-    }, [seasonId]);
+    useBrowserLayoutEffect(() => {
+      renderManagerRef.current?.setTheme(theme);
+    }, [theme]);
 
-    useEffect(() => {
-      if (!renderManagerRef.current) return;
-      if (customTheme) {
-        renderManagerRef.current.setCustomTheme(customTheme);
+    useBrowserLayoutEffect(() => {
+      const manager = renderManagerRef.current;
+      if (!manager) return;
+
+      const progress = viewMode === 'scan' ? 1 : 0;
+      if (shouldReduceMotion) {
+        manager.toggleTurntable(false);
+        manager.setProgressImmediate(progress);
+        manager.renderOnce();
       } else {
-        renderManagerRef.current.setCustomTheme(null);
-        renderManagerRef.current.setSeason(seasonId);
+        manager.setTargetProgress(progress);
       }
-    }, [customTheme, seasonId]);
+    }, [shouldReduceMotion, viewMode]);
 
-    useEffect(() => {
-      renderManagerRef.current?.setTargetProgress(viewMode === 'scan' ? 1 : 0);
-    }, [viewMode]);
+    useBrowserLayoutEffect(() => {
+      renderManagerRef.current?.toggleTurntable(
+        autoRotate && !shouldReduceMotion
+      );
+    }, [autoRotate, shouldReduceMotion]);
 
-    useEffect(() => {
-      renderManagerRef.current?.toggleTurntable(autoRotate);
-    }, [autoRotate]);
+    useBrowserLayoutEffect(() => {
+      renderManagerRef.current?.setTurntableDirection(autoRotateDirection);
+    }, [autoRotateDirection]);
 
-    useEffect(() => {
-      renderManagerRef.current?.setQuality(quality);
-      handleResize();
-    }, [handleResize, quality]);
+    useBrowserLayoutEffect(() => {
+      renderManagerRef.current?.setTransitionSpeed(transitionSpeed);
+    }, [transitionSpeed]);
+
+    useBrowserLayoutEffect(() => {
+      renderManagerRef.current?.setLogo(logo);
+    }, [logo]);
 
     useEffect(() => {
       const canvas = sourceCanvasRef.current;
@@ -308,12 +393,17 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
 
       const handleContextLost = (event: Event) => {
         event.preventDefault();
-        renderManagerRef.current?.pause();
+        contextAvailableRef.current = false;
+        syncPlayback();
         onRendererErrorRef.current?.(
           new Error('The DesignQR WebGL context was lost.')
         );
       };
-      const handleContextRestored = () => syncPlayback();
+      const handleContextRestored = () => {
+        contextAvailableRef.current = true;
+        renderManagerRef.current?.renderOnce();
+        syncPlayback();
+      };
       canvas.addEventListener('webglcontextlost', handleContextLost);
       canvas.addEventListener('webglcontextrestored', handleContextRestored);
 
@@ -349,34 +439,56 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
 
     useEffect(() => {
       if (!containerRef.current) return;
-      const resizeObserver = new ResizeObserver(handleResize);
-      resizeObserver.observe(containerRef.current);
+      const resizeObserver = typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(handleResize);
+      resizeObserver?.observe(containerRef.current);
       window.addEventListener('resize', handleResize);
       handleResize();
 
       return () => {
-        resizeObserver.disconnect();
+        resizeObserver?.disconnect();
         window.removeEventListener('resize', handleResize);
       };
     }, [handleResize]);
 
-    const onPointerDown = (event: React.PointerEvent) => {
-      isDragging.current = true;
-      pointerStart.current = {
-        x: event.clientX,
-        y: event.clientY,
-        time: performance.now(),
+    const canDrag = dragToRotate && viewMode === '3d';
+    const canToggle = tapToToggleView && onToggleScanMode !== undefined;
+
+    const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+      if (
+        !event.isPrimary
+        || event.button !== 0
+        || (!canDrag && !canToggle)
+        || pointerGestureRef.current !== null
+      ) {
+        return;
+      }
+
+      pointerGestureRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        movedBeyondTapThreshold: false,
+        canDrag,
+        canToggle,
       };
-      lastPointer.current = { x: event.clientX, y: event.clientY };
-      (event.target as HTMLElement).setPointerCapture(event.pointerId);
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {
+        pointerGestureRef.current = null;
+        return;
+      }
+      if (canToggle) event.currentTarget.focus({ preventScroll: true });
     };
 
-    const onPointerMove = (event: React.PointerEvent) => {
+    const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
       const manager = renderManagerRef.current;
       const container = containerRef.current;
-      if (!manager) return;
 
-      if (container) {
+      if (manager && container) {
         const point = presentationSurfaceRef.current?.clientPointToNdc(
           event.clientX,
           event.clientY
@@ -386,55 +498,112 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         }
       }
 
-      if (!isDragging.current) return;
-      const deltaX = event.clientX - lastPointer.current.x;
-      const deltaY = event.clientY - lastPointer.current.y;
-      lastPointer.current = { x: event.clientX, y: event.clientY };
+      const gesture = pointerGestureRef.current;
+      if (!gesture || gesture.pointerId !== event.pointerId) return;
 
-      if (dragToRotate && viewMode === '3d') {
+      const wasDragging = gesture.movedBeyondTapThreshold;
+      if (!wasDragging) {
+        gesture.movedBeyondTapThreshold = Math.hypot(
+          event.clientX - gesture.startX,
+          event.clientY - gesture.startY
+        ) >= TAP_MOVE_THRESHOLD;
+      }
+
+      if (manager && gesture.canDrag && gesture.movedBeyondTapThreshold) {
+        const deltaX = event.clientX - (wasDragging ? gesture.lastX : gesture.startX);
+        const deltaY = event.clientY - (wasDragging ? gesture.lastY : gesture.startY);
         manager.handleDrag(deltaX, deltaY);
       }
+      gesture.lastX = event.clientX;
+      gesture.lastY = event.clientY;
     };
 
     const onPointerLeave = () => {
       renderManagerRef.current?.setMousePosition(0, 0, false);
     };
 
-    const onPointerUp = (event: React.PointerEvent) => {
-      if (!isDragging.current) return;
-      isDragging.current = false;
+    const releasePointer = (event: React.PointerEvent<HTMLDivElement>) => {
       try {
-        (event.target as HTMLElement).releasePointerCapture(event.pointerId);
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
       } catch {
         // Pointer capture may already be released by the browser.
       }
+    };
 
-      const moveDistance = Math.hypot(
-        event.clientX - pointerStart.current.x,
-        event.clientY - pointerStart.current.y
-      );
-      const duration = performance.now() - pointerStart.current.time;
-      if (tapToToggleView && moveDistance < 8 && duration < 350) {
+    const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+      const gesture = pointerGestureRef.current;
+      if (!gesture || gesture.pointerId !== event.pointerId) return;
+
+      pointerGestureRef.current = null;
+      releasePointer(event);
+
+      const movedBeyondTapThreshold = gesture.movedBeyondTapThreshold || Math.hypot(
+        event.clientX - gesture.startX,
+        event.clientY - gesture.startY
+      ) >= TAP_MOVE_THRESHOLD;
+      if (gesture.canToggle && !movedBeyondTapThreshold) {
         onToggleScanMode?.();
       }
     };
 
-    const canvasLabel = ariaLabel ?? (showQrDetails
+    const onPointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+      if (pointerGestureRef.current?.pointerId !== event.pointerId) return;
+      pointerGestureRef.current = null;
+      releasePointer(event);
+    };
+
+    const onLostPointerCapture = (event: React.PointerEvent<HTMLDivElement>) => {
+      if (pointerGestureRef.current?.pointerId === event.pointerId) {
+        pointerGestureRef.current = null;
+      }
+    };
+
+    const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (
+        !canToggle
+        || event.repeat
+        || (event.key !== 'Enter' && event.key !== ' ')
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      onToggleScanMode?.();
+    };
+
+    const logoDescription = logo === false || logo.alt.length === 0
+      ? ''
+      : ` with ${logo.alt}`;
+    const presentationLabel = viewMode === 'scan'
       ? `DesignQR code${qrTitle.trim() ? ` titled ${qrTitle.trim()}` : ''}${
           showQrContent ? ` for ${qrValue}` : ''
-        }`
-      : 'Interactive DesignQR tree');
+        }${logoDescription}`
+      : `DesignQR tree${logoDescription}`;
+    const accessibleLabel = ariaLabel ?? (canToggle
+      ? `Show ${viewMode === 'scan' ? 'design' : 'QR'} view. ${presentationLabel}`
+      : presentationLabel);
+    const interactionClasses = `${canDrag ? ' designqr-can-drag' : ''}${
+      canToggle ? ' designqr-can-toggle' : ''
+    }`;
 
     return (
       <div
         ref={containerRef}
-        className={`designqr-root designqr-canvas-wrapper view-${viewMode}${className ? ` ${className}` : ''}`}
+        className={`designqr-root designqr-canvas-wrapper view-${viewMode}${interactionClasses}${className ? ` ${className}` : ''}`}
         style={style}
+        role={canToggle ? 'button' : 'img'}
+        tabIndex={canToggle ? 0 : undefined}
+        aria-keyshortcuts={canToggle ? 'Enter Space' : undefined}
+        aria-label={accessibleLabel}
+        onKeyDown={canToggle ? onKeyDown : undefined}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onLostPointerCapture={onLostPointerCapture}
       >
         <canvas
           ref={sourceCanvasRef}
@@ -444,8 +613,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         <canvas
           ref={presentationCanvasRef}
           className="designqr-presentation-canvas"
-          role="img"
-          aria-label={canvasLabel}
+          aria-hidden="true"
         />
         <div
           ref={transformProbeRef}

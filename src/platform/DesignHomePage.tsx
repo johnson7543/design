@@ -1,15 +1,13 @@
 import { useEffect, useRef, type CSSProperties } from 'react';
 import { GitFork } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SEASONS } from 'designqr/editor';
+import { TREE_THEME_PRESETS } from 'designqr';
 
-const springTheme = SEASONS[0];
-const toCssRgb = (channels: [number, number, number]) =>
-  `rgb(${channels.map((channel) => Math.round(channel * 255)).join(' ')})`;
+const springTheme = TREE_THEME_PRESETS.spring;
 
 const springThemeStyle = {
-  '--design-sky-top': toCssRgb(springTheme.skyTop),
-  '--design-sky-bottom': toCssRgb(springTheme.skyBottom),
+  '--design-sky-top': springTheme.skyTop,
+  '--design-sky-bottom': springTheme.skyBottom,
 } as CSSProperties;
 
 function DesignQRPreview() {

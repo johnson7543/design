@@ -1,3 +1,9 @@
+.designqr-embed-document,
+.designqr-embed-document body,
+.designqr-embed-document #root {
+  background: transparent;
+}
+
 .designqr-embed-route {
   width: 100%;
   height: 100%;

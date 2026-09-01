@@ -28,14 +28,14 @@ Completed in the first implementation slice:
 
 - Added the root npm workspace and the initial `designqr@0.1.0` package scaffold.
 - Added `DesignQRConfigV1`, defaults, normalization, typed errors, the schema-v1
-  base64url codec, the tree design registry, and legacy v2/original link decoders.
-- Migrated editor links to schema v1 while preserving legacy decoding and complete
-  custom-theme snapshots.
+  base64url codec, and the tree design registry.
+- Migrated editor links to the current schema with complete custom-theme
+  snapshots.
 - Replaced the selector-based, download-only image compositor with one live
   presentation canvas. The editor displays this canvas and exports its PNG blob
   directly, including its background and visible QR details.
 - Added package tests for normalization, malformed input, UTF-8 round trips,
-  design lookup, title-color resolution, and both legacy link formats.
+  design lookup, title-color resolution, and current-schema links.
 
 Completed in the second implementation slice:
 
@@ -48,6 +48,10 @@ Completed in the second implementation slice:
 - Scoped the reusable player CSS under `designqr-` classes and removed the old
   root renderer/component copies. The editor now imports the workspace package's
   player and renderer implementation.
+- Made presentation fonts, detail colors, borders, focus, cursors, and
+  interaction semantics package-owned. Enter and Space toggle only when
+  tap-to-toggle is enabled, and reduced motion settles view and background
+  changes immediately.
 - Added Vite ESM/CJS library builds, TypeScript declarations, a CSS subpath
   export, and build-time ESM/CJS/SSR import checks.
 - Added a standalone React/Vite consumer fixture that compiles against the
@@ -83,14 +87,66 @@ Completed in the fourth implementation slice:
 - Expanded the Share modal into responsive `Share`, `Embed`, and `React` views,
   with WYSIWYG image download, system/direct sharing, hosted-player URL copy,
   safe iframe markup, a copyable npm install command, a minimal React example
-  that emits only settings which differ from the public component defaults, and
-  an `Advance` example that exposes the practical public customization surface
-  without an unused imperative ref.
+  that emits only settings which differ from the public component defaults, an
+  `Advanced` example that implements controlled view and host error handling
+  over the complete current public component setup, and a second advanced
+  `Custom Theme` example that exposes the current resolved theme through every
+  public `createTreeTheme()` parameter alongside the complete current render
+  configuration.
 - Unified Share-modal copy actions as accessible icon-only controls and added a
   tokenized syntax theme for HTML, shell, and TSX examples.
+- Added strict compilation of generated preset/custom-theme TSX with URL and
+  inline logos, plus browser checks that copied code exactly matches the active
+  example and copy feedback does not leak between tabs.
+- Made React example selection follow the canonical editor snapshot on every
+  Share opening: URL-only defaults recommend `Simple`, non-theme customization
+  recommends `Advanced`, and an active custom theme recommends `Custom Theme`.
+  The recommendation remains visibly and accessibly marked after manual tab
+  selection.
 - Added `createDesignQRIframeMarkup()` to the public `designqr/embed` API and
   browser coverage that verifies Share and Embed carry the same encoded config
   without overflowing the 320 px layout.
+
+Completed in the fifth implementation slice:
+
+- Added complete, immutable Spring/Summer/Autumn/Winter theme objects and
+  `createTreeTheme()`, including explicit renderer roles for foliage, branches,
+  QR modules, ground, weather, ambient particles, snow, background, and text.
+- Added time-based clockwise/counterclockwise automatic rotation and one
+  fixed-footprint editor direction control that preserves the current yaw.
+- Added clean-room Pixel foliage using the existing QR-derived voxel set, so the
+  3D/2D turn remains one continuous object without a duplicate QR layer.
+- Added an optional raster logo that moves from the 3D canopy to the QR center,
+  is serialized by every integration surface, appears in the live/exported
+  pixels, uses high QR error correction, and reports typed loading failures.
+- Added the editor's dedicated logo upload/replace/size/remove controls. Local
+  PNG, JPEG, and WebP originals up to 100 MiB are downsampled and re-encoded
+  below 1 MiB while still meeting the stricter canonical-link source limit;
+  inline preparation failures do not move the artwork stage.
+- Expanded public declarations and the package README with the full theme,
+  interaction, logo-source, error, and WYSIWYG export contracts. The theme
+  guide now separates a small `createTreeTheme()` preset customization from a
+  compile-checked `createTreeTheme()` call that supplies every parameter.
+- Unified `createTreeTheme()` and Add Theme dependency cascades for source
+  colors and exclusive particle selection, and moved fallen-ground placement
+  onto a theme-owned deterministic seed so preset clones render identically
+  through either integration path.
+
+Completed in the transparent-background implementation slice:
+
+- Added the sparse, backward-compatible schema-v1 `transparentBackground`
+  boolean and matching React prop. Opaque remains the default, so existing
+  configurations and their encoded links are unchanged.
+- Propagated one setting through the editor, direct links, generated React
+  examples, hosted iframe configuration and live `setConfig()` updates, and the
+  WYSIWYG PNG path.
+- Made the live presentation surface clear to alpha without duplicating the
+  renderer. The underlying WebGL artwork remains alpha-capable, while the
+  settled 2D theme-light plate stays inside the normal QR/detail-border
+  footprint and uses at most four modules of configured border padding.
+- Added the persistent action-row toggle beside Blur, editor-only checkerboard
+  preview, route-scoped transparent iframe document, responsive coverage,
+  alpha/export assertions, and cross-origin QR decoding coverage.
 
 Completed in publication preparation:
 
@@ -220,9 +276,11 @@ Wrangler-served header assertions verify the public route can be framed while
 - Publication metadata remains private until naming, licensing, packed-consumer,
   and release checks are complete.
 - Browser smoke scripts test `/`, `/qr`, an unknown route, navigation, standalone
-  React consumption, and cross-origin hosted-player control/export. The hosted
-  smoke also asserts the real local Wrangler headers. Packed installation, QR
-  decoding, and explicit renderer-loop instrumentation remain pending.
+  React consumption, cross-origin hosted-player control/export, logo lifecycle,
+  visible/exported pixel identity, and final QR decoding at the minimum, default,
+  and maximum supported logo sizes. The hosted smoke also asserts the real local
+  Wrangler headers. Packed installation and explicit renderer-loop
+  instrumentation remain pending.
 
 ## 6. Public naming and API
 
@@ -231,7 +289,7 @@ Wrangler-served header assertions verify the public route can be framed while
 The primary developer experience should be:
 
 ```tsx
-import { DesignQR } from 'designqr';
+import { createTreeTheme, DesignQR } from 'designqr';
 import 'designqr/style.css';
 
 export function ProductQRCode() {
@@ -239,11 +297,19 @@ export function ProductQRCode() {
     <DesignQR
       value="https://example.com"
       design="tree"
-      theme="spring"
+      theme={createTreeTheme('spring', {
+        foliageShape: 'pixel',
+      })}
       tree={{
         shape: 'dome',
       }}
+      logo={{
+        src: '/logo.webp',
+        alt: 'Example brand',
+        size: 0.16,
+      }}
       defaultView="design"
+      transparentBackground
       details={{
         title: 'Visit our website',
         showValue: true,
@@ -254,7 +320,9 @@ export function ProductQRCode() {
       interaction={{
         dragToRotate: true,
         tapToToggleView: true,
-        autoRotate: false,
+        autoRotate: true,
+        autoRotateDirection: 'counterclockwise',
+        transitionSpeed: 1.5,
         motionBlur: true,
       }}
       onReady={() => console.log('DesignQR ready')}
@@ -282,10 +350,20 @@ export function ProductQRCode() {
   `width` and `height` props.
 - Derive the title color from the resolved theme. Do not add an unrelated title
   color prop in version 0.1.
+- Keep `logo` optional. Accept only bounded PNG, JPEG, and WebP data URLs,
+  same-origin paths, or HTTPS URLs; report loading failure through the typed
+  error channel without replacing the usable tree/QR.
+- Keep configured logo sources exact in Share, Embed, and generated React
+  examples. Inline uploads remain inline so copied TSX is immediately runnable;
+  app owners may later replace them with a public path, bundled import, or
+  hosted HTTPS URL.
+- Use `transparentBackground` for one cross-surface backdrop setting. It removes
+  the full seasonal gradient, not artwork or QR light modules, and defaults to
+  `false`.
 - Reject unknown design identifiers with a typed `UNSUPPORTED_DESIGN` error.
 - Clamp every numeric value and validate colors before they reach the renderer.
 
-### 6.3 Proposed React props
+### 6.3 Current React props
 
 ```ts
 export type DesignQRDesignName = 'tree';
@@ -295,6 +373,8 @@ export type DesignQRThemePreset =
   | 'summer'
   | 'autumn'
   | 'winter';
+export type AutoRotateDirection = 'clockwise' | 'counterclockwise';
+export type TreeFoliageShape = 'blossom' | 'leaf' | 'pixel';
 
 export interface TreeDesignOptions {
   shape?: 'dome' | 'wide' | 'pine';
@@ -313,7 +393,15 @@ export interface DesignQRInteractionOptions {
   dragToRotate?: boolean;
   tapToToggleView?: boolean;
   autoRotate?: boolean;
+  autoRotateDirection?: AutoRotateDirection;
+  transitionSpeed?: number;
   motionBlur?: boolean;
+}
+
+export interface DesignQRLogoOptions {
+  src: string;
+  alt?: string;
+  size?: number;
 }
 
 export interface DesignQRError {
@@ -321,6 +409,7 @@ export interface DesignQRError {
     | 'INVALID_CONFIG'
     | 'UNSUPPORTED_DESIGN'
     | 'QR_GENERATION_FAILED'
+    | 'LOGO_LOAD_FAILED'
     | 'WEBGL_UNAVAILABLE'
     | 'WEBGL_CONTEXT_LOST'
     | 'EXPORT_FAILED';
@@ -345,7 +434,8 @@ export interface DesignQRProps {
   defaultView?: DesignQRView;
   details?: DesignQRDetailsOptions;
   interaction?: DesignQRInteractionOptions;
-  quality?: 'low' | 'high';
+  logo?: false | DesignQRLogoOptions;
+  transparentBackground?: boolean;
   className?: string;
   style?: React.CSSProperties;
   ariaLabel?: string;
@@ -358,6 +448,12 @@ export interface DesignQRProps {
 `view` is controlled when supplied. `defaultView` initializes internal state when
 `view` is omitted. Supplying both should generate a development warning and use
 `view`.
+
+When `tapToToggleView` is enabled, the player is keyboard focusable and Enter or
+Space requests the opposite view through the same controlled or uncontrolled
+path as a pointer tap. Disabling it removes the toggle-specific button semantics,
+tab stop, and keyboard action. Cursor state follows the enabled tap and drag
+interactions.
 
 ### 6.4 Defaults
 
@@ -379,9 +475,12 @@ const DESIGN_QR_DEFAULTS = {
     dragToRotate: true,
     tapToToggleView: true,
     autoRotate: false,
+    autoRotateDirection: 'clockwise',
+    transitionSpeed: 1,
     motionBlur: true,
   },
-  quality: 'high',
+  logo: false,
+  transparentBackground: false,
 } as const;
 ```
 
@@ -426,7 +525,8 @@ export interface DesignQRConfigV1 {
   };
 
   interaction: Required<DesignQRInteractionOptions>;
-  quality: 'low' | 'high';
+  logo: false | Required<DesignQRLogoOptions>;
+  transparentBackground?: boolean;
 }
 ```
 
@@ -436,29 +536,19 @@ future design to carry its own options without polluting the common namespace.
 
 ### 7.1 Theme separation
 
-Create two distinct concepts:
+Keep public visual configuration and editor persistence as two distinct concepts.
+The executable `TreeTheme` source of truth is
+[`config/types.ts`](../../packages/designqr/src/config/types.ts), and its
+complete built-in values are exported as `TREE_THEME_PRESETS`. Consumers can
+copy a preset safely with `createTreeTheme(preset, overrides)`.
 
 ```ts
-export interface TreeTheme {
-  foliageColor: string;
-  foliageHighlightColor?: string;
-  foliageShadowColor?: string;
-  foliageMidtoneColor?: string;
-  foliageShape?: 'blossom' | 'leaf';
-  groundColor: string;
-  groundShadowColor?: string;
-  groundFeature?: 'grass' | 'snow' | 'none';
-  groundFeatureColor?: string;
-  groundFeatureHighlightColor?: string;
-  groundFeatureShadowColor?: string;
-  skyTop: string;
-  skyBottom: string;
-  titleColor?: string;
-  canopyDensity?: number;
-  particleType: 'leaf' | 'sakura' | 'fireflies' | 'snow' | 'none';
-  particleAmount?: number;
-  groundLeavesAmount?: number;
-}
+const customTheme = createTreeTheme('spring', {
+  foliageShape: 'pixel',
+  canopyDensity: 72,
+  weatherType: 'rain',
+  weatherAmount: 120,
+});
 
 export interface SavedTreeTheme extends TreeTheme {
   id: string;
@@ -469,13 +559,50 @@ export interface SavedTreeTheme extends TreeTheme {
 `SavedTreeTheme` belongs to the editor and local persistence. Only `TreeTheme`
 belongs in the package and serialized configuration.
 
+The public role groups are:
+
+| Group | Roles |
+| --- | --- |
+| Canopy | Organic foliage roles, ordered five-color distribution and stops, RGB variation/lift, `foliageShape`, blossom center, and density |
+| QR foliage | QR voxel/scan-face roles, ordered four-color distribution and stops, and RGB variation |
+| Tree | Branch body, highlight, shadow, tip, and branch style |
+| Ground | Light-module, surface, shadow, surface variations, pedestal, and four-band ground-feature ramps |
+| Finder modules | Finder body, highlight, shadow, eye, ordered distribution, stops, and RGB variation |
+| Presentation | Sky gradient and title |
+| Environment | Falling particles, ground leaves and their deterministic layout seed, weather, ambient particles, and snow |
+
+The package README lists every property in these groups. Partial custom themes
+are a current public input; normalization fills missing renderer roles.
+`createTreeTheme()` applies the same dependent-role release rules as the Add
+Theme editor when source tones change, and its particle helper composes the
+same exclusive falling, ambient, weather, snow, and ground-leaf setup. The
+README's full `createTreeTheme()` literal remains explicit so TypeScript reports
+newly required theme roles instead of silently deriving them. The Share modal
+mirrors this public workflow: its additional `Custom Theme` advanced React
+example imports `createTreeTheme()` and `ResolvedTreeTheme` from `designqr`,
+lists every role from the current resolved theme as an explicit override, and
+passes the resulting complete theme plus the canonical current render
+configuration to `<DesignQR>` without editor-only metadata or placeholder
+assets.
+Built-in distributions preserve the pre-package seasonal output. Settled 2D
+QRs retain those multi-tone distributions with or without a logo. Logo mode
+uses high error correction and a bounded, frame-free image plane instead of
+flattening the surrounding module colors or masking them with an oversized
+backplate. One shared hue-preserving, scan-safe depth filter is applied to
+settled dark modules in both states; logo activation does not add another color
+adjustment. Custom and preset themes therefore receive identical 2D module
+colors before and after logo changes without altering their source colors or 3D
+rendering. Light modules use an independent shared sRGB display lift derived
+from each theme's `groundColor`. This preserves the brighter reference negative
+space without introducing a universal fixed light color, and both treatments
+blend through the existing turn.
+
 The title color resolves in this order:
 
 1. Custom `theme.titleColor`.
 2. Custom `theme.foliageShadowColor`.
 3. Custom `theme.foliageColor`.
 4. The selected preset's existing title color.
-5. A documented neutral fallback.
 
 This makes title styling part of the theme contract rather than a disconnected UI
 setting.
@@ -498,24 +625,34 @@ Validation requirements:
   current QR error-correction settings.
 - Limit title length to the current 40-character product rule unless product
   requirements change it deliberately.
+- Limit encoded canonical configurations to 16,384 characters. The editor must
+  show a clear error and withhold invalid share/embed URLs instead of truncating
+  a logo or silently dropping configuration.
+- Accept logos only as raster data URLs, same-origin paths, or HTTPS URLs. Limit
+  source text to 8,192 characters, alternate text to 80 characters, decoded
+  image data to 2 MiB, image dimensions to 2,048 px per edge, and normalized
+  logo size to `0.08`–`0.20` of QR width.
 - Validate `#RGB` and `#RRGGBB` colors and normalize to `#RRGGBB`.
-- Clamp canopy, particle, border-padding, and quality values.
-- Remove editor-only theme fields during normalization.
+- Clamp canopy, environmental particle, border-padding, and logo-size values.
+- Keep editor-only theme metadata outside serialized package configuration;
+  normalization copies only public theme roles.
 - Reject objects with an unsupported `design.type`.
-- Never evaluate HTML, CSS, script, or arbitrary URLs from configuration fields.
+- Never evaluate HTML, CSS, or script from configuration fields. Remote logo
+  responses must be CORS-readable PNG, JPEG, or WebP data.
 - Do not throw for user input at the route boundary; return a typed error and
   render a stable fallback.
 
-### 7.3 Compatibility
+### 7.3 Current schema contract
 
-- Continue decoding the current compact `q` payload.
-- Convert decoded legacy data into `DesignQRConfigV1` immediately.
-- Do not make new renderer code understand both legacy and current formats.
-- Continue accepting existing season indices only inside the legacy decoder.
-- Migrate the removed encoded `quality: 'auto'` value to `high`; do not expose
-  `auto` through new props, normalized input, or generated examples.
-- New links should use the new codec and retain the schema version.
-- Add fixture tests for every legacy payload format before changing the decoder.
+- Decode only canonical `DesignQRConfigV1` payloads with `schemaVersion: 1`.
+- Treat unsupported payload shapes, unsupported schema versions, and unknown
+  top-level configuration fields as invalid.
+- Keep concise `DesignQRConfigInput` forms as current inputs to normalization and
+  encode them into the canonical structure before sharing.
+- Emit the schema version in every new editor and hosted-player link.
+- Omit `transparentBackground` when false and emit it only when true, keeping
+  default schema-v1 links byte-stable while accepting older v1 payloads.
+- Test canonical round trips and rejection of unsupported payloads.
 
 ## 8. Target architecture
 
@@ -556,9 +693,14 @@ The shared React player owns generic behavior:
 
 - Container and canvas lifecycle.
 - Responsive sizing.
-- Visibility and reduced-motion handling.
+- Visibility handling and immediate view/background settlement under reduced
+  motion.
 - Controlled and uncontrolled view state.
+- Interaction-aware semantics, keyboard activation, focus, and cursors.
+- Package-owned presentation variables and fallbacks.
 - Details/title rendering.
+- Full-stage alpha compositing and the package-owned, footprint-bounded settled
+  QR plate.
 - Error boundaries and public callbacks.
 - Ref methods.
 
@@ -646,9 +788,13 @@ The embed route must:
 - Avoid editor navigation, local theme persistence, modals, analytics controls, and
   browser-history mutation.
 - Show a stable `Invalid DesignQR configuration` fallback when parsing fails.
-- Use the same responsive renderer quality rules as the npm component.
+- Use the same fixed renderer pixel-ratio cap as the npm component.
 - Pause when the document is hidden.
-- Respect `prefers-reduced-motion`.
+- Respect `prefers-reduced-motion` by disabling automatic rotation and blur and
+  settling view and background changes immediately.
+- Keep the hosted document, body, and application root transparent. The opaque
+  default canvas still paints its theme gradient; transparent mode reveals the
+  host through the iframe without a legacy `allowtransparency` attribute.
 
 ### 10.3 Suggested iframe markup
 
@@ -879,7 +1025,7 @@ Exit criteria:
 - Naming and licensing have no release blocker.
 - Visual and performance baselines exist before refactoring.
 
-### Phase 1: Configuration and compatibility foundation
+### Phase 1: Current configuration foundation
 
 Tasks:
 
@@ -887,15 +1033,15 @@ Tasks:
 - Add the design registry with the `tree` adapter entry.
 - Separate `TreeTheme` from `SavedTreeTheme`.
 - Add explicit title-color resolution to the theme resolver.
-- Add the legacy share decoder and conversion fixtures.
+- Add strict current-schema decoding and invalid-payload fixtures.
 - Add unit tests for normalization, malicious/malformed values, numeric clamps,
-  custom-theme snapshots, and legacy compatibility.
+  custom-theme snapshots, and canonical round trips.
 
 Exit criteria:
 
 - Every current editor state normalizes to `DesignQRConfigV1`.
 - Encoding then decoding produces the same normalized configuration.
-- Existing shared URLs still open correctly.
+- Current schema-v1 shared URLs open correctly.
 
 ### Phase 2: Extract the package and reusable player
 
@@ -967,19 +1113,25 @@ Tasks:
 - Serialize a complete custom theme snapshot.
 - Update the Share modal with `Share link`, `Embed`, and `React` sections.
 - Generate iframe code using the same helper exported by the package.
-- Generate a React snippet containing the current design, theme, and details.
+- Generate a `Simple` React snippet for the minimal equivalent configuration,
+  an `Advanced` runnable controlled-view snippet containing the complete current
+  component setup and exact optional logo, and an additional advanced
+  `Custom Theme` snippet that exposes the current full resolved parameter
+  surface through `createTreeTheme()` alongside the complete current render
+  configuration.
 - Add copy/open feedback and an embedded preview where space allows.
 - Replace the editor's current selector-based image compositor with the package
   `exportImage()` handle. The editor retains only filename selection, download
   triggering, and user feedback.
-- Use the new codec for browser-history links while retaining legacy decoding.
+- Use the canonical codec for browser-history links.
 - Rename remaining user-facing `Design QR` copy to `DesignQR` where it refers to
   the product name.
 
 Exit criteria:
 
 - Editor, direct link, iframe, and React fixture render the same normalized state.
-- Custom themes, title, title color, content, border, padding, and initial view all
+- Custom themes, Pixel foliage, title, title color, content, border, padding,
+  logo, transparency, rotation direction, transition speed, and initial view all
   match.
 - The editor download, React export, and iframe export return the same pixels for
   the same current frame and artwork bounds.
@@ -1099,28 +1251,35 @@ loops for one instance.
 - Prefix package classes with `designqr-`.
 - Scope resets to `.designqr-root`; do not style `html`, `body`, `button`, `input`,
   or `canvas` globally.
-- Use component CSS variables for customization and resolved theme values.
-- Keep the canvas transparent and paint the theme background on the component root.
+- Use namespaced component CSS variables for presentation customization.
+- Paint the theme background, artwork, and optional QR details on the live
+  presentation surface so displayed and exported pixels share one path.
+- When `transparentBackground` is true, clear the presentation to alpha and
+  omit only the full-stage gradient. Retain a theme-derived local plate at the
+  settled 2D endpoint, but never enlarge the normal QR/detail-border footprint:
+  without Border it matches the matrix; with Border it may use configured
+  padding up to the four-module target. Keep details outside the plate.
 - Avoid relying on the editor's font imports. Package output should use a documented
   system-font fallback unless the host loads the preferred fonts.
 - Ensure the title remains derived from the theme.
 - Ensure details and borders never cover the scannable module area.
 - Test small, rectangular, portrait, square, and landscape containers.
 
-Suggested variables:
+Package-owned presentation variables:
 
-```css
-.designqr-root {
-  --designqr-background-top: ...;
-  --designqr-background-bottom: ...;
-  --designqr-title-color: ...;
-  --designqr-content-color: ...;
-  --designqr-border-color: ...;
-}
-```
+| Variable | Default | Contract |
+| --- | --- | --- |
+| `--designqr-title-font-family` | `"Outfit"`, then system sans-serif | QR title font |
+| `--designqr-body-font-family` | `"Plus Jakarta Sans"`, then system sans-serif | Visible QR value font |
+| `--designqr-content-color` | `#3F352B` | Visible QR value color |
+| `--designqr-border-color` | `rgba(95, 78, 61, 0.25)` | Detail frame and shadow |
+| `--designqr-border-highlight-color` | `rgba(255, 255, 255, 0.45)` | Detail frame highlight |
+| `--designqr-focus-color` | `#3F352B` | Keyboard focus ring |
+| `--designqr-focus-contrast-color` | `#FFFFFF` | Focus contrast edge |
 
-These variables are implementation outputs of theme resolution, not a second
-configuration source in version 0.1.
+Canvas presentation overrides apply to the displayed surface and WYSIWYG
+export. Focus variables apply only to browser focus UI. Background and title
+colors remain resolved theme inputs, not a second CSS configuration source.
 
 ## 17. WYSIWYG image export
 
@@ -1131,8 +1290,10 @@ not construct an approximation from configuration in a separate export process.
 
 - Capture the currently visible `design` or `qr` frame at the moment the export
   request is committed.
-- Include the exact theme background and artwork. In QR view, include the border,
-  padding, title, and content only when they are currently visible.
+- Include the exact configured background state and artwork. Transparent mode
+  must preserve PNG alpha outside the artwork and the footprint-bounded settled
+  QR plate. In QR view, include the border, padding, title, and content only
+  when they are currently visible.
 - Exclude editor chrome such as the header, hints, text input, theme drawer,
   editor controls, and modals.
 - Use the current artwork bounds and backing-store pixel ratio. Version `0.1.0`
@@ -1183,8 +1344,10 @@ interface DesignQRHandle {
 
 - At equal dimensions, the exported PNG and the displayed presentation surface
   are pixel-identical within the current artwork bounds.
-- Toggling title, content, border, or padding changes both UI and export together,
-  with no export-specific code path.
+- Toggling title, content, border, padding, or logo changes both UI and export
+  together, with no export-specific code path.
+- Toggling transparency while active, paused, hidden, or offscreen updates the
+  visible surface and exported corner alpha without remounting the renderer.
 - Export during either 3D or 2D mode captures that current mode without a hidden
   transition.
 - Repeated export does not rebuild QR/tree data, start another animation loop, or
@@ -1198,24 +1361,38 @@ interface DesignQRHandle {
 
 - Defaults and explicit options.
 - Preset and custom-theme resolution.
+- Complete immutable preset roles and `createTreeTheme()` overrides.
+- Clockwise/counterclockwise defaults and invalid-direction input.
+- Pixel foliage normalization and morph visibility.
+- Logo source, alternate-text, size, format, and canonical-length limits.
 - Title-color resolution order.
 - Design registry lookup.
 - Unsupported design errors.
 - Numeric clamping and color validation.
 - Configuration encode/decode round trips.
-- Legacy share-link fixtures.
+- Transparent-background default, sparse true round trip, invalid input, quiet
+  zone geometry, and endpoint opacity.
+- Unsupported share-payload fixtures.
 - Message-envelope validation.
 
 ### 18.2 Component tests
 
 - Controlled and uncontrolled view behavior.
 - Prop updates without remounting the renderer.
+- Opaque-to-transparent-to-opaque updates while running and paused, including
+  zero-alpha corners and WYSIWYG PNG alpha.
+- Logo load, replacement, removal, failure, and rapid-source changes.
 - Ready, view-change, and error callbacks.
 - Strict Mode mount/unmount behavior.
 - Two simultaneous components.
 - No body-style or browser-history mutation.
 - ResizeObserver updates.
-- Reduced-motion behavior.
+- Reduced motion commits view and background changes without an intermediate
+  frame and disables automatic rotation and morph blur.
+- Enter and Space toggle in controlled and uncontrolled mode only when
+  tap-to-toggle is enabled; focus and cursor semantics match enabled actions.
+- Package presentation roles use scoped defaults without host application
+  tokens, and supported overrides affect both display and export.
 - `exportImage()` snapshots the owning instance and does not invoke QR/tree
   generation or mutate view state.
 - Two mounted instances export their own presentation surfaces.
@@ -1228,12 +1405,23 @@ interface DesignQRHandle {
 - A parent page on a different origin loads and communicates with the iframe.
 - Editor routes reject framing while the embed route allows it.
 - Design-to-QR transition and QR-to-design transition work.
-- Pointer drag, tap, turntable, and reset behavior work.
+- Pointer drag, tap, Enter/Space toggle, turntable, reset, focus-visible, and
+  interaction-aware cursor behavior work.
+- Automatic direction reverses without resetting yaw, and Pixel foliage uses a
+  single QR-derived voxel set through both turn directions.
+- A logo remains continuous at the 3D canopy, intermediate turn, QR center, and
+  reverse turn; its dedicated panel remains within the fixed overlay geometry,
+  and uploads above the former 5 MiB limit prepare below 1 MiB without breaking
+  canonical sharing.
 - Pixel-compare the displayed presentation surface with `exportImage()` for both
   views and every title/content/border combination.
 - Request an iframe export cross-origin and verify the request ID, MIME type,
   result pixels, and unchanged iframe state.
+- Verify transparent iframe document styles, parent-background visibility,
+  zero-alpha canvas/PNG corners, and live `setConfig()` propagation.
 - Offscreen and hidden instances pause and resume.
+- Reduced-motion browser coverage observes only settled view and background
+  endpoints.
 - WebGL context-loss fallback appears correctly.
 
 ### 18.4 QR reliability tests
@@ -1241,7 +1429,11 @@ interface DesignQRHandle {
 - Capture final QR-view exports for representative payload lengths.
 - Decode exported PNGs with an independent QR decoder.
 - Cover each preset, custom themes, title/content combinations, border settings,
-  mobile/desktop sizes, and supported quality levels.
+  logos at `0.08`, `0.16`, and `0.20`, and mobile/desktop sizes.
+- Decode transparent outputs over light, dark, and patterned host backgrounds.
+  Verify the local plate remains within the normal QR/detail-border footprint
+  while retaining as much of the four-module target as configured padding
+  permits.
 - Never count matrix-generation unit tests alone as proof that the final rendered
   image scans.
 
@@ -1252,6 +1444,8 @@ interface DesignQRHandle {
 - Verify ESM and CJS exports.
 - Verify package import in Node does not evaluate browser globals.
 - Verify CSS is exported and contains no global host-page reset.
+- Verify the packed consumer renders presentation defaults without editor
+  tokens or internal-selector overrides.
 - Audit tarball contents and install size.
 
 ### 18.6 Performance checks
@@ -1263,8 +1457,8 @@ interface DesignQRHandle {
   persistent canvases and do not cause sustained memory growth.
 - Track application and package bundle sizes in CI output.
 - Test a representative low-power mobile profile.
-- Default to `quality="high"` for consistent output. Consumers targeting constrained
-  devices or many simultaneous players may explicitly opt into `quality="low"`.
+- Keep the renderer pixel-ratio cap fixed and consistent across package and
+  hosted players.
 
 ## 19. Security and privacy checklist
 
@@ -1274,7 +1468,9 @@ interface DesignQRHandle {
 - Validate all `postMessage` data and origins.
 - Do not use `dangerouslySetInnerHTML` for titles or encoded values.
 - Do not load configuration-provided scripts, models, CSS, fonts, or arbitrary
-  media.
+  media. The only media exception is a validated PNG, JPEG, or WebP logo from a
+  data URL, same-origin path, or HTTPS URL; remote responses must pass CORS,
+  MIME, byte-size, and dimension checks.
 - Do not treat base64url configuration as secret.
 - Keep camera, microphone, and geolocation disabled.
 - Use `noopener` and `noreferrer` for any link opened by integration UI.
@@ -1283,7 +1479,7 @@ interface DesignQRHandle {
 
 ## 20. Release and rollout
 
-1. Land schema and compatibility tests without changing visuals.
+1. Land schema and validation tests without changing visuals.
 2. Land the workspace package and migrate the editor to it.
 3. Run the editor against the workspace package for at least one release cycle.
 4. Enable `/qr/embed` and validate headers on the deployed domain.
@@ -1359,8 +1555,8 @@ schema and extraction work unless noted:
 3. The verified minimum React version for peer dependencies.
 4. Whether Three.js remains a direct dependency or is externalized as a peer after
    bundle and consumer testing.
-5. The encoded configuration URL-length limit that triggers the later short-ID
-   service.
+5. The adoption threshold for a short-ID service; schema-v1 links currently
+   enforce a 16,384-character encoded limit.
 
 Recommended defaults are: unscoped `designqr`, public iframe embedding, React 18+
 after verification, Three.js as a direct dependency initially, public WYSIWYG PNG
@@ -1376,7 +1572,8 @@ The integration project is complete when all of the following are true:
 - Preset and custom themes render identically across editor, link, iframe, and
   React usage.
 - The title follows the resolved theme.
-- The border, title, content, initial view, and interactions serialize correctly.
+- The border, title, content, optional logo, initial view, Pixel foliage, and
+  clockwise/counterclockwise interactions serialize correctly.
 - A third-party origin can embed `/qr/embed`.
 - `/` and `/qr` cannot be externally framed.
 - An external fixture can install the packed package and render DesignQR.

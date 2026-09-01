@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -24,7 +25,6 @@ import {
   type DesignQRChildMessage,
   type DesignQREmbedErrorPayload,
 } from 'designqr/embed';
-import 'designqr/style.css';
 import './design-qr-embed.css';
 
 interface InitialEmbedState {
@@ -37,6 +37,7 @@ const DESIGN_QR_ERROR_CODES: ReadonlySet<string> = new Set<DesignQRErrorCode>([
   'INVALID_CONFIG',
   'UNSUPPORTED_DESIGN',
   'QR_GENERATION_FAILED',
+  'LOGO_LOAD_FAILED',
   'WEBGL_UNAVAILABLE',
   'WEBGL_CONTEXT_LOST',
   'EXPORT_FAILED',
@@ -108,6 +109,14 @@ export default function DesignQREmbedRoute() {
   const parentOriginRef = useRef<string | null>(null);
   const announcedViewRef = useRef(view);
   const activeExportIdsRef = useRef(new Set<string>());
+
+  useLayoutEffect(() => {
+    const documentRoot = document.documentElement;
+    documentRoot.classList.add('designqr-embed-document');
+    return () => {
+      documentRoot.classList.remove('designqr-embed-document');
+    };
+  }, []);
 
   const postToParent = useCallback((
     message: DesignQRChildMessage,
@@ -335,7 +344,8 @@ export default function DesignQREmbedRoute() {
         view={view}
         details={config.details}
         interaction={config.interaction}
-        quality={config.quality}
+        logo={config.logo}
+        transparentBackground={config.transparentBackground === true}
         className="designqr-embed-player"
         ariaLabel="Interactive DesignQR"
         onReady={handleReady}

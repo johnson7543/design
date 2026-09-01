@@ -50,59 +50,13 @@ export interface GrassBlade {
   seed: number;
 }
 
-export interface FallingParticle {
-  x: number;
-  y: number;
-  z: number;
-  vx: number;
-  vy: number;
-  vz: number;
-  rotX: number;
-  rotY: number;
-  rotZ: number;
-  rotSpeed: number;
-  scale: number;
-  seed: number;
-  initialY: number;
-}
-
-export interface Butterfly {
-  orbitRadius: number;
-  orbitSpeed: number;
-  height: number;
-  phase: number;
-  wingAngle: number;
-  size: number;
-  color: [number, number, number];
-}
-
 export interface TreeData {
   gridSize: number;
   blocks: VoxelBlock[];
   branches: BranchSegment[];
   flowers: BlossomFlower[];
   grass: GrassBlade[];
-  fallingPetals: FallingParticle[];
-  rain: FallingParticle[];
-  butterflies: Butterfly[];
   trunkHeight: number;
-  trunkRadius: number;
-  density: number;
-  edgeRatio: number;
-  blockPositions: Float32Array;
-  blockHeights: Float32Array;
-  blockBaseY: Float32Array;
-  blockTypes: Uint32Array;
-  counts: {
-    numBlocks: number;
-    gridSize: number;
-    segmentCount: number;
-    flowerCount: number;
-    grassCount: number;
-    petalCount: number;
-    rainCount: number;
-    butterflyCount: number;
-  };
 }
 
 // Deterministic pseudo-random noise generator
@@ -120,19 +74,15 @@ export function build3DTree(
   const halfGrid = gridSize / 2;
   const scale = gridSize / 29;
 
-  // 1. Analyze QR topology
+  // 1. Measure the QR density used to size procedural foliage clusters.
   let darkCount = 0;
-  let edgeTransitions = 0;
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (modules[r][c]) darkCount++;
-      if (c < gridSize - 1 && modules[r][c] !== modules[r][c + 1]) edgeTransitions++;
-      if (r < gridSize - 1 && modules[r][c] !== modules[r + 1][c]) edgeTransitions++;
     }
   }
 
   const density = darkCount / (gridSize * gridSize);
-  const edgeRatio = edgeTransitions / (2 * gridSize * (gridSize - 1));
 
   // Tree silhouette modifiers based on treeShape
   let heightMult = 1.0;
@@ -172,19 +122,10 @@ export function build3DTree(
   const flowers: BlossomFlower[] = [];
   const grass: GrassBlade[] = [];
 
-  // Arrays for WebGPU buffer streaming
-  const maxAlloc = 67240;
-  const blockPositions = new Float32Array(maxAlloc * 4);
-  const blockHeights = new Float32Array(maxAlloc);
-  const blockBaseY = new Float32Array(maxAlloc);
-  const blockTypes = new Uint32Array(maxAlloc);
-  let blockIndex = 0;
-
   function addBlock(
     c: number,
     r: number,
     baseY: number,
-    height: number,
     type: TreeBlockType,
     layer: number = 0
   ) {
@@ -199,17 +140,6 @@ export function build3DTree(
       type,
       layer,
     });
-
-    if (blockIndex < maxAlloc) {
-      blockPositions[blockIndex * 4 + 0] = x;
-      blockPositions[blockIndex * 4 + 1] = baseY;
-      blockPositions[blockIndex * 4 + 2] = z;
-      blockPositions[blockIndex * 4 + 3] = type;
-      blockHeights[blockIndex] = height;
-      blockBaseY[blockIndex] = baseY;
-      blockTypes[blockIndex] = type;
-      blockIndex++;
-    }
   }
 
   // 3. Generate Ground Floor Blocks & Corner Grass
@@ -229,7 +159,7 @@ export function build3DTree(
         }
       }
 
-      addBlock(c, r, 0, BLOCK_SIZE, baseType, 0);
+      addBlock(c, r, 0, baseType, 0);
 
       // 3D grass tufts ONLY on DARK QR modules in the outer 4 corners (forming the QR code Finder patterns)
       if (baseType === TreeBlockType.Grass) {
@@ -259,7 +189,7 @@ export function build3DTree(
         // Vertical trunk stack at center
         if (distSq < 6.25) {
           for (let k = 1; k < trunkBlockLayers; k++) {
-            addBlock(c, r, k * BLOCK_SIZE, BLOCK_SIZE, TreeBlockType.Trunk, k);
+            addBlock(c, r, k * BLOCK_SIZE, TreeBlockType.Trunk, k);
           }
         }
 
@@ -276,7 +206,7 @@ export function build3DTree(
 
           for (let layer = 0; layer < thickness; layer++) {
             const y = trunkBaseY + layer * BLOCK_SIZE + domeOffset;
-            addBlock(c, r, y, BLOCK_SIZE, TreeBlockType.CherryBlossom, layer);
+            addBlock(c, r, y, TreeBlockType.CherryBlossom, layer);
           }
         }
       }
@@ -696,124 +626,12 @@ export function build3DTree(
     }
   }
 
-  // 6. Falling Petal Particle Pool (500 particles for rich flurry/storm density)
-  const fallingPetals: FallingParticle[] = [];
-  const petalCount = 500;
-  for (let i = 0; i < petalCount; i++) {
-    const angle = hashNoise(i, 1) * Math.PI * 2;
-    const rad = Math.sqrt(hashNoise(i, 2)) * canopyBoundRadius * 1.25;
-    const x = Math.cos(angle) * rad;
-    const z = Math.sin(angle) * rad;
-    const y = trunkHeight + canopyBoundRadius * (0.2 + 0.8 * hashNoise(i, 3));
-
-    fallingPetals.push({
-      x,
-      y,
-      z,
-      vx: (hashNoise(i, 4) - 0.5) * 0.04,
-      vy: -(0.02 + 0.03 * hashNoise(i, 5)),
-      vz: (hashNoise(i, 6) - 0.5) * 0.04,
-      rotX: hashNoise(i, 7) * Math.PI * 2,
-      rotY: hashNoise(i, 8) * Math.PI * 2,
-      rotZ: hashNoise(i, 9) * Math.PI * 2,
-      rotSpeed: 0.5 + 2.0 * hashNoise(i, 10),
-      scale: BLOCK_SIZE * (0.6 + 0.5 * hashNoise(i, 11)),
-      seed: hashNoise(i, 12),
-      initialY: y,
-    });
-  }
-
-  // 7. Rain particles (250 streaks)
-  const rain: FallingParticle[] = [];
-  const rainCount = 250;
-  for (let i = 0; i < rainCount; i++) {
-    const x = (hashNoise(i, 13) - 0.5) * canopyBoundRadius * 3.0;
-    const z = (hashNoise(i, 14) - 0.5) * canopyBoundRadius * 3.0;
-    const y = trunkHeight * 2.0 + hashNoise(i, 15) * 0.8;
-
-    rain.push({
-      x,
-      y,
-      z,
-      vx: -0.05,
-      vy: -0.8 - 0.4 * hashNoise(i, 16),
-      vz: 0.02,
-      rotX: 0,
-      rotY: 0,
-      rotZ: 0,
-      rotSpeed: 0,
-      scale: BLOCK_SIZE * (1.2 + 0.8 * hashNoise(i, 17)),
-      seed: hashNoise(i, 18),
-      initialY: y,
-    });
-  }
-
-  // 8. Butterflies (4 butterflies)
-  const butterflies: Butterfly[] = [
-    {
-      orbitRadius: canopyBoundRadius * 0.85,
-      orbitSpeed: 0.8,
-      height: trunkHeight + 0.08,
-      phase: 0.0,
-      wingAngle: 0.0,
-      size: BLOCK_SIZE * 0.8,
-      color: [1.0, 0.92, 0.4],
-    },
-    {
-      orbitRadius: canopyBoundRadius * 0.7,
-      orbitSpeed: -0.65,
-      height: trunkHeight + 0.14,
-      phase: 2.1,
-      wingAngle: 0.0,
-      size: BLOCK_SIZE * 0.7,
-      color: [0.95, 0.85, 0.35],
-    },
-    {
-      orbitRadius: canopyBoundRadius * 0.95,
-      orbitSpeed: 0.5,
-      height: trunkHeight + 0.04,
-      phase: 4.2,
-      wingAngle: 0.0,
-      size: BLOCK_SIZE * 0.85,
-      color: [1.0, 0.95, 0.5],
-    },
-    {
-      orbitRadius: canopyBoundRadius * 0.6,
-      orbitSpeed: -0.9,
-      height: trunkHeight + 0.18,
-      phase: 1.0,
-      wingAngle: 0.0,
-      size: BLOCK_SIZE * 0.65,
-      color: [0.9, 0.8, 0.3],
-    },
-  ];
-
   return {
     gridSize,
     blocks,
     branches,
     flowers,
     grass,
-    fallingPetals,
-    rain,
-    butterflies,
     trunkHeight,
-    trunkRadius,
-    density,
-    edgeRatio,
-    blockPositions,
-    blockHeights,
-    blockBaseY,
-    blockTypes,
-    counts: {
-      numBlocks: blocks.length,
-      gridSize,
-      segmentCount: branches.length,
-      flowerCount: flowers.length,
-      grassCount: grass.length,
-      petalCount: fallingPetals.length,
-      rainCount: rain.length,
-      butterflyCount: butterflies.length,
-    },
   };
 }

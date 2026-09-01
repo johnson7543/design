@@ -79,6 +79,7 @@ const ERROR_CODES: ReadonlySet<string> = new Set<DesignQREmbedErrorPayload['code
   'INVALID_CONFIG',
   'UNSUPPORTED_DESIGN',
   'QR_GENERATION_FAILED',
+  'LOGO_LOAD_FAILED',
   'WEBGL_UNAVAILABLE',
   'WEBGL_CONTEXT_LOST',
   'EXPORT_FAILED',

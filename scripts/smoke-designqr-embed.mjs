@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import puppeteer from 'puppeteer-core';
+import jsQR from 'jsqr';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const host = '127.0.0.1';
@@ -129,6 +130,29 @@ async function canvasHash(frame) {
   });
 }
 
+async function decodeEmbedCanvas(frame) {
+  const snapshot = await frame.evaluate(() => {
+    const canvas = document.querySelector('.designqr-presentation-canvas');
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('The embed presentation canvas is missing.');
+    }
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('The embed presentation context is unavailable.');
+    return {
+      width: canvas.width,
+      height: canvas.height,
+      pixels: Array.from(context.getImageData(0, 0, canvas.width, canvas.height).data),
+    };
+  });
+  const pixels = Uint8ClampedArray.from(snapshot.pixels);
+  return jsQR(
+    pixels,
+    snapshot.width,
+    snapshot.height,
+    { inversionAttempts: 'attemptBoth' }
+  )?.data ?? null;
+}
+
 async function verifyCrossOriginEmbed(browser) {
   const page = await browser.newPage();
   const pageErrors = [];
@@ -170,10 +194,19 @@ async function verifyCrossOriginEmbed(browser) {
       playerCount: document.querySelectorAll('.designqr-root').length,
       hasEditor: Boolean(document.querySelector('.app-root, .app-header, .design-home')),
       overflow: document.documentElement.scrollWidth > window.innerWidth,
+      documentBackground: getComputedStyle(document.documentElement).backgroundColor,
+      bodyBackground: getComputedStyle(document.body).backgroundColor,
+      rootBackground: getComputedStyle(document.querySelector('#root')).backgroundColor,
     }));
     assert(shell.playerCount === 1, 'The embed route must render one DesignQR player.');
     assert(!shell.hasEditor, 'The embed route exposed platform or editor chrome.');
     assert(!shell.overflow, 'The embed route has horizontal overflow.');
+    assert(
+      shell.documentBackground === 'rgba(0, 0, 0, 0)'
+        && shell.bodyBackground === 'rgba(0, 0, 0, 0)'
+        && shell.rootBackground === 'rgba(0, 0, 0, 0)',
+      `The hosted-player document is not transparent: ${JSON.stringify(shell)}.`
+    );
 
     await page.click('#set-config');
     await page.waitForFunction(
@@ -182,6 +215,82 @@ async function verifyCrossOriginEmbed(browser) {
     );
     await embedFrame.waitForSelector('.designqr-root.view-scan', { timeout: 20_000 });
     await new Promise((resolve) => setTimeout(resolve, 1_200));
+
+    const transparentState = await embedFrame.evaluate(() => {
+      const canvas = document.querySelector('.designqr-presentation-canvas');
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        throw new Error('The embed presentation canvas is missing.');
+      }
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) throw new Error('The embed presentation context is unavailable.');
+      const { width, height } = canvas;
+      return {
+        corners: [
+          context.getImageData(0, 0, 1, 1).data[3],
+          context.getImageData(width - 1, 0, 1, 1).data[3],
+          context.getImageData(0, height - 1, 1, 1).data[3],
+          context.getImageData(width - 1, height - 1, 1, 1).data[3],
+        ],
+        center: context.getImageData(
+          Math.floor(width / 2),
+          Math.floor(height / 2),
+          1,
+          1
+        ).data[3],
+      };
+    });
+    assert(
+      transparentState.corners.every((alpha) => alpha === 0)
+        && transparentState.center > 0,
+      `The iframe did not render artwork over transparent corners: ${JSON.stringify(transparentState)}.`
+    );
+    assert(
+      await decodeEmbedCanvas(embedFrame) === 'https://example.com/updated-iframe',
+      'The transparent iframe QR did not decode over its package-owned quiet zone.'
+    );
+
+    const logoState = await embedFrame.evaluate(() => {
+      const canvas = document.querySelector('.designqr-presentation-canvas');
+      if (!(canvas instanceof HTMLCanvasElement)) return { count: 0, x: null, y: null };
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) return { count: 0, x: null, y: null };
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let count = 0;
+      let sumX = 0;
+      let sumY = 0;
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const index = (y * canvas.width + x) * 4;
+          if (
+            x > canvas.width * 0.25
+            && x < canvas.width * 0.75
+            && y > canvas.height * 0.25
+            && y < canvas.height * 0.75
+            && pixels[index] < 45
+            && pixels[index + 1] > 115
+            && pixels[index + 1] < 190
+            && pixels[index + 2] < 100
+          ) {
+            count += 1;
+            sumX += x;
+            sumY += y;
+          }
+        }
+      }
+      return {
+        count,
+        x: count === 0 ? null : sumX / count / canvas.width,
+        y: count === 0 ? null : sumY / count / canvas.height,
+      };
+    });
+    assert(logoState.count > 100, 'The canonical iframe logo did not render.');
+    assert(
+      logoState.x !== null
+        && logoState.y !== null
+        && Math.abs(logoState.x - 0.5) < 0.06
+        && Math.abs(logoState.y - 0.5) < 0.06,
+      `The canonical iframe logo is not centered: ${JSON.stringify(logoState)}.`
+    );
 
     await page.click('#pause-player');
     await new Promise((resolve) => setTimeout(resolve, 250));
@@ -197,12 +306,14 @@ async function verifyCrossOriginEmbed(browser) {
       mime: element.getAttribute('data-export-mime'),
       bytes: Number(element.getAttribute('data-export-bytes')),
       hash: element.getAttribute('data-export-hash'),
+      cornerAlpha: element.getAttribute('data-export-corner-alpha'),
       view: element.getAttribute('data-view'),
       errorCode: element.getAttribute('data-error-code'),
     }));
     assert(exported.mime === 'image/png', 'The iframe export did not return image/png.');
     assert(exported.bytes > 100, 'The iframe export returned an empty PNG.');
     assert(exported.hash === displayedHash, 'The iframe export differs from its visible canvas.');
+    assert(exported.cornerAlpha === '0', 'The iframe PNG export lost transparent corner alpha.');
     assert(exported.view === 'qr', 'Exporting changed the iframe view.');
     assert(!exported.errorCode, `The iframe reported ${exported.errorCode}.`);
 
