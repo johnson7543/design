@@ -962,6 +962,11 @@ async function verifyDesignQrLayout(browser) {
 
       await page.click('.share-icon-btn');
       await page.waitForSelector('.share-modal-content');
+      await page.$eval('.share-modal-content', async (modal) => {
+        await Promise.all(
+          modal.getAnimations().map((animation) => animation.finished)
+        );
+      });
       const shareState = await page.evaluate(() => {
         const modal = document.querySelector('.share-modal-content');
         const shareInput = document.querySelector('[aria-label="Editable DesignQR link"]');
