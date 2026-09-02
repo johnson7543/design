@@ -1,6 +1,6 @@
 {
   "name": "designqr",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "description": "Reusable interactive 3D and 2D DesignQR player",
   "license": "MIT",
