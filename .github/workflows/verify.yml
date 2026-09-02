@@ -9,10 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   production-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Check out repository
@@ -29,3 +33,5 @@ jobs:
 
       - name: Verify production build
         run: npm run check
+        env:
+          DESIGNQR_SMOKE_SCENARIOS: 'desktop,small-mobile'
