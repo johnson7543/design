@@ -1,5 +1,8 @@
 # DesignQR
 
+[![npm](https://img.shields.io/npm/v/designqr?logo=npm)](https://www.npmjs.com/package/designqr)
+[![npm downloads](https://img.shields.io/npm/dm/designqr?logo=npm)](https://www.npmjs.com/package/designqr)
+
 React component for an interactive 3D tree and scannable 2D QR.
 
 ## Install
