@@ -2109,10 +2109,12 @@ export class ThreeFallbackRenderer {
     const targetYaw = THREE.MathUtils.lerp(this.yaw, nearestYaw, progress);
     const targetPitch = THREE.MathUtils.lerp(this.pitch, -Math.PI / 2 + 0.0001, progress);
     const baseScanDist = this.viewportProjection.scanDistance;
-    const compactTreeDistance =
-      TREE_MOBILE_DISTANCE * this.viewportProjection.compactDistanceScale;
+    // The compact distance scale belongs to QR scan framing. Reusing it for
+    // the 3D tree makes square embeds 35% smaller than narrow-phone embeds.
+    // Keep one tree distance throughout portrait and square viewports; the
+    // shared 23-degree horizontal FOV then preserves a stable visual ratio.
     const baseTreeDist = THREE.MathUtils.lerp(
-      compactTreeDistance,
+      TREE_MOBILE_DISTANCE,
       TREE_DESKTOP_DISTANCE,
       this.viewportProjection.landscapeBlend
     );
