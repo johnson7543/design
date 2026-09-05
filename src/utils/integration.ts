@@ -136,16 +136,13 @@ ${formatFullThemeParameters(config.theme.value)}
     config.theme.type === 'preset'
       ? `theme="${config.theme.preset}"`
       : 'theme={currentTheme}',
-    'view={view}',
+    `defaultView="${config.view.initial}"`,
     `details={${formatJsValue(config.details)}}`,
     `interaction={${formatJsValue(config.interaction)}}`,
     `logo={${logo.value}}`,
     `transparentBackground={${config.transparentBackground === true}}`,
     'style={{ width: "100%", maxWidth: 480 }}',
     'ariaLabel="Interactive DesignQR"',
-    'onReady={() => setErrorMessage(null)}',
-    'onViewChange={setView}',
-    'onError={(error) => setErrorMessage(error.message)}',
   ];
 
   const declarations = [customThemeDeclaration, logo.declaration].filter(Boolean);
@@ -156,27 +153,14 @@ ${formatFullThemeParameters(config.theme.value)}
     ? ', type TreeTheme'
     : '';
 
-  return `import { useState } from 'react';
-import { DesignQR, type DesignQRView${treeThemeTypeImport} } from 'designqr';
+  return `import { DesignQR${treeThemeTypeImport} } from 'designqr';
 import 'designqr/style.css';
 
 ${declarationBlock}export function InteractiveQRCode() {
-  const [view, setView] = useState<DesignQRView>("${config.view.initial}");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   return (
-    <>
-      <DesignQR
-${props.map((prop) => `        ${prop}`).join('\n')}
-      />
-      <button
-        type="button"
-        onClick={() => setView((current) => current === "design" ? "qr" : "design")}
-      >
-        {view === "design" ? "Show QR" : "Show tree"}
-      </button>
-      {errorMessage && <p role="alert">{errorMessage}</p>}
-    </>
+    <DesignQR
+${props.map((prop) => `      ${prop}`).join('\n')}
+    />
   );
 }`;
 }

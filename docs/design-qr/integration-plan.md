@@ -88,11 +88,11 @@ Completed in the fourth implementation slice:
   with WYSIWYG image download, system/direct sharing, hosted-player URL copy,
   safe iframe markup, a copyable npm install command, a minimal React example
   that emits only settings which differ from the public component defaults, an
-  `Advanced` example that implements controlled view and host error handling
-  over the complete current public component setup, and a second advanced
-  `Custom Theme` example that exposes the current resolved theme through every
-  public `createTreeTheme()` parameter alongside the complete current render
-  configuration.
+  `Advanced` example that emits one package-only component with the complete
+  current public setup and no generated host application UI, and a second
+  package-only `Custom Theme` example that exposes the current resolved theme
+  through every public `createTreeTheme()` parameter alongside the complete
+  current render configuration.
 - Unified Share-modal copy actions as accessible icon-only controls and added a
   tokenized syntax theme for HTML, shell, and TSX examples.
 - Added strict compilation of generated preset/custom-theme TSX with URL and
@@ -313,7 +313,9 @@ export function ProductQRCode() {
       transparentBackground
       details={{
         title: 'Visit our website',
+        titleScale: 1,
         showValue: true,
+        contentScale: 0.9,
         border: {
           padding: 16,
         },
@@ -384,7 +386,9 @@ export interface TreeDesignOptions {
 
 export interface DesignQRDetailsOptions {
   title?: string;
+  titleScale?: number;
   showValue?: boolean;
+  contentScale?: number;
   border?: false | {
     padding?: number;
   };
@@ -519,7 +523,9 @@ export interface DesignQRConfigV1 {
 
   details: {
     title: string;
+    titleScale?: number;
     showValue: boolean;
+    contentScale?: number;
     border: false | {
       padding: number;
     };
@@ -1115,8 +1121,9 @@ Tasks:
 - Update the Share modal with `Share link`, `Embed`, and `React` sections.
 - Generate iframe code using the same helper exported by the package.
 - Generate a `Simple` React snippet for the minimal equivalent configuration,
-  an `Advanced` runnable controlled-view snippet containing the complete current
-  component setup and exact optional logo, and an additional advanced
+  an `Advanced` runnable package-only snippet containing the complete current
+  component setup and exact optional logo without surrounding controls, state,
+  callbacks, or error UI, and an additional advanced
   `Custom Theme` snippet that exposes the current full resolved parameter
   surface through `createTreeTheme()` alongside the complete current render
   configuration.
@@ -1264,6 +1271,11 @@ loops for one instance.
 - Avoid relying on the editor's font imports. Package output should use a documented
   system-font fallback unless the host loads the preferred fonts.
 - Ensure the title remains derived from the theme.
+- Keep visible-value type smaller than title type by default, and apply the
+  bounded `details.titleScale` / `details.contentScale` multipliers to the
+  responsive package-owned sizes across live playback and export.
+- Use the same four-module metadata anchor and text width with Border enabled or
+  disabled so decoration cannot change text wrapping or truncation.
 - Ensure details and borders never cover the scannable module area.
 - Test small, rectangular, portrait, square, and landscape containers.
 

@@ -19,6 +19,7 @@ import {
 import type { CustomTheme } from './editor/types';
 import { THEME_PRESET_OPTIONS } from './editor/theme-presets';
 import {
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
   DesignQRConfigError,
   normalizeDesignQRConfig,
   type AutoRotateDirection,
@@ -57,6 +58,7 @@ import { LogoCropDialog } from './components/LogoCropDialog';
 const CUSTOM_THEMES_STORAGE_KEY = 'magic_tree_custom_themes';
 const SHARED_CUSTOM_THEME_ID = 'shared-designqr-theme';
 const DEFAULT_URL = 'https://design.johnson7543.com';
+const EDITOR_QR_ARTWORK_SCALE = 0.88;
 
 function loadSavedCustomThemes(): CustomTheme[] {
   try {
@@ -123,7 +125,9 @@ export const App: React.FC = () => {
       season: 0, // Spring default
       viewMode: '3d' as const,
       title: '',
+      titleScale: DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
       showContent: false,
+      contentScale: DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
       borderEnabled: false,
       borderPadding: QR_BORDER_PADDING_DEFAULT,
     };
@@ -159,12 +163,16 @@ export const App: React.FC = () => {
   const [openStageEditor, setOpenStageEditor] =
     useState<'details' | 'logo' | null>(null);
   const [qrTitle, setQrTitle] = useState<string>(initialConfig.title ?? '');
+  const qrTitleScale = initialConfig.titleScale
+    ?? DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT;
   const [transparentBackground, setTransparentBackground] = useState<boolean>(
     initialConfig.transparentBackground ?? false
   );
   const [showQrContent, setShowQrContent] = useState<boolean>(
     initialConfig.showContent ?? false
   );
+  const qrContentScale = initialConfig.contentScale
+    ?? DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT;
   const [qrBorderEnabled, setQrBorderEnabled] = useState<boolean>(
     initialConfig.borderEnabled ?? false
   );
@@ -488,7 +496,9 @@ export const App: React.FC = () => {
     season: seasonId,
     viewMode,
     title: qrTitle,
+    titleScale: qrTitleScale,
     showContent: showQrContent,
+    contentScale: qrContentScale,
     borderEnabled: qrBorderEnabled,
     borderPadding: qrBorderPadding,
     transparentBackground,
@@ -512,8 +522,10 @@ export const App: React.FC = () => {
     qrBorderEnabled,
     qrBorderPadding,
     qrTitle,
+    qrTitleScale,
     seasonId,
     showQrContent,
+    qrContentScale,
     transparentBackground,
     transitionSpeed,
     url,
@@ -672,7 +684,9 @@ export const App: React.FC = () => {
             }
             showQrDetails={viewMode === 'scan'}
             qrTitle={qrTitle}
+            qrTitleScale={qrTitleScale}
             showQrContent={showQrContent}
+            qrContentScale={qrContentScale}
             qrValue={debouncedUrl || DEFAULT_URL}
             qrBorderEnabled={qrBorderEnabled}
             qrBorderPadding={qrBorderPadding}
@@ -682,6 +696,7 @@ export const App: React.FC = () => {
               || activeCustomTheme?.foliageColor
               || currentPresetTheme.titleColor
             }
+            qrArtworkScale={EDITOR_QR_ARTWORK_SCALE}
           />
         ) : (
           <div

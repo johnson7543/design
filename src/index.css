@@ -77,7 +77,7 @@ html, body {
 }
 
 /* One keyboard-focus language across every Design QR control family. */
-.app-root :where(button, summary, .header-info-list a, .share-open-btn, .share-code-view, .share-install-code, input[type='color'], textarea):focus-visible {
+.app-root :where(button, summary, .github-star-link, .header-info-list a, .share-open-btn, .share-code-view, .share-install-code, input[type='color'], textarea):focus-visible {
   outline: 2px solid var(--qr-focus-color);
   outline-offset: 2px;
 }
@@ -111,6 +111,11 @@ html, body {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.header-brand .site-header-brand {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .brand-title {
@@ -240,6 +245,56 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.github-star-link {
+  height: 34px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid var(--qr-border-default);
+  border-radius: var(--radius-pill);
+  background: var(--qr-surface-control);
+  box-shadow: var(--qr-shadow-control);
+  color: var(--qr-ink-muted);
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    color var(--qr-transition-control),
+    background var(--qr-transition-control),
+    border-color var(--qr-transition-control),
+    box-shadow var(--qr-transition-control),
+    transform var(--qr-transition-control);
+}
+
+.github-star-link:hover {
+  border-color: var(--qr-border-hover);
+  background: var(--qr-surface-control-hover);
+  box-shadow: var(--qr-shadow-control-hover);
+  color: var(--qr-ink);
+}
+
+.github-star-link:active {
+  background: var(--qr-surface-solid);
+  transform: translateY(1px);
+}
+
+.github-star-mark {
+  flex: 0 0 auto;
+  display: block;
+  fill: currentColor;
+}
+
+.github-star-count {
+  min-width: 0.75em;
+  text-align: center;
 }
 
 /* View Mode Selector */
@@ -2671,6 +2726,16 @@ html, body {
     gap: 9px;
   }
 
+  .header-actions {
+    gap: 6px;
+  }
+
+  .github-star-link {
+    gap: 4px;
+    padding: 0 7px;
+    font-size: 0.7rem;
+  }
+
   .header-info-popover {
     position: fixed;
     top: calc(max(8px, env(safe-area-inset-top, 0px)) + 54px);
@@ -2998,6 +3063,21 @@ html, body {
 }
 
 @media (max-width: 360px) {
+  .header-brand {
+    gap: 6px;
+  }
+
+  .tech-badge {
+    width: 26px;
+    height: 26px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .tech-badge span {
+    display: none;
+  }
+
   .action-buttons-row,
   .drawer-left-actions {
     gap: 4px;
@@ -3040,17 +3120,6 @@ html, body {
     font-size: 0.94rem;
   }
 
-  .tech-badge {
-    width: 26px;
-    height: 26px;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .tech-badge span {
-    display: none;
-  }
-
   .mode-btn {
     padding-inline: 8px;
   }
@@ -3091,6 +3160,14 @@ html, body {
 @media (min-width: 641px) and (min-height: 850px) {
   .designqr-editor-player {
     --stage-transform: translateY(min(var(--stage-lower-offset), calc(50vh - 598px + var(--stage-lower-offset)))) scale(0.95);
+  }
+}
+
+/* Keep wide portrait artwork clear of the editor-only toolbar and input rail. */
+@media (min-width: 641px) and (min-height: 1000px) and (max-aspect-ratio: 1 / 1) {
+  .designqr-editor-player {
+    --portrait-stage-control-clearance: clamp(30px, calc(170px - 15.25vw), 62px);
+    --stage-transform: translateY(calc(min(var(--stage-lower-offset), calc(50vh - 598px + var(--stage-lower-offset))) - var(--portrait-stage-control-clearance))) scale(0.95);
   }
 }
 

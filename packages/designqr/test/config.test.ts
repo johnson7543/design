@@ -2,6 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  DESIGN_QR_DETAIL_FONT_SCALE_MAX,
+  DESIGN_QR_DETAIL_FONT_SCALE_MIN,
   decodeDesignQRConfig,
   encodeDesignQRConfig,
   normalizeDesignQRConfig,
@@ -82,20 +85,37 @@ test('derives the shared 2D light lift from each theme ground color', () => {
   assert.notDeepEqual(liftedSpring, liftedSummer);
 });
 
-test('scales intermediate portraits and crosses orientation continuously', () => {
+test('scales wide portraits and crosses orientation continuously', () => {
   const mobile = resolveQRViewportProjection(390, 844);
+  const packageFixture = resolveQRViewportProjection(480, 480);
   const narrowDesktop = resolveQRViewportProjection(900, 1_217);
   const tabletPortrait = resolveQRViewportProjection(1_022, 1_217);
+  const reportedPortrait = resolveQRViewportProjection(1_059, 1_273);
   const tallDesktop = resolveQRViewportProjection(1_190, 1_217);
   const square = resolveQRViewportProjection(1_217, 1_217);
   const justLandscape = resolveQRViewportProjection(1_218, 1_217);
   const landscape = resolveQRViewportProjection(1_440, 900);
+  const beforeWideBoundary = resolveQRViewportProjection(799, 1_000);
+  const atWideBoundary = resolveQRViewportProjection(800, 1_000);
+  const afterWideBoundary = resolveQRViewportProjection(801, 1_000);
+  const veryTall = resolveQRViewportProjection(1_024, 3_000);
 
   assert.equal(mobile.compactDistanceScale, 1);
   assert.equal(mobile.landscapeBlend, 0);
+  assert.equal(mobile.wideViewportBlend, 0);
+  assert.equal(mobile.desktopBlend, 0);
   assert.equal(mobile.scanDistance, QR_SCAN_MOBILE_DISTANCE);
+  assert.equal(packageFixture.wideViewportBlend, 0);
+  assert.equal(packageFixture.desktopBlend, 0);
+  assert.equal(veryTall.wideViewportBlend, 0);
   assert.ok(narrowDesktop.compactDistanceScale > 1);
+  assert.ok(narrowDesktop.wideViewportBlend > 0);
   assert.ok(tabletPortrait.compactDistanceScale > 1.3);
+  assert.ok(tabletPortrait.wideViewportBlend > 0.99);
+  assert.equal(reportedPortrait.wideViewportBlend, 1);
+  assert.equal(reportedPortrait.desktopBlend, 1);
+  assert.equal(reportedPortrait.scanDistance, QR_SCAN_DESKTOP_DISTANCE);
+  assert.equal(reportedPortrait.verticalFov, QR_SCAN_DESKTOP_VERTICAL_FOV);
   assert.equal(
     tallDesktop.compactDistanceScale,
     QR_COMPACT_DISTANCE_SCALE_MAX
@@ -115,12 +135,16 @@ test('scales intermediate portraits and crosses orientation continuously', () =>
   const tabletPortraitQrSize = projectedQrPixelSize(1_217, tabletPortrait);
   const tallDesktopQrSize = projectedQrPixelSize(1_217, tallDesktop);
   assert.ok(
-    tabletPortraitQrSize < narrowDesktopQrSize,
-    'the intermediate portrait should reduce before growing toward square'
+    Math.abs(tabletPortraitQrSize - narrowDesktopQrSize) < 2,
+    'wide portrait layouts should converge on the same desktop projection'
   );
-  assert.ok(tallDesktopQrSize > tabletPortraitQrSize);
+  assert.ok(
+    Math.abs(tallDesktopQrSize - tabletPortraitQrSize) < 2,
+    'wide portrait layouts should converge on the same desktop projection'
+  );
 
   assert.equal(square.landscapeBlend, 0);
+  assert.equal(square.desktopBlend, 1);
   assert.ok(justLandscape.landscapeBlend > 0);
   assert.ok(justLandscape.landscapeBlend < 0.001);
   assert.ok(
@@ -129,6 +153,17 @@ test('scales intermediate portraits and crosses orientation continuously', () =>
       - projectedQrPixelSize(1_217, justLandscape)
     ) < 2,
     'crossing square must not produce a visible size jump'
+  );
+  assert.ok(
+    Math.abs(
+      projectedQrPixelSize(1_000, beforeWideBoundary)
+      - projectedQrPixelSize(1_000, atWideBoundary)
+    ) < 2
+    && Math.abs(
+      projectedQrPixelSize(1_000, atWideBoundary)
+      - projectedQrPixelSize(1_000, afterWideBoundary)
+    ) < 2,
+    'crossing the desktop-width blend boundary must not produce a visible size jump'
   );
 
   assert.equal(landscape.landscapeBlend, 1);
@@ -161,6 +196,31 @@ test('normalizes defaults into the canonical v1 shape', () => {
   });
   assert.equal(config.transparentBackground ?? false, false);
   assert.equal('transparentBackground' in config, false);
+});
+
+test('normalizes responsive QR detail font scales without changing default v1 payloads', () => {
+  const scaled = normalizeDesignQRConfig({
+    value: 'https://example.com/scaled-details',
+    details: {
+      title: 'Scaled title',
+      titleScale: DESIGN_QR_DETAIL_FONT_SCALE_MIN - 1,
+      showValue: true,
+      contentScale: DESIGN_QR_DETAIL_FONT_SCALE_MAX + 1,
+    },
+  });
+
+  assert.equal(scaled.details.titleScale, DESIGN_QR_DETAIL_FONT_SCALE_MIN);
+  assert.equal(scaled.details.contentScale, DESIGN_QR_DETAIL_FONT_SCALE_MAX);
+
+  const defaults = normalizeDesignQRConfig({
+    value: 'https://example.com/default-detail-scales',
+    details: {
+      titleScale: Number.NaN,
+      contentScale: DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+    },
+  });
+  assert.equal('titleScale' in defaults.details, false);
+  assert.equal('contentScale' in defaults.details, false);
 });
 
 test('normalizes transparent backgrounds as a sparse backward-compatible v1 field', () => {
@@ -741,7 +801,12 @@ test('round-trips UTF-8 canonical configuration with base64url', () => {
     value: 'https://example.com/春天',
     theme: 'winter',
     view: 'qr',
-    details: { title: '春の QR', showValue: true },
+    details: {
+      title: '春の QR',
+      titleScale: 1.1,
+      showValue: true,
+      contentScale: 0.85,
+    },
     interaction: { transitionSpeed: 1.75 },
     logo: {
       src: '/assets/brand.png',
@@ -758,6 +823,8 @@ test('round-trips UTF-8 canonical configuration with base64url', () => {
     assert.equal(decoded.value.value, 'https://example.com/春天');
     assert.deepEqual(decoded.value.theme, { type: 'preset', preset: 'winter' });
     assert.equal(decoded.value.view.initial, 'qr');
+    assert.equal(decoded.value.details.titleScale, 1.1);
+    assert.equal(decoded.value.details.contentScale, 0.85);
     assert.equal(decoded.value.interaction.transitionSpeed, 1.75);
     assert.deepEqual(decoded.value.logo, {
       src: '/assets/brand.png',

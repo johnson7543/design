@@ -25,6 +25,9 @@ export function Example() {
 ```
 
 The root is a responsive 1:1 square. Set its size with `style` or `className`.
+Artwork projection responds to both aspect ratio and usable CSS width, so a
+wide portrait host uses balanced desktop proportions instead of retaining a
+phone-sized composition.
 
 ## Props
 
@@ -36,7 +39,7 @@ The root is a responsive 1:1 square. Set its size with `style` or `className`.
 | `theme` | `DesignQRThemePreset \| TreeTheme` | `'spring'` |
 | `view` | `'design' \| 'qr'` | Uncontrolled |
 | `defaultView` | `'design' \| 'qr'` | `'design'` |
-| `details` | `DesignQRDetailsOptions` | `{ title: '', showValue: false, border: false }` |
+| `details` | `DesignQRDetailsOptions` | `{ title: '', titleScale: 1, showValue: false, contentScale: 1, border: false }` |
 | `interaction` | `DesignQRInteractionOptions` | See below |
 | `logo` | `false \| DesignQRLogoOptions` | `false` |
 | `transparentBackground` | `boolean` | `false` |
@@ -56,7 +59,9 @@ The root is a responsive 1:1 square. Set its size with `style` or `className`.
 | `tree.shape` | `'dome' \| 'wide' \| 'pine'` | `'dome'` |
 | `tree.seed` | `number` | `0.5`; clamped to `0–1` |
 | `details.title` | `string` | `''`; max 40 characters |
+| `details.titleScale` | `number` | `1`; responsive font-size multiplier clamped to `0.75–1.5` |
 | `details.showValue` | `boolean` | `false` |
+| `details.contentScale` | `number` | `1`; responsive font-size multiplier clamped to `0.75–1.5` |
 | `details.border` | `false \| { padding?: number }` | `false`; adds a filled four-module QR margin, with decorative padding defaulting to `16` px (`4–32`) |
 | `interaction.dragToRotate` | `boolean` | `true` |
 | `interaction.tapToToggleView` | `boolean` | `true` |
@@ -64,6 +69,10 @@ The root is a responsive 1:1 square. Set its size with `style` or `className`.
 | `interaction.autoRotateDirection` | `'clockwise' \| 'counterclockwise'` | `'clockwise'` |
 | `interaction.transitionSpeed` | `number` | `1`; clamped to `0.25–2` |
 | `interaction.motionBlur` | `boolean` | `true` |
+
+The package exports `DESIGN_QR_DETAIL_FONT_SCALE_MIN`,
+`DESIGN_QR_DETAIL_FONT_SCALE_MAX`, `DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT`, and
+`DESIGN_QR_DETAIL_FONT_SCALE_STEP` for compatible controls and diagnostics.
 
 ## Styling
 
@@ -83,6 +92,18 @@ the live player and `exportImage()`.
 
 The focus variables affect browser focus UI only and are not drawn into image
 exports. Theme colors, including the background and title, belong in `theme`.
+Title and visible-value typography scale with the projected QR artwork inside
+the package renderer, with the value intentionally smaller than the title,
+compact minimums, and restrained large-artwork caps. `details.titleScale` and
+`details.contentScale` adjust those responsive sizes independently rather than
+replacing them with fixed pixels.
+
+The React component, editor helper, hosted player, and exported PNG therefore
+use the same metadata proportions. The package stylesheet declares `Outfit`
+and `Plus Jakarta Sans` as its preferred families but deliberately does not
+download font files. Load those families in the host to match the reference
+editor exactly, as the React Vite fixture does, or override the documented font
+variables; the sizing logic remains package-owned either way.
 
 Set `transparentBackground` to remove the full-stage seasonal backdrop while
 keeping the tree, QR artwork, details, and exported PNG on a transparent canvas.
@@ -109,6 +130,9 @@ DesignQR 0.1.5 now fails with `QR_GENERATION_FAILED` instead of silently
 substituting another QR value. Extremely dense matrices are temporarily rejected
 before interactive 3D rendering, while QR presentation retains its compact,
 matrix-sized artwork footprint unless the optional scan-safe Border is enabled.
+Border decoration no longer changes metadata truncation, visible values use a
+smaller default size than titles, and both sizes now have bounded responsive
+multipliers.
 
 ## Keyboard and motion
 
@@ -154,7 +178,9 @@ export function CustomThemeExample() {
       theme={customTheme}
       details={{
         title: 'Visit our website',
+        titleScale: 1,
         showValue: true,
+        contentScale: 0.9,
         border: { padding: 16 },
       }}
       interaction={{

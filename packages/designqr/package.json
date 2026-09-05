@@ -68,5 +68,8 @@
   "dependencies": {
     "qrcode": "^1.5.4",
     "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "jsqr": "^1.4.0"
   }
 }

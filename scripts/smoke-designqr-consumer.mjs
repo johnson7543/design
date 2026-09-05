@@ -811,21 +811,41 @@ try {
 
   const initialDetailsControls = await page.$eval('.consumer-shell', (shell) => ({
     titleEnabled: shell.getAttribute('data-title-enabled'),
+    titleScale: shell.getAttribute('data-title-scale'),
     contentEnabled: shell.getAttribute('data-content-enabled'),
+    contentScale: shell.getAttribute('data-content-scale'),
     titlePressed: document.querySelector('[data-action="toggle-title"]')
       ?.getAttribute('aria-pressed'),
     contentPressed: document.querySelector('[data-action="toggle-content"]')
       ?.getAttribute('aria-pressed'),
     title: document.querySelector('[data-field="primary-title"]')?.value,
     value: document.querySelector('[data-field="primary-value"]')?.value,
+    titleScaleControl: (() => {
+      const input = document.querySelector('[data-field="primary-title-scale"]');
+      return input instanceof HTMLInputElement
+        ? { value: input.value, min: input.min, max: input.max, step: input.step }
+        : null;
+    })(),
+    contentScaleControl: (() => {
+      const input = document.querySelector('[data-field="primary-content-scale"]');
+      return input instanceof HTMLInputElement
+        ? { value: input.value, min: input.min, max: input.max, step: input.step }
+        : null;
+    })(),
   }));
   if (
     initialDetailsControls.titleEnabled !== 'true'
     || initialDetailsControls.contentEnabled !== 'true'
     || initialDetailsControls.titlePressed !== 'true'
     || initialDetailsControls.contentPressed !== 'true'
+    || initialDetailsControls.titleScale !== '1'
+    || initialDetailsControls.contentScale !== '1'
     || initialDetailsControls.title !== 'Primary DesignQR'
     || initialDetailsControls.value !== 'https://example.com/primary'
+    || JSON.stringify(initialDetailsControls.titleScaleControl)
+      !== JSON.stringify({ value: '1', min: '0.75', max: '1.5', step: '0.05' })
+    || JSON.stringify(initialDetailsControls.contentScaleControl)
+      !== JSON.stringify({ value: '1', min: '0.75', max: '1.5', step: '0.05' })
   ) {
     throw new Error(
       `The title/content controls did not initialize correctly: ${JSON.stringify(initialDetailsControls)}.`

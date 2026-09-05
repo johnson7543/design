@@ -1,6 +1,10 @@
 import { useRef, useState } from 'react';
 import {
   createTreeTheme,
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  DESIGN_QR_DETAIL_FONT_SCALE_MAX,
+  DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+  DESIGN_QR_DETAIL_FONT_SCALE_STEP,
   DESIGN_QR_MAX_TITLE_CHARACTERS,
   DESIGN_QR_MAX_VALUE_BYTES,
   DesignQR,
@@ -106,7 +110,13 @@ export function ConsumerFixture() {
   const [primaryTitle, setPrimaryTitle] = useState(DEFAULT_PRIMARY_TITLE);
   const [primaryValue, setPrimaryValue] = useState(DEFAULT_PRIMARY_VALUE);
   const [titleEnabled, setTitleEnabled] = useState(true);
+  const [titleScale, setTitleScale] = useState(
+    DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT
+  );
   const [contentEnabled, setContentEnabled] = useState(true);
+  const [contentScale, setContentScale] = useState(
+    DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT
+  );
   const [transparentBackground, setTransparentBackground] = useState(false);
   const [borderEnabled, setBorderEnabled] = useState(true);
   const [primaryPaused, setPrimaryPaused] = useState(false);
@@ -205,7 +215,9 @@ export function ConsumerFixture() {
       data-logo-error={logoError}
       data-logo-size={logoSize}
       data-title-enabled={titleEnabled}
+      data-title-scale={titleScale}
       data-content-enabled={contentEnabled}
+      data-content-scale={contentScale}
       data-primary-title-length={primaryTitleLength}
       data-primary-value-byte-length={primaryValueByteLength}
       data-transparent-background={transparentBackground}
@@ -342,6 +354,22 @@ export function ConsumerFixture() {
           </output>
         </div>
         <div className="consumer-detail-field">
+          <label htmlFor="primary-title-scale">Title size</label>
+          <input
+            id="primary-title-scale"
+            data-field="primary-title-scale"
+            type="range"
+            min={DESIGN_QR_DETAIL_FONT_SCALE_MIN}
+            max={DESIGN_QR_DETAIL_FONT_SCALE_MAX}
+            step={DESIGN_QR_DETAIL_FONT_SCALE_STEP}
+            value={titleScale}
+            onChange={(event) => setTitleScale(Number(event.target.value))}
+          />
+          <output data-output="primary-title-scale" aria-live="polite">
+            {titleScale.toFixed(2)}×
+          </output>
+        </div>
+        <div className="consumer-detail-field">
           <label htmlFor="primary-value">Primary content / QR value</label>
           <textarea
             id="primary-value"
@@ -352,6 +380,22 @@ export function ConsumerFixture() {
           />
           <output data-output="primary-value-length" aria-live="polite">
             {primaryValueByteLength} UTF-8 bytes · config maximum {DESIGN_QR_MAX_VALUE_BYTES}
+          </output>
+        </div>
+        <div className="consumer-detail-field">
+          <label htmlFor="primary-content-scale">Content size</label>
+          <input
+            id="primary-content-scale"
+            data-field="primary-content-scale"
+            type="range"
+            min={DESIGN_QR_DETAIL_FONT_SCALE_MIN}
+            max={DESIGN_QR_DETAIL_FONT_SCALE_MAX}
+            step={DESIGN_QR_DETAIL_FONT_SCALE_STEP}
+            value={contentScale}
+            onChange={(event) => setContentScale(Number(event.target.value))}
+          />
+          <output data-output="primary-content-scale" aria-live="polite">
+            {contentScale.toFixed(2)}×
           </output>
         </div>
       </div>
@@ -377,7 +421,9 @@ export function ConsumerFixture() {
             onError={handlePrimaryError}
             details={{
               title: titleEnabled ? primaryTitle : '',
+              titleScale,
               showValue: contentEnabled,
+              contentScale,
               border: borderEnabled ? { padding: 16 } : false,
             }}
           />

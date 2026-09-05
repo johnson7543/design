@@ -4,6 +4,11 @@ import {
   resolveQRViewportProjection,
   QR_VISUAL_REFERENCE_GRID_SIZE,
 } from '../designs/tree/constants.ts';
+import {
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  DESIGN_QR_DETAIL_FONT_SCALE_MAX,
+  DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+} from '../config/defaults.ts';
 import { resolveDesignQRPresentationStyles } from './presentationStyles.ts';
 
 export interface PresentationSurfaceState {
@@ -14,12 +19,15 @@ export interface PresentationSurfaceState {
   qrLightColor: string;
   showQrDetails: boolean;
   title: string;
+  titleScale?: number;
   showValue: boolean;
+  contentScale?: number;
   value: string;
   borderEnabled: boolean;
   borderPadding: number;
   titleColor: string;
   prefersReducedMotion: boolean;
+  qrArtworkScale?: number;
 }
 
 interface RgbColor {
@@ -32,6 +40,17 @@ const BACKGROUND_TRANSITION_MS = 800;
 export const QR_QUIET_ZONE_MODULES = 4;
 const QR_ARTWORK_FILL_FADE_START_PROGRESS = 0.82;
 const QR_METADATA_TOP_GAP = 0;
+const QR_TITLE_FONT_SIZE_MIN = 11.2;
+const QR_TITLE_FONT_SIZE_MAX = 24;
+const QR_TITLE_FONT_SIZE_RATIO = 0.05;
+const QR_CONTENT_FONT_SIZE_MIN = 10;
+const QR_CONTENT_FONT_SIZE_MAX = 20;
+const QR_CONTENT_FONT_SIZE_RATIO = 0.042;
+const QR_INFO_GAP_MIN = 4;
+const QR_INFO_GAP_MAX = 8;
+const QR_INFO_GAP_RATIO = 0.016;
+const QR_ARTWORK_SCALE_MIN = 0.5;
+const QR_ARTWORK_SCALE_MAX = 1;
 
 function parseHexColor(value: string): RgbColor {
   const normalized = value.trim().replace('#', '');
@@ -162,6 +181,72 @@ export function resolveQRArtworkFillOpacity(progress: number): number {
   return normalized * normalized * (3 - 2 * normalized);
 }
 
+export function resolveQRArtworkScale(
+  progress: number,
+  settledScale = 1
+): number {
+  const normalizedProgress = Number.isFinite(progress)
+    ? Math.max(0, Math.min(1, progress))
+    : 0;
+  const safeSettledScale = Number.isFinite(settledScale)
+    ? Math.max(
+        QR_ARTWORK_SCALE_MIN,
+        Math.min(QR_ARTWORK_SCALE_MAX, settledScale)
+      )
+    : 1;
+
+  return 1 + (safeSettledScale - 1) * normalizedProgress;
+}
+
+export interface QRDetailTypography {
+  titleFontSize: number;
+  contentFontSize: number;
+  infoGap: number;
+}
+
+export function resolveQRDetailTypography(
+  qrSize: number,
+  titleScale = DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  contentScale = DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT
+): QRDetailTypography {
+  const safeQrSize = Number.isFinite(qrSize) ? Math.max(0, qrSize) : 0;
+  const clamp = (value: number, minimum: number, maximum: number) => (
+    Math.min(maximum, Math.max(minimum, value))
+  );
+  const safeTitleScale = Number.isFinite(titleScale)
+    ? clamp(
+        titleScale,
+        DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+        DESIGN_QR_DETAIL_FONT_SCALE_MAX
+      )
+    : DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT;
+  const safeContentScale = Number.isFinite(contentScale)
+    ? clamp(
+        contentScale,
+        DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+        DESIGN_QR_DETAIL_FONT_SCALE_MAX
+      )
+    : DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT;
+
+  return {
+    titleFontSize: safeTitleScale * clamp(
+      safeQrSize * QR_TITLE_FONT_SIZE_RATIO,
+      QR_TITLE_FONT_SIZE_MIN,
+      QR_TITLE_FONT_SIZE_MAX
+    ),
+    contentFontSize: safeContentScale * clamp(
+      safeQrSize * QR_CONTENT_FONT_SIZE_RATIO,
+      QR_CONTENT_FONT_SIZE_MIN,
+      QR_CONTENT_FONT_SIZE_MAX
+    ),
+    infoGap: clamp(
+      safeQrSize * QR_INFO_GAP_RATIO,
+      QR_INFO_GAP_MIN,
+      QR_INFO_GAP_MAX
+    ),
+  };
+}
+
 function qrLightColorString(color: string): string {
   const [r, g, b] = resolveQR2DLightDisplayRgb(color);
   return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
@@ -182,17 +267,20 @@ interface QRDetailMetrics {
 }
 
 function resolveQRDetailMetrics(
-  width: number,
+  qrSize: number,
   state: PresentationSurfaceState
 ): QRDetailMetrics {
-  const isMobile = width <= 640;
   const title = state.title.trim().toUpperCase();
   const content = state.showValue ? state.value : '';
-  const titleFontSize = isMobile ? 11.2 : 12;
-  const contentFontSize = isMobile ? 12 : 13.12;
+  const typography = resolveQRDetailTypography(
+    qrSize,
+    state.titleScale,
+    state.contentScale
+  );
+  const { titleFontSize, contentFontSize } = typography;
   const titleLineHeight = titleFontSize * 1.2;
   const contentLineHeight = contentFontSize * 1.2;
-  const infoGap = title && content ? 4 : 0;
+  const infoGap = title && content ? typography.infoGap : 0;
   const infoHeight = (title ? titleLineHeight : 0)
     + (content ? contentLineHeight : 0)
     + infoGap;
@@ -450,7 +538,7 @@ export class PresentationSurface {
     this.context.globalAlpha = opacity;
     this.context.fillStyle = qrLightColorString(this.state.qrLightColor);
     if (borderVisible) {
-      const details = resolveQRDetailMetrics(width, this.state);
+      const details = resolveQRDetailMetrics(geometry.qrSize, this.state);
       const frame = resolveQRDetailFrameGeometry(
         geometry,
         details.padding,
@@ -491,23 +579,34 @@ export class PresentationSurface {
 
   private stageMatrix(width: number, height: number): DOMMatrix {
     const transform = getComputedStyle(this.transformProbe).transform;
-    if (!transform || transform === 'none') return new DOMMatrix();
+    const qrArtworkScale = resolveQRArtworkScale(
+      this.viewProgress,
+      this.state.qrArtworkScale
+    );
+    if (
+      (!transform || transform === 'none')
+      && qrArtworkScale === 1
+    ) {
+      return new DOMMatrix();
+    }
 
-    const cssMatrix = new DOMMatrix(transform);
+    const cssMatrix = !transform || transform === 'none'
+      ? new DOMMatrix()
+      : new DOMMatrix(transform);
     return new DOMMatrix()
       .translate(width * 0.5, height * 0.5)
       .multiply(cssMatrix)
+      .scale(qrArtworkScale)
       .translate(width * -0.5, height * -0.5);
   }
 
   private drawQrDetails(width: number, height: number): void {
-    const isMobile = width <= 640;
-    const details = resolveQRDetailMetrics(width, this.state);
     const geometry = resolveQRPresentationGeometry(
       width,
       height,
       this.state.qrGridSize
     );
+    const details = resolveQRDetailMetrics(geometry.qrSize, this.state);
     const detailAnchorSize = geometry.quietZoneSize;
     const centerX = width * 0.5;
     const centerY = height * 0.5;
@@ -556,9 +655,7 @@ export class PresentationSurface {
     if (!details.hasInfo) return;
 
     let lineCenterY = centerY + detailAnchorSize * 0.5 + details.infoTopGap;
-    const maxTextWidth = this.state.borderEnabled
-      ? detailAnchorSize
-      : Math.min(isMobile ? 260 : 320, width - (isMobile ? 80 : 40));
+    const maxTextWidth = detailAnchorSize;
     this.context.textAlign = 'center';
     this.context.textBaseline = 'middle';
 
@@ -584,18 +681,15 @@ export class PresentationSurface {
     }
 
     if (details.content) {
-      const contentMaxWidth = this.state.borderEnabled
-        ? maxTextWidth
-        : Math.min(isMobile ? 260 : 280, width - (isMobile ? 80 : 40));
       this.context.save();
       this.context.fillStyle = presentationStyles.contentColor;
       this.context.font = `500 ${details.contentFontSize}px ${presentationStyles.bodyFontFamily}`;
       lineCenterY += details.contentLineHeight * 0.5;
       this.context.fillText(
-        fitText(this.context, details.content, contentMaxWidth),
+        fitText(this.context, details.content, maxTextWidth),
         centerX,
         lineCenterY,
-        contentMaxWidth
+        maxTextWidth
       );
       this.context.restore();
     }

@@ -12,6 +12,7 @@ import type {
   DesignQRLogoOptions,
   ResolvedTreeTheme,
 } from '../config/types.ts';
+import { DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT } from '../config/defaults.ts';
 import { RenderManager } from '../renderer/RenderManager.ts';
 import {
   PresentationSurface,
@@ -47,11 +48,19 @@ export interface DesignQRCanvasProps {
   backgroundBottom: string;
   showQrDetails?: boolean;
   qrTitle?: string;
+  qrTitleScale?: number;
   showQrContent?: boolean;
+  qrContentScale?: number;
   qrValue: string;
   qrBorderEnabled?: boolean;
   qrBorderPadding?: number;
   qrTitleColor?: string;
+  /**
+   * Optional editor integration scale for the settled QR artwork. The 3D
+   * endpoint remains at 1x and the renderer blends toward this value while
+   * changing views. Values are constrained to the scan-safe 0.5-1 range.
+   */
+  qrArtworkScale?: number;
   className?: string;
   style?: React.CSSProperties;
   ariaLabel?: string;
@@ -103,11 +112,14 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       backgroundBottom,
       showQrDetails = false,
       qrTitle = '',
+      qrTitleScale = DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
       showQrContent = false,
+      qrContentScale = DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
       qrValue,
       qrBorderEnabled = false,
       qrBorderPadding = 16,
       qrTitleColor = '#98596e',
+      qrArtworkScale = 1,
       className,
       style,
       ariaLabel,
@@ -144,12 +156,15 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       qrLightColor: theme.groundColor,
       showQrDetails,
       title: qrTitle,
+      titleScale: qrTitleScale,
       showValue: showQrContent,
+      contentScale: qrContentScale,
       value: qrValue,
       borderEnabled: qrBorderEnabled,
       borderPadding: qrBorderPadding,
       titleColor: qrTitleColor,
       prefersReducedMotion: shouldReduceMotion,
+      qrArtworkScale,
     });
     const enableMotionBlurRef = useRef(
       enableMotionBlur && !shouldReduceMotion
@@ -317,21 +332,27 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         qrLightColor: theme.groundColor,
         showQrDetails,
         title: qrTitle,
+        titleScale: qrTitleScale,
         showValue: showQrContent,
+        contentScale: qrContentScale,
         value: qrValue,
         borderEnabled: qrBorderEnabled,
         borderPadding: qrBorderPadding,
         titleColor: qrTitleColor,
         prefersReducedMotion: shouldReduceMotion,
+        qrArtworkScale,
       });
     }, [
       backgroundBottom,
       backgroundTop,
       qrBorderEnabled,
       qrBorderPadding,
+      qrContentScale,
       qrTitle,
+      qrTitleScale,
       qrTitleColor,
       qrValue,
+      qrArtworkScale,
       shouldReduceMotion,
       showQrContent,
       showQrDetails,

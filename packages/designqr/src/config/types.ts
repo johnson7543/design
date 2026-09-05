@@ -159,8 +159,12 @@ export interface ResolvedTreeTheme extends TreeTheme {
 export interface DesignQRDetailsOptions {
   /** Optional title rendered below the QR. */
   title?: string;
+  /** Multiplier applied to the responsive QR title size. */
+  titleScale?: number;
   /** Shows `value` below the title. */
   showValue?: boolean;
+  /** Multiplier applied to the responsive visible-value size. */
+  contentScale?: number;
   /** Groups QR, title, and value in one padded border; `false` removes it. */
   border?: false | {
     /** Space between the border and its grouped contents, in CSS pixels. */
@@ -236,7 +240,11 @@ export interface DesignQRConfigV1 {
   };
   details: {
     title: string;
+    /** Omitted when the responsive title-size multiplier is `1`. */
+    titleScale?: number;
     showValue: boolean;
+    /** Omitted when the responsive visible-value-size multiplier is `1`. */
+    contentScale?: number;
     border: false | {
       padding: number;
     };

@@ -39,7 +39,7 @@ export interface DesignQRProps {
   view?: DesignQRView;
   /** Initial view for an uncontrolled player. */
   defaultView?: DesignQRView;
-  /** Optional title, visible value, and grouped QR-card border. */
+  /** Optional title, visible value, responsive text scaling, and QR-card border. */
   details?: DesignQRDetailsOptions;
   /** Pointer, tap, automatic rotation, transition speed, and blur behavior. */
   interaction?: DesignQRInteractionOptions;

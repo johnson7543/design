@@ -7,7 +7,9 @@ import {
   QR_QUIET_ZONE_MODULES,
   type PresentationSurfaceState,
   resolveQRArtworkFillOpacity,
+  resolveQRArtworkScale,
   resolveQRDetailFrameGeometry,
+  resolveQRDetailTypography,
   resolveQRMatrixFillGeometry,
   resolveQRPresentationGeometry,
 } from '../src/renderer/PresentationSurface.ts';
@@ -96,6 +98,90 @@ test('fades the local artwork fill only near the settled 2D view', () => {
   assert.equal(resolveQRArtworkFillOpacity(2), 1);
 });
 
+test('blends an opt-in QR artwork scale without changing the 3D endpoint', () => {
+  assert.equal(resolveQRArtworkScale(0, 0.88), 1);
+  assert.ok(Math.abs(resolveQRArtworkScale(0.5, 0.88) - 0.94) < 1e-9);
+  assert.equal(resolveQRArtworkScale(1, 0.88), 0.88);
+  assert.equal(resolveQRArtworkScale(-1, 0.88), 1);
+  assert.equal(resolveQRArtworkScale(2, 0.88), 0.88);
+  assert.equal(resolveQRArtworkScale(1, 0), 0.5);
+  assert.equal(resolveQRArtworkScale(1, 2), 1);
+  assert.equal(resolveQRArtworkScale(Number.NaN, 0.88), 1);
+  assert.equal(resolveQRArtworkScale(1, Number.NaN), 1);
+});
+
+test('scales QR metadata typography with the projected artwork size', () => {
+  const smallMobileGeometry = resolveQRPresentationGeometry(320, 568, 25);
+  const packageFixtureGeometry = resolveQRPresentationGeometry(480, 480, 25);
+  const desktopGeometry = resolveQRPresentationGeometry(1_440, 900, 25);
+  const largeArtworkGeometry = resolveQRPresentationGeometry(2_560, 1_600, 25);
+  const smallMobile = resolveQRDetailTypography(smallMobileGeometry.qrSize);
+  const packageFixture = resolveQRDetailTypography(packageFixtureGeometry.qrSize);
+  const desktop = resolveQRDetailTypography(desktopGeometry.qrSize);
+  const largeArtwork = resolveQRDetailTypography(largeArtworkGeometry.qrSize);
+
+  assert.deepEqual(smallMobile, {
+    titleFontSize: 11.2,
+    contentFontSize: 10,
+    infoGap: 4,
+  });
+  assert.ok(packageFixture.titleFontSize > smallMobile.titleFontSize);
+  assert.ok(desktop.titleFontSize > packageFixture.titleFontSize);
+  assert.ok(desktop.contentFontSize > packageFixture.contentFontSize);
+  assert.deepEqual(largeArtwork, {
+    titleFontSize: 24,
+    contentFontSize: 20,
+    infoGap: 8,
+  });
+  assert.deepEqual(resolveQRDetailTypography(Number.NaN), smallMobile);
+  assert.ok(smallMobile.contentFontSize < smallMobile.titleFontSize);
+  assert.ok(desktop.contentFontSize < desktop.titleFontSize);
+});
+
+test('applies bounded independent title and content scale multipliers', () => {
+  const qrSize = 400;
+  const defaults = resolveQRDetailTypography(qrSize);
+  const minimum = resolveQRDetailTypography(qrSize, 0, 0);
+  const maximum = resolveQRDetailTypography(qrSize, 10, 10);
+
+  assert.equal(minimum.titleFontSize, defaults.titleFontSize * 0.75);
+  assert.equal(minimum.contentFontSize, defaults.contentFontSize * 0.75);
+  assert.equal(maximum.titleFontSize, defaults.titleFontSize * 1.5);
+  assert.equal(maximum.contentFontSize, defaults.contentFontSize * 1.5);
+  assert.deepEqual(
+    resolveQRDetailTypography(qrSize, Number.NaN, Number.NaN),
+    defaults
+  );
+});
+
+test('uses desktop artwork proportions for a wide portrait host', () => {
+  const geometry = resolveQRPresentationGeometry(1_059, 1_273, 25);
+  const typography = resolveQRDetailTypography(geometry.qrSize);
+  const detailHeight = typography.titleFontSize * 1.2
+    + typography.contentFontSize * 1.2
+    + typography.infoGap;
+  const frame = resolveQRDetailFrameGeometry(geometry, 16, detailHeight);
+
+  assert.ok(geometry.qrSize / 1_059 < 0.41);
+  assert.ok(geometry.quietZoneSize / 1_059 < 0.54);
+  assert.ok(frame.y > 300);
+  assert.ok(frame.y + frame.height < 1_000);
+});
+
+test('keeps the QR details card proportional in a narrow portrait desktop', () => {
+  const geometry = resolveQRPresentationGeometry(707, 1_157, 25);
+  const typography = resolveQRDetailTypography(geometry.qrSize);
+  const detailHeight = typography.titleFontSize * 1.2
+    + typography.contentFontSize * 1.2
+    + typography.infoGap;
+  const frame = resolveQRDetailFrameGeometry(geometry, 16, detailHeight);
+
+  assert.ok(geometry.qrSize / 707 < 0.62);
+  assert.ok(geometry.quietZoneSize / 707 < 0.82);
+  assert.ok(frame.x > 50);
+  assert.ok(frame.x + frame.width < 657);
+});
+
 interface RecordedFill {
   alpha: number;
   fillStyle: unknown;
@@ -125,7 +211,13 @@ test('fills only the matrix in transparent mode and preserves opaque artwork', (
   const originalGetComputedStyle = globalThis.getComputedStyle;
   const fills: RecordedFill[] = [];
   const pathFills: RecordedFill[] = [];
-  const textDraws: Array<{ text: string; x: number; y: number }> = [];
+  const textDraws: Array<{
+    text: string;
+    x: number;
+    y: number;
+    maxWidth: number | undefined;
+    font: string;
+  }> = [];
   const stateStack: Array<{ alpha: number; fillStyle: unknown }> = [];
   let pathRect: Omit<RecordedFill, 'alpha' | 'fillStyle'> | null = null;
   let clearCount = 0;
@@ -146,6 +238,7 @@ test('fills only the matrix in transparent mode and preserves opaque artwork', (
   const context = {
     globalAlpha: 1,
     filter: 'none',
+    font: '',
     fillStyle: '' as unknown,
     setTransform() {},
     clearRect() { clearCount += 1; },
@@ -166,8 +259,8 @@ test('fills only the matrix in transparent mode and preserves opaque artwork', (
     },
     stroke() {},
     measureText(text: string) { return { width: text.length * 6 }; },
-    fillText(text: string, x: number, y: number) {
-      textDraws.push({ text, x, y });
+    fillText(text: string, x: number, y: number, maxWidth?: number) {
+      textDraws.push({ text, x, y, maxWidth, font: this.font });
     },
     fillRect(x: number, y: number, width: number, height: number) {
       fills.push({
@@ -286,29 +379,35 @@ test('fills only the matrix in transparent mode and preserves opaque artwork', (
     });
     textDraws.length = 0;
     surface.setState(metadataState(false));
-    const borderlessTextPositions = textDraws.map(({ x, y }) => ({ x, y }));
+    const borderlessTextDraws = textDraws.map((draw) => ({ ...draw }));
     textDraws.length = 0;
     surface.setState(metadataState(true));
-    const borderedTextPositions = textDraws.map(({ x, y }) => ({ x, y }));
+    const borderedTextDraws = textDraws.map((draw) => ({ ...draw }));
     const geometry = resolveQRPresentationGeometry(100, 100, 25);
 
     assert.deepEqual(
-      borderedTextPositions,
-      borderlessTextPositions,
-      'toggling the border should not reposition the title or value'
+      borderedTextDraws,
+      borderlessTextDraws,
+      'toggling the border should not change title/value layout or truncation'
     );
-    assert.ok(borderlessTextPositions.length > 0);
-    const mobileTitleLineHeight = 11.2 * 1.2;
+    assert.ok(borderlessTextDraws.length > 0);
+    assert.ok(
+      borderlessTextDraws.every(({ maxWidth }) => maxWidth === geometry.quietZoneSize),
+      'title and value should share the border-independent quiet-zone width'
+    );
+    const mobileTitleLineHeight = resolveQRDetailTypography(
+      geometry.qrSize
+    ).titleFontSize * 1.2;
     assert.ok(
       Math.abs(
-        borderlessTextPositions[0].y
+        borderlessTextDraws[0].y
           - mobileTitleLineHeight * 0.5
           - (geometry.quietZoneY + geometry.quietZoneSize)
       ) < 1e-9,
       'the title line should begin directly after the four-module clearance'
     );
     assert.ok(
-      borderlessTextPositions.every(({ y }) => (
+      borderlessTextDraws.every(({ y }) => (
         y > geometry.quietZoneY + geometry.quietZoneSize
       )),
       'metadata should remain below the virtual four-module clearance'

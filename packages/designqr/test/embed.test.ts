@@ -22,7 +22,12 @@ test('builds a canonical hosted-player URL without browser globals', () => {
       value: 'https://example.com/embed',
       theme: 'winter',
       view: 'qr',
-      details: { title: 'Embedded QR', showValue: true },
+      details: {
+        title: 'Embedded QR',
+        titleScale: 1.2,
+        showValue: true,
+        contentScale: 0.8,
+      },
       logo: { src: '/brand.webp', alt: 'Embedded brand', size: 0.14 },
     },
     {
@@ -48,6 +53,8 @@ test('builds a canonical hosted-player URL without browser globals', () => {
       alt: 'Embedded brand',
       size: 0.14,
     });
+    assert.equal(decoded.value.details.titleScale, 1.2);
+    assert.equal(decoded.value.details.contentScale, 0.8);
   }
 });
 

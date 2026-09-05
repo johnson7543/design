@@ -5,6 +5,9 @@ import {
   createDesignQREmbedUrl,
   createDesignQRIframeMarkup,
   createTreeTheme,
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  DESIGN_QR_DETAIL_FONT_SCALE_MAX,
+  DESIGN_QR_DETAIL_FONT_SCALE_MIN,
   DesignQR,
   TREE_THEME_PRESETS,
   VIEW_TRANSITION_SPEED_DEFAULT,
@@ -24,7 +27,9 @@ export const designQRProps = {
   defaultView: 'design',
   details: {
     title: 'Visit our website',
+    titleScale: 1.1,
     showValue: true,
+    contentScale: 0.85,
     border: { padding: 16 },
   },
   interaction: {
@@ -47,6 +52,12 @@ export const transitionSpeedRange = {
   min: VIEW_TRANSITION_SPEED_MIN,
   default: VIEW_TRANSITION_SPEED_DEFAULT,
   max: VIEW_TRANSITION_SPEED_MAX,
+};
+
+export const detailFontScaleRange = {
+  min: DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+  default: DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  max: DESIGN_QR_DETAIL_FONT_SCALE_MAX,
 };
 
 export const customTreeTheme = createTreeTheme('summer', {

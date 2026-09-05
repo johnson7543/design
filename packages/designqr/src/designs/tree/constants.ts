@@ -13,11 +13,17 @@ export const QR_COMPACT_DENSITY_START_ASPECT = 0.68;
 export const QR_COMPACT_DENSITY_END_ASPECT = 0.86;
 export const QR_COMPACT_DISTANCE_SCALE_MAX = 1.35;
 export const QR_LANDSCAPE_BLEND_END_ASPECT = 1.6;
+export const QR_DESKTOP_WIDTH_BLEND_START = 600;
+export const QR_DESKTOP_WIDTH_BLEND_END = 800;
+export const QR_DESKTOP_ASPECT_BLEND_START = 0.45;
+export const QR_DESKTOP_ASPECT_BLEND_END = 0.65;
 
 export interface QRViewportProjection {
   aspect: number;
   compactDistanceScale: number;
   landscapeBlend: number;
+  wideViewportBlend: number;
+  desktopBlend: number;
   scanDistance: number;
   verticalFov: number;
 }
@@ -25,8 +31,10 @@ export interface QRViewportProjection {
 /**
  * Keeps narrow-phone artwork at its established scale, compresses intermediate
  * portrait canvases as they approach square, then blends into the desktop
- * projection as landscape space increases. Every boundary is continuous so a
- * resize cannot trigger an orientation-based size jump.
+ * projection as either landscape space or usable CSS width increases. The
+ * aspect gate prevents very narrow, tall canvases from receiving a desktop
+ * vertical field of view that would make the artwork wider than their host.
+ * Every boundary is continuous so a resize cannot trigger a size jump.
  */
 export function resolveQRViewportProjection(
   width: number,
@@ -51,6 +59,17 @@ export function resolveQRViewportProjection(
     1,
     QR_LANDSCAPE_BLEND_END_ASPECT
   );
+  const wideViewportBlend = smoothstep(
+    safeWidth,
+    QR_DESKTOP_WIDTH_BLEND_START,
+    QR_DESKTOP_WIDTH_BLEND_END
+  ) * smoothstep(
+    aspect,
+    QR_DESKTOP_ASPECT_BLEND_START,
+    QR_DESKTOP_ASPECT_BLEND_END
+  );
+  const desktopBlend = landscapeBlend
+    + (1 - landscapeBlend) * wideViewportBlend;
 
   const horizontalFovRadians =
     (QR_SCAN_MOBILE_HORIZONTAL_FOV * Math.PI) / 180;
@@ -65,10 +84,12 @@ export function resolveQRViewportProjection(
     aspect,
     compactDistanceScale,
     landscapeBlend,
+    wideViewportBlend,
+    desktopBlend,
     scanDistance: compactScanDistance
-      + (QR_SCAN_DESKTOP_DISTANCE - compactScanDistance) * landscapeBlend,
+      + (QR_SCAN_DESKTOP_DISTANCE - compactScanDistance) * desktopBlend,
     verticalFov: compactVerticalFov
-      + (QR_SCAN_DESKTOP_VERTICAL_FOV - compactVerticalFov) * landscapeBlend,
+      + (QR_SCAN_DESKTOP_VERTICAL_FOV - compactVerticalFov) * desktopBlend,
   };
 }
 

@@ -47,6 +47,10 @@ button {
   font: inherit;
 }
 
+.consumer-detail-field input[type='range'] {
+  padding-inline: 0;
+}
+
 .consumer-detail-field output {
   font-size: 0.75rem;
   font-weight: 400;

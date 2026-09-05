@@ -28,7 +28,9 @@ const examples = [
       view: 'qr',
       details: {
         title: 'Winter release',
+        titleScale: 1.1,
         showValue: true,
+        contentScale: 0.85,
         border: { padding: 24 },
       },
       interaction: {
@@ -66,7 +68,9 @@ const examples = [
       view: 'qr',
       details: {
         title: 'Spring event',
+        titleScale: 0.9,
         showValue: true,
+        contentScale: 0.8,
         border: { padding: 20 },
       },
       interaction: {
@@ -101,7 +105,9 @@ const advancedRecommendationInputs = [
   ['tree seed', { tree: { seed: 0.72 } }],
   ['initial view', { view: 'qr' }],
   ['details title', { details: { title: 'Current setup' } }],
+  ['title scale', { details: { titleScale: 1.2 } }],
   ['visible value', { details: { showValue: true } }],
+  ['content scale', { details: { contentScale: 0.8 } }],
   ['detail border', { details: { border: { padding: 24 } } }],
   ['drag interaction', { interaction: { dragToRotate: false } }],
   ['tap interaction', { interaction: { tapToToggleView: false } }],
@@ -152,7 +158,15 @@ function assertExecutableExample(source, name, config) {
   assert.ok(source.includes(`shape: "${config.design.options.shape}"`), `${name} omits tree.shape.`);
   assert.ok(source.includes(`seed: ${config.design.options.seed}`), `${name} omits tree.seed.`);
   assert.ok(source.includes(config.details.title), `${name} omits details.title.`);
+  assert.ok(
+    source.includes(`titleScale: ${config.details.titleScale}`),
+    `${name} omits details.titleScale.`
+  );
   assert.ok(source.includes('showValue: true'), `${name} omits details.showValue.`);
+  assert.ok(
+    source.includes(`contentScale: ${config.details.contentScale}`),
+    `${name} omits details.contentScale.`
+  );
   assert.ok(source.includes(`padding: ${config.details.border.padding}`), `${name} omits border padding.`);
   assert.ok(source.includes('dragToRotate: false'), `${name} omits dragToRotate.`);
   assert.ok(source.includes('tapToToggleView: false'), `${name} omits tapToToggleView.`);
@@ -231,10 +245,11 @@ assert.match(
 assert.match(customAdvanced.source, /theme=\{currentTheme\}/, 'Custom Advanced must use currentTheme.');
 
 for (const { name, source } of generatedFiles.filter(({ name }) => name.endsWith('-advanced'))) {
-  assert.match(source, /useState<DesignQRView>/, `${name} must implement controlled view state.`);
-  assert.match(source, /view=\{view\}/, `${name} must pass the controlled view.`);
-  assert.match(source, /onViewChange=\{setView\}/, `${name} must handle package view changes.`);
-  assert.match(source, /onClick=\{\(\) => setView\(/, `${name} must include a working view control.`);
+  assert.match(source, /defaultView="(?:design|qr)"/, `${name} must preserve the initial view.`);
+  assert.doesNotMatch(source, /\buseState\b/, `${name} must not generate host application state.`);
+  assert.doesNotMatch(source, /<button\b/, `${name} must not generate host application controls.`);
+  assert.doesNotMatch(source, /<p\b/, `${name} must not generate host error UI.`);
+  assert.doesNotMatch(source, /\bon(?:Ready|ViewChange|Error)=/, `${name} must contain only package setup.`);
 }
 
 const temporaryDirectory = await mkdtemp(join(repositoryRoot, '.designqr-react-snippets-'));

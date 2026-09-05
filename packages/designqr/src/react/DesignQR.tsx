@@ -328,7 +328,9 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
         backgroundBottom={preparedTheme.value.resolved.skyBottom}
         showQrDetails={detailsVisible}
         qrTitle={config.details.title}
+        qrTitleScale={config.details.titleScale}
         showQrContent={config.details.showValue}
+        qrContentScale={config.details.contentScale}
         qrValue={config.value}
         qrBorderEnabled={border !== false}
         qrBorderPadding={border === false ? undefined : border.padding}

@@ -242,10 +242,10 @@ passed before Phase 5 began.
 - Serialize every new option into direct links, hosted-player URLs, iframe
   markup, and React snippets.
 - Update the `Simple` example only when a new setting differs from defaults;
-  keep `Advanced` as the complete current component customization surface and add
-  a second advanced `Custom Theme` example that lists every resolved theme
-  parameter through the public `createTreeTheme()` helper while carrying the
-  current details and interaction settings.
+  keep `Advanced` as a package-only complete current component customization
+  surface and add a second advanced `Custom Theme` example that lists every
+  resolved theme parameter through the public `createTreeTheme()` helper while
+  carrying the current details and interaction settings.
 - Prevent generation of a canonical link that exceeds the codec's decoding
   limit. Show a clear editor error rather than silently omitting or truncating a
   logo.

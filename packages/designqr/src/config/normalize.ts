@@ -3,6 +3,9 @@ import {
   DESIGN_QR_BORDER_PADDING_MAX,
   DESIGN_QR_BORDER_PADDING_MIN,
   DESIGN_QR_BORDER_PADDING_STEP,
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+  DESIGN_QR_DETAIL_FONT_SCALE_MAX,
+  DESIGN_QR_DETAIL_FONT_SCALE_MIN,
   DESIGN_QR_AMBIENT_PARTICLE_AMOUNT_MAX,
   DESIGN_QR_AMBIENT_PARTICLE_AMOUNT_MIN,
   DESIGN_QR_CANOPY_DENSITY_MAX,
@@ -714,6 +717,18 @@ function normalizeConfig(input: unknown, requireSchemaVersion: boolean): DesignQ
     input.transparentBackground,
     DESIGN_QR_DEFAULTS.transparentBackground
   );
+  const titleScale = normalizeFiniteNumber(
+    details.titleScale,
+    DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+    DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+    DESIGN_QR_DETAIL_FONT_SCALE_MAX
+  );
+  const contentScale = normalizeFiniteNumber(
+    details.contentScale,
+    DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
+    DESIGN_QR_DETAIL_FONT_SCALE_MIN,
+    DESIGN_QR_DETAIL_FONT_SCALE_MAX
+  );
 
   return {
     schemaVersion: DESIGN_QR_SCHEMA_VERSION,
@@ -728,7 +743,13 @@ function normalizeConfig(input: unknown, requireSchemaVersion: boolean): DesignQ
     },
     details: {
       title: normalizeTitle(details.title),
+      ...(titleScale === DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT
+        ? {}
+        : { titleScale }),
       showValue: normalizeBoolean(details.showValue, DESIGN_QR_DEFAULTS.details.showValue),
+      ...(contentScale === DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT
+        ? {}
+        : { contentScale }),
       border: normalizeBorder(details.border),
     },
     interaction: {

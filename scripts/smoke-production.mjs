@@ -12,43 +12,29 @@ const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const host = '127.0.0.1';
 const port = Number(process.env.PREVIEW_PORT ?? 4173);
 const url = `http://${host}:${port}`;
+const githubStarFixtureCount = 27;
+const githubRepositoryApiUrl = 'https://api.github.com/repos/johnson7543/design';
 const fullThemeParameterNames = Object.keys(TREE_THEME_PRESETS.spring);
 const expectedSpringThemeParameterLines = Object.entries(TREE_THEME_PRESETS.spring)
   .map(([parameter, value]) => `  ${parameter}: ${formatSnippetValue(value)},`);
-const expectedDefaultAdvancedReactCode = `import { useState } from 'react';
-import { DesignQR, type DesignQRView } from 'designqr';
+const expectedDefaultAdvancedReactCode = `import { DesignQR } from 'designqr';
 import 'designqr/style.css';
 
 export function InteractiveQRCode() {
-  const [view, setView] = useState<DesignQRView>("design");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   return (
-    <>
-      <DesignQR
-        value="https://design.johnson7543.com"
-        design="tree"
-        tree={{ shape: "dome", seed: 0.5 }}
-        theme="spring"
-        view={view}
-        details={{ title: "", showValue: false, border: false }}
-        interaction={{ dragToRotate: true, tapToToggleView: true, autoRotate: false, autoRotateDirection: "clockwise", transitionSpeed: 1, motionBlur: true }}
-        logo={false}
-        transparentBackground={false}
-        style={{ width: "100%", maxWidth: 480 }}
-        ariaLabel="Interactive DesignQR"
-        onReady={() => setErrorMessage(null)}
-        onViewChange={setView}
-        onError={(error) => setErrorMessage(error.message)}
-      />
-      <button
-        type="button"
-        onClick={() => setView((current) => current === "design" ? "qr" : "design")}
-      >
-        {view === "design" ? "Show QR" : "Show tree"}
-      </button>
-      {errorMessage && <p role="alert">{errorMessage}</p>}
-    </>
+    <DesignQR
+      value="https://design.johnson7543.com"
+      design="tree"
+      tree={{ shape: "dome", seed: 0.5 }}
+      theme="spring"
+      defaultView="design"
+      details={{ title: "", showValue: false, border: false }}
+      interaction={{ dragToRotate: true, tapToToggleView: true, autoRotate: false, autoRotateDirection: "clockwise", transitionSpeed: 1, motionBlur: true }}
+      logo={false}
+      transparentBackground={false}
+      style={{ width: "100%", maxWidth: 480 }}
+      ariaLabel="Interactive DesignQR"
+    />
   );
 }`;
 const requestedLayoutScenarios = new Set(
@@ -798,6 +784,8 @@ async function verifyDesignQrLayout(browser) {
   const allScenarios = [
     { id: 'desktop', name: 'desktop', width: 1440, height: 900, controlHeight: 38, floatingToolHeight: 34, headerWidth: 760 },
     { id: 'tablet-portrait', name: 'tablet portrait', width: 1022, height: 1217, controlHeight: 38, floatingToolHeight: 34, headerWidth: 760 },
+    { id: 'portrait-desktop', name: 'portrait desktop', width: 1059, height: 1273, controlHeight: 38, floatingToolHeight: 34, headerWidth: 760 },
+    { id: 'narrow-portrait-desktop', name: 'narrow portrait desktop', width: 707, height: 1157, controlHeight: 38, floatingToolHeight: 34, headerWidth: 643 },
     { id: 'tall-desktop', name: 'tall desktop', width: 1190, height: 1217, controlHeight: 38, floatingToolHeight: 34, headerWidth: 760 },
     { id: 'mobile', name: 'mobile', width: 390, height: 844, controlHeight: 34, floatingToolHeight: 28, headerWidth: 354 },
     { id: 'small-mobile', name: 'small mobile', width: 320, height: 568, controlHeight: 34, floatingToolHeight: 28, headerWidth: 284 },
@@ -828,7 +816,14 @@ async function verifyDesignQrLayout(browser) {
       await page.setRequestInterception(true);
       page.on('request', (request) => {
         const requestUrl = new URL(request.url());
-        if (requestUrl.origin === appOrigin || requestUrl.protocol === 'data:') {
+        if (requestUrl.href === githubRepositoryApiUrl) {
+          void request.respond({
+            status: 200,
+            contentType: 'application/json',
+            headers: { 'access-control-allow-origin': '*' },
+            body: JSON.stringify({ stargazers_count: githubStarFixtureCount }),
+          });
+        } else if (requestUrl.origin === appOrigin || requestUrl.protocol === 'data:') {
           void request.continue();
         } else {
           void request.abort();
@@ -839,6 +834,12 @@ async function verifyDesignQrLayout(browser) {
       await installClipboardCapture(page);
       phase = 'waiting for the initial WebGL canvas';
       await page.waitForSelector('.designqr-webgl-canvas', { timeout: 15_000 });
+      await page.waitForFunction(
+        (expectedCount) => document.querySelector('.github-star-link')
+          ?.getAttribute('data-github-star-count') === String(expectedCount),
+        { timeout: 15_000 },
+        githubStarFixtureCount
+      );
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const layout = await page.evaluate(() => {
@@ -857,11 +858,29 @@ async function verifyDesignQrLayout(browser) {
         const transparentControl = document.querySelector(
           '.transparent-background-btn'
         );
+        const githubLink = document.querySelector('.github-star-link');
+        const githubCount = document.querySelector('.github-star-count');
+        const stageTransform = getComputedStyle(
+          document.querySelector('.designqr-stage-transform-probe')
+        ).transform;
+        const stageMatrix = stageTransform === 'none'
+          ? new DOMMatrix()
+          : new DOMMatrix(stageTransform);
         return {
           viewportWidth: window.innerWidth,
           documentWidth: document.documentElement.scrollWidth,
           bodyWidth: document.body.scrollWidth,
           header: rect('.app-header'),
+          headerBrand: rect('.header-brand'),
+          github: rect('.github-star-link'),
+          githubHref: githubLink instanceof HTMLAnchorElement ? githubLink.href : '',
+          githubTarget: githubLink instanceof HTMLAnchorElement ? githubLink.target : '',
+          githubRel: githubLink instanceof HTMLAnchorElement ? githubLink.rel : '',
+          githubCountText: githubCount?.textContent?.trim(),
+          githubDataCount: githubLink?.getAttribute('data-github-star-count'),
+          githubHasMark: Boolean(githubLink?.querySelector('.github-star-mark')),
+          githubAccessibleName: githubLink?.getAttribute('aria-label'),
+          viewModes: rect('.view-mode-group'),
           controls: rect('.controls-overlay'),
           season: rect('.season-chip'),
           addTheme: rect('.add-theme-chip-compact'),
@@ -884,6 +903,10 @@ async function verifyDesignQrLayout(browser) {
           ).display,
           share: rect('.share-icon-btn'),
           stage: rect('.designqr-canvas-wrapper'),
+          stageTransform,
+          stageTransformScaleX: stageMatrix.a,
+          stageTransformScaleY: stageMatrix.d,
+          stageTransformTranslateY: stageMatrix.f,
           floatingRow: rect('.floating-top-tools-row'),
           floatingHint: rect('.floating-center-tools .canvas-hint-badge'),
           floatingRight: rect('.floating-right-tools'),
@@ -905,6 +928,38 @@ async function verifyDesignQrLayout(browser) {
         nearlyEqual(layout.header.width, scenario.headerWidth),
         `${scenario.name}: shared header rail width drifted to ${layout.header.width}px.`
       );
+      assertLayout(
+        Boolean(layout.github)
+        && layout.githubHref === 'https://github.com/johnson7543/design'
+        && layout.githubTarget === '_blank'
+        && layout.githubRel.includes('noreferrer')
+        && layout.githubHasMark
+        && layout.githubCountText === String(githubStarFixtureCount)
+        && layout.githubDataCount === String(githubStarFixtureCount)
+        && layout.githubAccessibleName
+          === `Star DesignQR on GitHub; ${githubStarFixtureCount} stars (opens in a new tab)`
+        && nearlyEqual(layout.github.height, 34)
+        && layout.github.left >= layout.headerBrand.right + 4
+        && layout.github.right <= layout.viewModes.left - 4
+        && layout.github.left >= layout.header.left
+        && layout.github.right <= layout.header.right
+        && !layout.githubCountText.includes('GitHub'),
+        `${scenario.name}: the GitHub star action is inaccessible, misplaced, or overlaps the header.`
+      );
+      if (
+        scenario.id === 'portrait-desktop'
+        || scenario.id === 'narrow-portrait-desktop'
+      ) {
+        assertLayout(
+          layout.stageTransform !== 'none'
+          && nearlyEqual(layout.stageTransformScaleX, 0.95)
+          && nearlyEqual(layout.stageTransformScaleY, 0.95)
+          && layout.stageTransformTranslateY <= (
+            scenario.id === 'narrow-portrait-desktop' ? -55 : 0
+          ),
+          `${scenario.name}: the shared portrait stage lift no longer protects the editor controls.`
+        );
+      }
       assertLayout(
         nearlyEqual((layout.controls.left + layout.controls.right) / 2, scenario.width / 2),
         `${scenario.name}: bottom control rail is not centered.`
@@ -1331,7 +1386,7 @@ async function verifyDesignQrLayout(browser) {
         && !advancedReactState.code.includes('TODO')
         && !/\n\s*\/\//.test(advancedReactState.code)
         && !advancedReactState.code.includes('/*'),
-        `${scenario.name}: Advanced React example is not the exact runnable controlled component.`
+        `${scenario.name}: Advanced React example is not the exact package-only component.`
       );
       const advancedSelectionState = await readReactExampleState(page);
       assertLayout(
@@ -1570,6 +1625,9 @@ async function verifyDesignQrLayout(browser) {
         const editLabel = document.querySelector(
           '.floating-right-tools .floating-edit-toggle:not(.floating-logo-toggle) .floating-stage-tool-label'
         );
+        const stageTransform = getComputedStyle(
+          document.querySelector('.designqr-stage-transform-probe')
+        ).transform;
         return {
           hint: rect('.floating-center-tools .canvas-hint-badge'),
           right: rect('.floating-right-tools'),
@@ -1580,6 +1638,7 @@ async function verifyDesignQrLayout(browser) {
           transparentPressed: document.querySelector('.transparent-background-btn')
             ?.getAttribute('aria-pressed'),
           editLabelDisplay: editLabel ? getComputedStyle(editLabel).display : '',
+          stageTransform,
         };
       });
       assertLayout(
@@ -1604,6 +1663,10 @@ async function verifyDesignQrLayout(browser) {
           ? tools2d.editLabelDisplay === 'none'
           : tools2d.editLabelDisplay !== 'none',
         `${scenario.name}: the Edit label does not follow the responsive floating-tool contract.`
+      );
+      assertLayout(
+        tools2d.stageTransform === layout.stageTransform,
+        `${scenario.name}: the 2D QR no longer shares the 3D stage transform.`
       );
 
       const stageBeforeEditors = await page.$eval(
@@ -1996,10 +2059,9 @@ async function verifyDesignQrWysiwygExport(browser) {
         === 'Advanced, recommended for the current editor setup'
       && configuredReactState.copyLabel === 'Copy Advanced React code'
       && configuredReactState.switcherFits
-      && configuredReactState.code.includes('useState<DesignQRView>("qr")')
       && configuredReactState.code.includes('tree={{ shape: "dome", seed: 0.5 }}')
       && configuredReactState.code.includes('theme="spring"')
-      && configuredReactState.code.includes('view={view}')
+      && configuredReactState.code.includes('defaultView="qr"')
       && configuredReactState.code.includes(
         'details={{ title: "Spring invitation", showValue: true, border: { padding: 16 } }}'
       )
@@ -2011,6 +2073,11 @@ async function verifyDesignQrWysiwygExport(browser) {
       && configuredReactLogo?.src === committedLogoBeforeCancel
       && configuredReactLogo.alt === 'green brand'
       && configuredReactLogo.size === 0.16
+      && !configuredReactState.code.includes('useState')
+      && !configuredReactState.code.includes('<button')
+      && !configuredReactState.code.includes('<p')
+      && !configuredReactState.code.includes('onViewChange=')
+      && !configuredReactState.code.includes('onError=')
       && !configuredReactState.code.includes('TODO')
       && !configuredReactState.code.includes('/logo.webp'),
       'The configured editor did not default to an exact highlighted Advanced React example.'

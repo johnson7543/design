@@ -1,4 +1,5 @@
 import {
+  DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
   decodeDesignQRConfig,
   encodeDesignQRConfig,
   normalizeDesignQRConfig,
@@ -23,7 +24,9 @@ export interface ShareConfig {
   season: number;
   viewMode?: '3d' | 'scan';
   title?: string;
+  titleScale?: number;
   showContent?: boolean;
+  contentScale?: number;
   borderEnabled?: boolean;
   borderPadding?: number;
   transparentBackground?: boolean;
@@ -60,7 +63,9 @@ export function createDesignQRConfig(config: ShareConfig): DesignQRConfigV1 {
     view: config.viewMode === 'scan' ? 'qr' : 'design',
     details: {
       title: config.title,
+      titleScale: config.titleScale,
       showValue: config.showContent,
+      contentScale: config.contentScale,
       border: config.borderEnabled
         ? { padding: config.borderPadding }
         : false,
@@ -96,7 +101,9 @@ export function decodeShareConfig(encoded: string): ShareConfig | null {
     season,
     viewMode: config.view.initial === 'qr' ? 'scan' : '3d',
     title: config.details.title,
+    titleScale: config.details.titleScale ?? DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
     showContent: config.details.showValue,
+    contentScale: config.details.contentScale ?? DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
     borderEnabled: config.details.border !== false,
     borderPadding: config.details.border === false
       ? QR_BORDER_PADDING_DEFAULT
