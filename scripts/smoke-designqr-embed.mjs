@@ -136,12 +136,22 @@ async function decodeEmbedCanvas(frame) {
     if (!(canvas instanceof HTMLCanvasElement)) {
       throw new Error('The embed presentation canvas is missing.');
     }
-    const context = canvas.getContext('2d', { willReadFrequently: true });
+    const composite = document.createElement('canvas');
+    composite.width = canvas.width;
+    composite.height = canvas.height;
+    const context = composite.getContext('2d', { willReadFrequently: true });
     if (!context) throw new Error('The embed presentation context is unavailable.');
+    // This fixture enables Border, so its package-owned four-module margin
+    // must isolate the QR even when the transparent iframe sits on a dark host.
+    context.fillStyle = '#000000';
+    context.fillRect(0, 0, composite.width, composite.height);
+    context.drawImage(canvas, 0, 0);
     return {
-      width: canvas.width,
-      height: canvas.height,
-      pixels: Array.from(context.getImageData(0, 0, canvas.width, canvas.height).data),
+      width: composite.width,
+      height: composite.height,
+      pixels: Array.from(
+        context.getImageData(0, 0, composite.width, composite.height).data
+      ),
     };
   });
   const pixels = Uint8ClampedArray.from(snapshot.pixels);
@@ -246,7 +256,7 @@ async function verifyCrossOriginEmbed(browser) {
     );
     assert(
       await decodeEmbedCanvas(embedFrame) === 'https://example.com/updated-iframe',
-      'The transparent iframe QR did not decode over its package-owned quiet zone.'
+      'The transparent bordered iframe QR did not decode over the dark host background.'
     );
 
     const logoState = await embedFrame.evaluate(() => {
@@ -321,6 +331,61 @@ async function verifyCrossOriginEmbed(browser) {
     await page.waitForFunction(
       () => document.querySelector('.iframe-consumer')
         ?.getAttribute('data-view') === 'design',
+      { timeout: 20_000 }
+    );
+
+    const readyCountBeforeFailure = await page.$eval(
+      '.iframe-consumer',
+      (element) => Number(element.getAttribute('data-ready-count'))
+    );
+    await page.click('#set-invalid-config');
+    await page.waitForFunction(
+      () => document.querySelector('.iframe-consumer')
+        ?.getAttribute('data-generation-error-code') === 'QR_GENERATION_FAILED',
+      { timeout: 20_000 }
+    );
+    await embedFrame.waitForSelector(
+      '.designqr-error[data-designqr-error-code="QR_GENERATION_FAILED"]',
+      { timeout: 20_000 }
+    );
+    const failedReplacement = await embedFrame.evaluate(() => {
+      const alert = document.querySelector(
+        '.designqr-error[data-designqr-error-code="QR_GENERATION_FAILED"]'
+      );
+      return {
+        role: alert?.getAttribute('role'),
+        text: alert?.textContent?.trim(),
+        webglCanvasCount: document.querySelectorAll('.designqr-webgl-canvas').length,
+        presentationCanvasCount: document.querySelectorAll(
+          '.designqr-presentation-canvas'
+        ).length,
+        substitutedHomepage: document.body.textContent?.includes(
+          'https://design.johnson7543.com'
+        ),
+      };
+    });
+    assert(
+      failedReplacement.role === 'alert'
+        && failedReplacement.text === 'Unable to generate this DesignQR'
+        && failedReplacement.webglCanvasCount === 0
+        && failedReplacement.presentationCanvasCount === 0
+        && !failedReplacement.substitutedHomepage,
+      `The failed iframe replacement retained render output: ${JSON.stringify(failedReplacement)}.`
+    );
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const readyCountAfterFailure = await page.$eval(
+      '.iframe-consumer',
+      (element) => Number(element.getAttribute('data-ready-count'))
+    );
+    assert(
+      readyCountAfterFailure === readyCountBeforeFailure,
+      'The iframe announced ready for a failed QR replacement.'
+    );
+
+    await page.click('#export-image');
+    await page.waitForFunction(
+      () => document.querySelector('.iframe-consumer')
+        ?.getAttribute('data-export-status') === 'error',
       { timeout: 20_000 }
     );
 

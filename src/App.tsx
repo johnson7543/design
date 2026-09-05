@@ -9,8 +9,7 @@ import {
   type DesignQRCanvasHandle as TreeCanvasHandle,
   RenderManager,
   build3DTree,
-  generateQRMatrix,
-  resolveQRErrorCorrectionLevel,
+  generateInteractiveQRMatrix,
   QR_BORDER_PADDING_DEFAULT,
   VIEW_TRANSITION_SPEED_DEFAULT,
   VIEW_TRANSITION_SPEED_MAX,
@@ -20,6 +19,7 @@ import {
 import type { CustomTheme } from './editor/types';
 import { THEME_PRESET_OPTIONS } from './editor/theme-presets';
 import {
+  DesignQRConfigError,
   normalizeDesignQRConfig,
   type AutoRotateDirection,
   type DesignQRConfigV1,
@@ -278,17 +278,38 @@ export const App: React.FC = () => {
     };
   }, [backgroundStyle]);
 
-  // 1. Generate QR Matrix and 3D Tree Data (from debounced URL)
-  const qrMatrix = useMemo(() => {
-    return generateQRMatrix(
-      debouncedUrl || DEFAULT_URL,
-      resolveQRErrorCorrectionLevel(logo !== false)
-    );
+  // 1. Prepare the exact QR matrix before allocating any procedural tree data.
+  const qrPreparation = useMemo(() => {
+    try {
+      return {
+        ok: true as const,
+        matrix: generateInteractiveQRMatrix(
+          debouncedUrl || DEFAULT_URL,
+          logo !== false
+        ),
+      };
+    } catch (cause) {
+      return {
+        ok: false as const,
+        error: cause instanceof DesignQRConfigError
+          ? cause
+          : new DesignQRConfigError(
+              'QR_GENERATION_FAILED',
+              'DesignQR could not encode this value.',
+              cause
+            ),
+      };
+    }
   }, [debouncedUrl, logo]);
 
-  const treeData: TreeData = useMemo(() => {
-    return build3DTree(qrMatrix.modules, 0.5, activeCustomTheme?.treeShape || 'dome');
-  }, [qrMatrix, activeCustomTheme?.treeShape]);
+  const treeData = useMemo<TreeData | null>(() => {
+    if (!qrPreparation.ok) return null;
+    return build3DTree(
+      qrPreparation.matrix.modules,
+      0.5,
+      activeCustomTheme?.treeShape || 'dome'
+    );
+  }, [qrPreparation, activeCustomTheme?.treeShape]);
 
   // 2. Custom Theme Management Handlers
   const handleSelectTheme = (themeId: string) => {
@@ -461,14 +482,7 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  // 4. Download the same committed presentation canvas shown in the editor.
-  const handleDownload = async () => {
-    const blob = await treeCanvasRef.current?.exportImage();
-    if (!blob) return;
-    downloadImageBlob(blob, `designqr-${currentSeasonPreset.name}.png`);
-  };
-
-  // 5. Build one canonical state for direct links, hosted embeds, and React.
+  // 4. Build one canonical state for direct links, hosted embeds, and React.
   const currentShareConfig = useMemo<ShareConfig>(() => ({
     url: url || DEFAULT_URL,
     season: seasonId,
@@ -506,23 +520,65 @@ export const App: React.FC = () => {
     viewMode,
   ]);
 
+  const isQRPreparationPending = (
+    url || DEFAULT_URL
+  ) !== (
+    debouncedUrl || DEFAULT_URL
+  );
+  const designQRConfigPreparation = useMemo(() => {
+    if (isQRPreparationPending) {
+      return { ok: false as const, pending: true as const };
+    }
+    if (!qrPreparation.ok) {
+      return {
+        ok: false as const,
+        pending: false as const,
+        error: qrPreparation.error,
+      };
+    }
+
+    try {
+      return {
+        ok: true as const,
+        config: createDesignQRConfig(currentShareConfig),
+      };
+    } catch (cause) {
+      return {
+        ok: false as const,
+        pending: false as const,
+        error: cause instanceof DesignQRConfigError
+          ? cause
+          : new DesignQRConfigError(
+              'INVALID_CONFIG',
+              'This DesignQR configuration is invalid.',
+              cause
+            ),
+      };
+    }
+  }, [currentShareConfig, isQRPreparationPending, qrPreparation]);
+  const designQRConfig = designQRConfigPreparation.ok
+    ? designQRConfigPreparation.config
+    : null;
   const encodedShareConfig = useMemo(
-    () => encodeShareConfig(currentShareConfig),
-    [currentShareConfig]
+    () => designQRConfig ? encodeShareConfig(currentShareConfig) : '',
+    [currentShareConfig, designQRConfig]
   );
-  const shareConfigurationError = encodedShareConfig
-    ? ''
-    : 'This design is too large for an editable link. Use a simpler logo or shorter content.';
-  const designQRConfig = useMemo(
-    () => createDesignQRConfig(currentShareConfig),
-    [currentShareConfig]
-  );
+  const shareConfigurationError = !qrPreparation.ok
+    ? qrPreparation.error.message
+    : !designQRConfigPreparation.ok && !designQRConfigPreparation.pending
+      ? designQRConfigPreparation.error.message
+      : designQRConfigPreparation.ok && !encodedShareConfig
+        ? 'This design is too large for an editable link. Use a simpler logo or shorter content.'
+        : '';
+  const shareDisabled = isQRPreparationPending || !designQRConfigPreparation.ok;
+  const qrGenerationError = qrPreparation.ok ? null : qrPreparation.error;
   const shareUrl = useMemo(() => {
     return encodedShareConfig
       ? `${window.location.origin}/qr?q=${encodedShareConfig}`
       : '';
   }, [encodedShareConfig]);
   const embedUrl = useMemo(() => encodedShareConfig
+    && designQRConfig
     ? createDesignQREmbedUrl(designQRConfig, { origin: window.location.origin })
     : '', [designQRConfig, encodedShareConfig]);
   const embedCode = useMemo(
@@ -530,21 +586,31 @@ export const App: React.FC = () => {
     [embedUrl]
   );
   const reactCode = useMemo(
-    () => createDesignQRReactSnippet(designQRConfig),
+    () => designQRConfig ? createDesignQRReactSnippet(designQRConfig) : '',
     [designQRConfig]
   );
   const reactAdvancedCode = useMemo(
-    () => createDesignQRAdvancedReactSnippet(designQRConfig),
+    () => designQRConfig ? createDesignQRAdvancedReactSnippet(designQRConfig) : '',
     [designQRConfig]
   );
   const reactThemeCode = useMemo(
-    () => createDesignQRThemeReactSnippet(designQRConfig),
+    () => designQRConfig ? createDesignQRThemeReactSnippet(designQRConfig) : '',
     [designQRConfig]
   );
   const recommendedReactExampleMode = useMemo(
-    () => getRecommendedDesignQRReactExample(designQRConfig),
+    () => designQRConfig
+      ? getRecommendedDesignQRReactExample(designQRConfig)
+      : 'simple',
     [designQRConfig]
   );
+
+  // 5. Download only a presentation that matches the currently prepared value.
+  const handleDownload = async () => {
+    if (shareDisabled) return;
+    const blob = await treeCanvasRef.current?.exportImage();
+    if (!blob) return;
+    downloadImageBlob(blob, `designqr-${currentSeasonPreset.name}.png`);
+  };
 
   // Keep the editor URL synchronized with the same canonical configuration.
   useEffect(() => {
@@ -580,42 +646,53 @@ export const App: React.FC = () => {
       />
 
       <main className={`main-viewport${transparentBackground ? ' transparency-preview' : ''}`}>
-        <TreeCanvas
-          ref={treeCanvasRef}
-          className="designqr-editor-player"
-          treeData={treeData}
-          theme={rendererTheme}
-          viewMode={viewMode}
-          onToggleScanMode={handleToggleScanMode}
-          onRendererReady={(manager) => {
-            renderManagerRef.current = manager;
-            manager.setTransitionSpeed(transitionSpeed);
-          }}
-          onRendererError={handleRendererError}
-          enableMotionBlur={enableMotionBlur}
-          autoRotate={isTurntable}
-          autoRotateDirection={autoRotateDirection}
-          logo={logo}
-          transparentBackground={transparentBackground}
-          backgroundTop={
-            activeCustomTheme?.skyTop ?? currentPresetTheme.skyTop
-          }
-          backgroundBottom={
-            activeCustomTheme?.skyBottom ?? currentPresetTheme.skyBottom
-          }
-          showQrDetails={viewMode === 'scan'}
-          qrTitle={qrTitle}
-          showQrContent={showQrContent}
-          qrValue={url}
-          qrBorderEnabled={qrBorderEnabled}
-          qrBorderPadding={qrBorderPadding}
-          qrTitleColor={
-            activeCustomTheme?.titleColor
-            || activeCustomTheme?.foliageShadowColor
-            || activeCustomTheme?.foliageColor
-            || currentPresetTheme.titleColor
-          }
-        />
+        {treeData ? (
+          <TreeCanvas
+            ref={treeCanvasRef}
+            className="designqr-editor-player"
+            treeData={treeData}
+            theme={rendererTheme}
+            viewMode={viewMode}
+            onToggleScanMode={handleToggleScanMode}
+            onRendererReady={(manager) => {
+              renderManagerRef.current = manager;
+              manager.setTransitionSpeed(transitionSpeed);
+            }}
+            onRendererError={handleRendererError}
+            enableMotionBlur={enableMotionBlur}
+            autoRotate={isTurntable}
+            autoRotateDirection={autoRotateDirection}
+            logo={logo}
+            transparentBackground={transparentBackground}
+            backgroundTop={
+              activeCustomTheme?.skyTop ?? currentPresetTheme.skyTop
+            }
+            backgroundBottom={
+              activeCustomTheme?.skyBottom ?? currentPresetTheme.skyBottom
+            }
+            showQrDetails={viewMode === 'scan'}
+            qrTitle={qrTitle}
+            showQrContent={showQrContent}
+            qrValue={debouncedUrl || DEFAULT_URL}
+            qrBorderEnabled={qrBorderEnabled}
+            qrBorderPadding={qrBorderPadding}
+            qrTitleColor={
+              activeCustomTheme?.titleColor
+              || activeCustomTheme?.foliageShadowColor
+              || activeCustomTheme?.foliageColor
+              || currentPresetTheme.titleColor
+            }
+          />
+        ) : (
+          <div
+            className="designqr-editor-error glass-panel"
+            role="alert"
+            data-designqr-error-code={qrGenerationError?.code}
+          >
+            <strong>Unable to generate this DesignQR</strong>
+            <span>{qrGenerationError?.message}</span>
+          </div>
+        )}
       </main>
 
       <ControlsOverlay
@@ -626,7 +703,10 @@ export const App: React.FC = () => {
         customThemes={customThemes}
         onOpenCreateTheme={handleOpenCreateTheme}
         onOpenEditTheme={handleOpenEditTheme}
-        onShare={() => setShareModalOpen(true)}
+        onShare={() => {
+          if (!shareDisabled) setShareModalOpen(true);
+        }}
+        shareDisabled={shareDisabled}
         isTurntable={isTurntable}
         onToggleTurntable={handleToggleTurntable}
         autoRotateDirection={autoRotateDirection}
@@ -686,6 +766,7 @@ export const App: React.FC = () => {
           reactThemeCode={reactThemeCode}
           recommendedReactExampleMode={recommendedReactExampleMode}
           configurationError={shareConfigurationError}
+          downloadDisabled={shareDisabled}
           onClose={() => setShareModalOpen(false)}
           onDownload={handleDownload}
         />

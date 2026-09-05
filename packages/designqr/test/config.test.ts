@@ -720,11 +720,20 @@ test('returns typed errors for unsafe or unsupported input', () => {
   });
   assert.equal(invalidColor.ok, false);
 
-  const oversized = parseDesignQRConfig({
+  const maximumValue = parseDesignQRConfig({
     schemaVersion: 1,
-    value: 'a'.repeat(2049),
+    value: 'a'.repeat(2_048),
   });
-  assert.equal(oversized.ok, false);
+  assert.equal(maximumValue.ok, true);
+
+  const oversizedValue = parseDesignQRConfig({
+    schemaVersion: 1,
+    value: 'a'.repeat(2_049),
+  });
+  assert.equal(oversizedValue.ok, false);
+  if (!oversizedValue.ok) {
+    assert.equal(oversizedValue.error.code, 'INVALID_CONFIG');
+  }
 });
 
 test('round-trips UTF-8 canonical configuration with base64url', () => {

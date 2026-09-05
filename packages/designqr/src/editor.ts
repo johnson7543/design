@@ -6,9 +6,12 @@ export {
 export { RenderManager } from './renderer/RenderManager.ts';
 export { PresentationSurface } from './renderer/PresentationSurface.ts';
 export {
+  assertInteractiveQRMatrixSupported,
+  generateInteractiveQRMatrix,
   generateQRMatrix,
   resolveQRErrorCorrectionLevel,
   type QRMatrixData,
+  type QRErrorCorrectionLevel,
 } from './designs/tree/qr.ts';
 export {
   build3DTree,

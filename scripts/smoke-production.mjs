@@ -151,6 +151,46 @@ async function installClipboardCapture(page) {
   if (!installed) throw new Error('Clipboard capture could not be installed.');
 }
 
+async function clickAndCaptureCopyFeedback(page, selector) {
+  return page.evaluate((buttonSelector) => new Promise((resolve) => {
+    const button = document.querySelector(buttonSelector);
+    if (!(button instanceof HTMLButtonElement)) {
+      throw new Error(`Copy button was not found: ${buttonSelector}`);
+    }
+
+    const readState = () => ({
+      label: button.getAttribute('aria-label') ?? '',
+      disabled: button.disabled,
+    });
+    if (button.disabled) {
+      resolve(readState());
+      return;
+    }
+
+    let settled = false;
+    let timeoutId = 0;
+    const observer = new MutationObserver(() => {
+      const state = readState();
+      if (state.label !== 'Copied!' && state.label !== 'Try again') return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      observer.disconnect();
+      resolve(state);
+    });
+    observer.observe(button, {
+      attributes: true,
+      attributeFilter: ['aria-label'],
+    });
+    timeoutId = window.setTimeout(() => {
+      if (settled) return;
+      observer.disconnect();
+      resolve(readState());
+    }, 15_000);
+
+    button.click();
+  }), selector);
+}
+
 async function readReactExampleState(page) {
   return page.evaluate(() => {
     const switcher = document.querySelector('.react-example-switcher');
@@ -329,6 +369,121 @@ async function verifyAppNavigation(browser) {
     console.log('Production navigation passed: / → /qr; title remains on /qr.');
   } catch (error) {
     throw new Error(`Production navigation smoke test failed: ${error.message}`);
+  } finally {
+    await page.close();
+  }
+}
+
+async function setEditorValue(page, value) {
+  await page.$eval('.url-input', (input, nextValue) => {
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('The DesignQR content input is missing.');
+    }
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value'
+    )?.set;
+    setter?.call(input, nextValue);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }, value);
+}
+
+async function verifyDesignQrFailureState(browser) {
+  const page = await browser.newPage();
+  const pageErrors = [];
+  const appOrigin = new URL(url).origin;
+
+  try {
+    page.on('pageerror', (error) => pageErrors.push(error.stack ?? error.message));
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+      const requestUrl = new URL(request.url());
+      if (requestUrl.origin === appOrigin || requestUrl.protocol === 'data:') {
+        void request.continue();
+      } else {
+        void request.abort();
+      }
+    });
+
+    await page.goto(`${url}/qr`, { waitUntil: 'domcontentloaded', timeout: 15_000 });
+    await page.waitForSelector('.designqr-presentation-canvas', { timeout: 15_000 });
+    await page.click('.share-icon-btn');
+    await page.waitForSelector('.share-modal-content', { timeout: 15_000 });
+
+    const oversizedValue = 'a'.repeat(220);
+    await setEditorValue(page, oversizedValue);
+    await page.waitForSelector(
+      '.designqr-editor-error[data-designqr-error-code="QR_GENERATION_FAILED"]',
+      { timeout: 15_000 }
+    );
+    const failure = await page.evaluate((expectedValue) => ({
+      inputValue: document.querySelector('.url-input') instanceof HTMLInputElement
+        ? document.querySelector('.url-input').value
+        : '',
+      shareDisabled: document.querySelector('.share-icon-btn') instanceof HTMLButtonElement
+        ? document.querySelector('.share-icon-btn').disabled
+        : false,
+      downloadDisabled: document.querySelector('.share-action-item.primary')
+        instanceof HTMLButtonElement
+        ? document.querySelector('.share-action-item.primary').disabled
+        : false,
+      canvasCount: document.querySelectorAll(
+        '.designqr-webgl-canvas, .designqr-presentation-canvas'
+      ).length,
+      controlsPresent: Boolean(document.querySelector('.controls-overlay')),
+      message: document.querySelector('.designqr-editor-error')?.textContent?.trim(),
+      valueMatches: document.querySelector('.url-input') instanceof HTMLInputElement
+        && document.querySelector('.url-input').value === expectedValue,
+    }), oversizedValue);
+    if (
+      failure.inputValue !== oversizedValue
+      || !failure.valueMatches
+      || !failure.shareDisabled
+      || !failure.downloadDisabled
+      || failure.canvasCount !== 0
+      || !failure.controlsPresent
+      || !failure.message?.includes('Unable to generate this DesignQR')
+    ) {
+      throw new Error(`The editor failure state is incomplete: ${JSON.stringify(failure)}.`);
+    }
+
+    await page.click('[data-share-mode="embed"]');
+    const embedOutput = await page.evaluate(() => ({
+      code: document.querySelector('[aria-label="DesignQR iframe code"]')
+        ?.textContent ?? '',
+      url: document.querySelector('[aria-label="Hosted DesignQR player URL"]')
+        instanceof HTMLInputElement
+        ? document.querySelector('[aria-label="Hosted DesignQR player URL"]').value
+        : '',
+    }));
+    if (embedOutput.code || embedOutput.url) {
+      throw new Error(`The invalid editor emitted embed output: ${JSON.stringify(embedOutput)}.`);
+    }
+
+    await page.click('[data-share-mode="react"]');
+    const reactOutput = await page.$eval(
+      '[aria-label="DesignQR React code"]',
+      (element) => element.textContent ?? ''
+    );
+    if (reactOutput) {
+      throw new Error('The invalid editor emitted a React snippet.');
+    }
+
+    await page.click('.modal-close-btn');
+    await setEditorValue(page, 'https://example.com/recovered');
+    await page.waitForSelector('.designqr-presentation-canvas', { timeout: 15_000 });
+    await page.waitForFunction(
+      () => document.querySelector('.share-icon-btn') instanceof HTMLButtonElement
+        && !document.querySelector('.share-icon-btn').disabled,
+      { timeout: 15_000 }
+    );
+
+    if (pageErrors.length > 0) {
+      throw new Error(`Editor failure page errors:\n${pageErrors.join('\n\n')}`);
+    }
+    console.log('Design QR editor failure and recovery state passed.');
+  } catch (error) {
+    throw new Error(`Design QR editor failure smoke test failed: ${error.message}`);
   } finally {
     await page.close();
   }
@@ -661,6 +816,7 @@ async function verifyDesignQrLayout(browser) {
 
   for (const scenario of scenarios) {
     const page = await browser.newPage();
+    let phase = 'opening the editor';
     try {
       await page.setViewport({
         width: scenario.width,
@@ -681,6 +837,7 @@ async function verifyDesignQrLayout(browser) {
 
       await page.goto(`${url}/qr`, { waitUntil: 'domcontentloaded', timeout: 15_000 });
       await installClipboardCapture(page);
+      phase = 'waiting for the initial WebGL canvas';
       await page.waitForSelector('.designqr-webgl-canvas', { timeout: 15_000 });
       await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -824,6 +981,7 @@ async function verifyDesignQrLayout(browser) {
         `${scenario.name}: the Logo label does not follow the responsive floating-tool contract.`
       );
 
+      phase = 'opening and closing the 3D logo editor';
       await page.click('.floating-logo-toggle');
       await page.waitForSelector('.floating-logo-editor');
       await new Promise((resolve) => setTimeout(resolve, 450));
@@ -901,6 +1059,7 @@ async function verifyDesignQrLayout(browser) {
       );
       await page.click('[aria-label="Change spin to clockwise"]');
 
+      phase = 'selecting Pixel foliage in the theme editor';
       await page.click('.add-theme-chip-compact');
       await page.waitForSelector('.custom-theme-aside-panel');
       await new Promise((resolve) => setTimeout(resolve, 350));
@@ -960,6 +1119,7 @@ async function verifyDesignQrLayout(browser) {
       await page.click('.custom-theme-aside-panel .modal-close-btn');
       await page.waitForSelector('.custom-theme-aside-panel', { hidden: true });
 
+      phase = 'checking the Share modal modes';
       await page.click('.share-icon-btn');
       await page.waitForSelector('.share-modal-content');
       await page.$eval('.share-modal-content', async (modal) => {
@@ -1291,11 +1451,14 @@ async function verifyDesignQrLayout(browser) {
         `${scenario.name}: Share modal height changed for the Custom Theme React example.`
       );
 
-      await page.click('.react-code-header .share-copy-icon-btn');
-      await page.waitForFunction(
-        () => document.querySelector('.react-code-header .share-copy-icon-btn')
-          ?.getAttribute('aria-label') === 'Copied!',
-        { timeout: 5_000 }
+      phase = 'copying the Custom Theme React example';
+      const themeCopyFeedback = await clickAndCaptureCopyFeedback(
+        page,
+        '.react-code-header .share-copy-icon-btn'
+      );
+      assertLayout(
+        themeCopyFeedback.label === 'Copied!' && !themeCopyFeedback.disabled,
+        `${scenario.name}: Custom Theme copy feedback failed: ${JSON.stringify(themeCopyFeedback)}.`
       );
       const copiedThemeState = await page.evaluate(() => ({
         clipboard: window.__designQrClipboardText,
@@ -1329,6 +1492,7 @@ async function verifyDesignQrLayout(browser) {
       await page.click('.share-modal-content .modal-close-btn');
       await page.waitForSelector('.share-modal-content', { hidden: true });
 
+      phase = 'saving and checking a custom theme';
       await page.click('.add-theme-chip-compact');
       await page.waitForSelector('.custom-theme-aside-panel');
       await page.click('[data-foliage-shape="pixel"]');
@@ -1377,6 +1541,7 @@ async function verifyDesignQrLayout(browser) {
       );
       await page.click('.share-modal-content .modal-close-btn');
       await page.waitForSelector('.share-modal-content', { hidden: true });
+      phase = 'restoring the Spring preset';
       await page.click('.season-tabs > .season-chip:first-child');
       await page.waitForFunction(
         () => document.querySelector('.season-tabs > .season-chip:first-child')
@@ -1384,6 +1549,7 @@ async function verifyDesignQrLayout(browser) {
         { timeout: 15_000 }
       );
 
+      phase = 'entering the settled 2D view';
       await page.click('.mode-btn[title="2D QR"]');
       await page.waitForFunction(
         () => document.querySelector('.app-root')?.classList.contains('view-scan'),
@@ -1447,6 +1613,7 @@ async function verifyDesignQrLayout(browser) {
           return { left: box.left, top: box.top, width: box.width, height: box.height };
         }
       );
+      phase = 'opening the 2D details editor';
       await page.click(
         '.floating-right-tools .floating-edit-toggle:not(.floating-logo-toggle)'
       );
@@ -1500,8 +1667,10 @@ async function verifyDesignQrLayout(browser) {
       );
 
       if (scenario.name === 'desktop') {
+        phase = 'enabling the transparent background';
         const opaqueUrl = page.url();
         await page.click('.transparent-background-btn');
+        phase = 'waiting for the transparent URL to synchronize';
         await page.waitForFunction(
           () => document.querySelector('.transparent-background-btn')
             ?.getAttribute('aria-pressed') === 'true'
@@ -1526,6 +1695,7 @@ async function verifyDesignQrLayout(browser) {
           previewBackground.includes('conic-gradient'),
           'The editor does not expose its non-exported transparency preview.'
         );
+        phase = 'disabling the transparent background';
         await page.click('.transparent-background-btn');
         await page.waitForFunction(
           () => document.querySelector('.transparent-background-btn')
@@ -1544,6 +1714,7 @@ async function verifyDesignQrLayout(browser) {
         ? await readSpringQrPaletteSignature(page)
         : null;
 
+      phase = 'uploading and sizing the 2D logo';
       await page.click('.floating-logo-toggle');
       await page.waitForSelector('.floating-logo-editor');
       await page.waitForSelector('.floating-details-editor', { hidden: true });
@@ -1632,7 +1803,9 @@ async function verifyDesignQrLayout(browser) {
 
       console.log(`Design QR layout passed: ${scenario.name}.`);
     } catch (error) {
-      throw new Error(`Design QR layout smoke test failed for ${scenario.name}: ${error.message}`);
+      throw new Error(
+        `Design QR layout smoke test failed for ${scenario.name} while ${phase}: ${error.message}`
+      );
     } finally {
       await page.close();
     }
@@ -1898,11 +2071,14 @@ async function verifyDesignQrWysiwygExport(browser) {
       failedConfiguredThemeChecks.length === 0,
       `The Custom Theme React snippet is missing: ${failedConfiguredThemeChecks.join(', ')}.`
     );
-    await page.click('.react-code-header .share-copy-icon-btn');
-    await page.waitForFunction(
-      () => document.querySelector('.react-code-header .share-copy-icon-btn')
-        ?.getAttribute('aria-label') === 'Copied!',
-      { timeout: 5_000 }
+    const configuredThemeCopyFeedback = await clickAndCaptureCopyFeedback(
+      page,
+      '.react-code-header .share-copy-icon-btn'
+    );
+    assertLayout(
+      configuredThemeCopyFeedback.label === 'Copied!'
+      && !configuredThemeCopyFeedback.disabled,
+      `Configured Custom Theme copy feedback failed: ${JSON.stringify(configuredThemeCopyFeedback)}.`
     );
     const configuredClipboardText = await page.evaluate(
       () => window.__designQrClipboardText
@@ -2036,6 +2212,7 @@ try {
     expectedTitle: 'Not found',
   });
   await verifyAppNavigation(browser);
+  await verifyDesignQrFailureState(browser);
   if (!skipLayout) await verifyDesignQrLayout(browser);
   if (!skipWysiwyg) await verifyDesignQrWysiwygExport(browser);
 

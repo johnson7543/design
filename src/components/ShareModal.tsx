@@ -65,6 +65,7 @@ interface ShareModalProps {
   reactThemeCode: string;
   recommendedReactExampleMode: ReactExampleMode;
   configurationError?: string;
+  downloadDisabled?: boolean;
   onClose: () => void;
   onDownload: () => void;
 }
@@ -181,6 +182,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   reactThemeCode,
   recommendedReactExampleMode,
   configurationError = '',
+  downloadDisabled = false,
   onClose,
   onDownload,
 }) => {
@@ -367,6 +369,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
               <button
                 type="button"
                 className="share-action-item primary"
+                disabled={downloadDisabled}
                 onClick={() => {
                   onDownload();
                   onClose();

@@ -44,6 +44,7 @@ interface ControlsOverlayProps {
   onOpenCreateTheme: () => void;
   onOpenEditTheme: (theme: CustomTheme) => void;
   onShare: () => void;
+  shareDisabled?: boolean;
   isTurntable: boolean;
   onToggleTurntable: () => void;
   autoRotateDirection: AutoRotateDirection;
@@ -90,6 +91,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   onOpenCreateTheme,
   onOpenEditTheme,
   onShare,
+  shareDisabled = false,
   isTurntable,
   onToggleTurntable,
   autoRotateDirection,
@@ -427,8 +429,9 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
             type="button"
             className="share-icon-btn"
             aria-label="Share link"
-            title="Share link"
+            title={shareDisabled ? 'Fix the QR content before sharing' : 'Share link'}
             onClick={onShare}
+            disabled={shareDisabled}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

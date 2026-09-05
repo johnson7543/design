@@ -9,14 +9,17 @@
     <main
       class="iframe-consumer"
       data-ready="false"
+      data-ready-count="0"
       data-view="unknown"
       data-early-export-status="working"
       data-export-status="idle"
+      data-generation-error-code=""
     >
       <section class="iframe-consumer-controls" aria-label="Embed controls">
         <strong>External DesignQR host</strong>
         <button id="show-qr" type="button">Show QR</button>
         <button id="set-config" type="button">Set config</button>
+        <button id="set-invalid-config" type="button">Set invalid config</button>
         <button id="pause-player" type="button">Pause</button>
         <button id="export-image" type="button">Export PNG</button>
         <output id="status">Connecting…</output>

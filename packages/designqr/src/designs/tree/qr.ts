@@ -1,11 +1,14 @@
 import QRCode from 'qrcode';
 
-const FALLBACK_QR_VALUE = 'https://design.johnson7543.com';
+import { DESIGN_QR_MAX_INTERACTIVE_GRID_SIZE } from '../../config/defaults.ts';
+import { DesignQRConfigError } from '../../config/types.ts';
+
+export type QRErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 
 export interface QRMatrixData {
   modules: boolean[][];
   size: number;
-  errorCorrectionLevel: string;
+  errorCorrectionLevel: QRErrorCorrectionLevel;
 }
 
 export function resolveQRErrorCorrectionLevel(
@@ -16,32 +19,66 @@ export function resolveQRErrorCorrectionLevel(
 
 export function generateQRMatrix(
   text: string,
-  errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
+  errorCorrectionLevel: QRErrorCorrectionLevel = 'M'
 ): QRMatrixData {
-  try {
-    const qr = QRCode.create(text || FALLBACK_QR_VALUE, {
-      errorCorrectionLevel,
-    });
-    const size = qr.modules.size;
-    const modules: boolean[][] = [];
+  const qr = QRCode.create(text, {
+    errorCorrectionLevel,
+  });
+  const modules: boolean[][] = [];
 
-    for (let r = 0; r < size; r++) {
-      const row: boolean[] = [];
-      for (let c = 0; c < size; c++) {
-        row.push(qr.modules.get(c, r) === 1);
-      }
-      modules.push(row);
+  for (let row = 0; row < qr.modules.size; row += 1) {
+    const moduleRow: boolean[] = [];
+
+    for (let column = 0; column < qr.modules.size; column += 1) {
+      moduleRow.push(qr.modules.get(column, row) === 1);
     }
 
-    return {
-      modules,
-      size,
-      errorCorrectionLevel,
-    };
-  } catch (err) {
-    console.error('QR generation failed, falling back to default:', err);
-    return generateQRMatrix(FALLBACK_QR_VALUE, errorCorrectionLevel);
+    modules.push(moduleRow);
   }
+
+  return {
+    modules,
+    size: qr.modules.size,
+    errorCorrectionLevel,
+  };
+}
+
+export function assertInteractiveQRMatrixSupported(
+  matrix: Pick<QRMatrixData, 'size'>
+): void {
+  if (matrix.size <= DESIGN_QR_MAX_INTERACTIVE_GRID_SIZE) return;
+
+  throw new DesignQRConfigError(
+    'QR_GENERATION_FAILED',
+    [
+      `This value produces a ${matrix.size}×${matrix.size}`,
+      'QR matrix, above DesignQR’s temporary',
+      `${DESIGN_QR_MAX_INTERACTIVE_GRID_SIZE}×${DESIGN_QR_MAX_INTERACTIVE_GRID_SIZE}`,
+      'interactive rendering limit.',
+      'Shorten the value or remove the logo.',
+    ].join(' ')
+  );
+}
+
+export function generateInteractiveQRMatrix(
+  value: string,
+  hasLogo: boolean
+): QRMatrixData {
+  const errorCorrectionLevel = resolveQRErrorCorrectionLevel(hasLogo);
+  let matrix: QRMatrixData;
+
+  try {
+    matrix = generateQRMatrix(value, errorCorrectionLevel);
+  } catch (cause) {
+    throw new DesignQRConfigError(
+      'QR_GENERATION_FAILED',
+      `DesignQR could not encode the supplied value at error correction level ${errorCorrectionLevel}.`,
+      cause
+    );
+  }
+
+  assertInteractiveQRMatrixSupported(matrix);
+  return matrix;
 }
 
 /**

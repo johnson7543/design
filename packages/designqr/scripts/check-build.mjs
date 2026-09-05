@@ -30,6 +30,9 @@ for (const entry of [esm, cjs, configEsm, configCjs]) {
   ) {
     throw new Error('The DesignQR transition-speed API is missing from a published build.');
   }
+  if (entry.DESIGN_QR_MAX_INTERACTIVE_GRID_SIZE !== 57) {
+    throw new Error('The DesignQR interactive matrix limit is missing from a published build.');
+  }
 }
 if (
   !embedEsm.createDesignQREmbedUrl

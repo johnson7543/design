@@ -312,6 +312,13 @@ export default function DesignQREmbedRoute() {
     );
     postError(payload);
     if (
+      error.code === 'QR_GENERATION_FAILED'
+      || error.code === 'WEBGL_UNAVAILABLE'
+      || error.code === 'WEBGL_CONTEXT_LOST'
+    ) {
+      playerReadyRef.current = false;
+    }
+    if (
       error.code === 'WEBGL_UNAVAILABLE'
       || error.code === 'WEBGL_CONTEXT_LOST'
     ) {

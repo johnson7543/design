@@ -3,6 +3,7 @@ import { VIEW_TRANSITION_SPEED_DEFAULT } from '../designs/tree/constants.ts';
 
 export const DESIGN_QR_SCHEMA_VERSION = 1 as const;
 export const DESIGN_QR_MAX_VALUE_BYTES = 2048;
+export const DESIGN_QR_MAX_INTERACTIVE_GRID_SIZE = 57;
 export const DESIGN_QR_MAX_TITLE_CHARACTERS = 40;
 export const DESIGN_QR_MAX_ENCODED_LENGTH = 16_384;
 export const DESIGN_QR_LOGO_SIZE_MIN = 0.08;

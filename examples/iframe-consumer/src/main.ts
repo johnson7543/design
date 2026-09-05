@@ -89,6 +89,7 @@ const controller = connectDesignQREmbed(frame, {
   origin: embedOrigin,
   onReady(event) {
     shell.dataset.ready = 'true';
+    shell.dataset.readyCount = String(Number(shell.dataset.readyCount ?? 0) + 1);
     shell.dataset.instanceId = event.instanceId;
     shell.dataset.view = event.view;
     status.value = 'Ready';
@@ -99,6 +100,9 @@ const controller = connectDesignQREmbed(frame, {
   },
   onError(error) {
     shell.dataset.errorCode = error.code;
+    if (error.code === 'QR_GENERATION_FAILED') {
+      shell.dataset.generationErrorCode = error.code;
+    }
     status.value = error.message;
   },
 });
@@ -143,6 +147,20 @@ requiredElement<HTMLButtonElement>('#set-config').addEventListener('click', () =
     },
   });
   shell.dataset.configSent = 'true';
+});
+
+requiredElement<HTMLButtonElement>('#set-invalid-config').addEventListener('click', () => {
+  shell.dataset.errorCode = '';
+  shell.dataset.generationErrorCode = '';
+  controller.setConfig({
+    value: 'a'.repeat(1_274),
+    logo: {
+      src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAKUlEQVR4AZXBAQEAMAiAME4ti76tZmB7/lkCiSSSSCKJJJJIIokkkugASykB7A5L0MQAAAAASUVORK5CYII=',
+      alt: 'Over-capacity fixture logo',
+      size: 0.16,
+    },
+  });
+  shell.dataset.invalidConfigSent = 'true';
 });
 
 requiredElement<HTMLButtonElement>('#pause-player').addEventListener('click', () => {

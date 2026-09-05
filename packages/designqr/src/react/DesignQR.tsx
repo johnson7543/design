@@ -20,8 +20,7 @@ import {
   normalizeDesignQRTheme,
 } from '../config/normalize.ts';
 import {
-  generateQRMatrix,
-  resolveQRErrorCorrectionLevel,
+  generateInteractiveQRMatrix,
 } from '../designs/tree/qr.ts';
 import { build3DTree, type TreeData } from '../designs/tree/treeBuilder.ts';
 import { resolveTreeTheme } from '../designs/tree/themes.ts';
@@ -199,9 +198,9 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
         return null;
       }
       try {
-        const matrix = generateQRMatrix(
+        const matrix = generateInteractiveQRMatrix(
           preparedValue,
-          resolveQRErrorCorrectionLevel(preparedLogoEnabled)
+          preparedLogoEnabled
         );
         return {
           ok: true,
@@ -291,8 +290,11 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
           className={`designqr-root designqr-error${className ? ` ${className}` : ''}`}
           style={style}
           role="alert"
+          data-designqr-error-code={activeError?.code}
         >
-          Invalid DesignQR configuration
+          {activeError?.code === 'QR_GENERATION_FAILED'
+            ? 'Unable to generate this DesignQR'
+            : 'Invalid DesignQR configuration'}
         </div>
       );
     }
