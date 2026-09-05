@@ -25,6 +25,33 @@ button {
   gap: 1rem;
 }
 
+.consumer-detail-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.consumer-detail-field {
+  display: grid;
+  gap: 0.375rem;
+  font-weight: 600;
+}
+
+.consumer-detail-field input,
+.consumer-detail-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+
+.consumer-detail-field output {
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
 .consumer-grid {
   margin-top: 1rem;
 }

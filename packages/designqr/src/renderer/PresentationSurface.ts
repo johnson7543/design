@@ -30,7 +30,8 @@ interface RgbColor {
 
 const BACKGROUND_TRANSITION_MS = 800;
 export const QR_QUIET_ZONE_MODULES = 4;
-const QR_QUIET_ZONE_FADE_START_PROGRESS = 0.82;
+const QR_ARTWORK_FILL_FADE_START_PROGRESS = 0.82;
+const QR_METADATA_TOP_GAP = 0;
 
 function parseHexColor(value: string): RgbColor {
   const normalized = value.trim().replace('#', '');
@@ -74,15 +75,24 @@ function projectedQrViewportSize(
 
 export interface QRPresentationGeometry {
   qrSize: number;
+  qrX: number;
+  qrY: number;
   quietZoneSize: number;
   quietZoneX: number;
   quietZoneY: number;
 }
 
-export interface QRBackgroundPlateGeometry {
+export interface QRMatrixFillGeometry {
   size: number;
   x: number;
   y: number;
+}
+
+export interface QRDetailFrameGeometry {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 export function resolveQRPresentationGeometry(
@@ -105,41 +115,49 @@ export function resolveQRPresentationGeometry(
 
   return {
     qrSize,
+    qrX: (width - qrSize) * 0.5,
+    qrY: (height - qrSize) * 0.5,
     quietZoneSize,
     quietZoneX: (width - quietZoneSize) * 0.5,
     quietZoneY: (height - quietZoneSize) * 0.5,
   };
 }
 
-export function resolveQRBackgroundPlateGeometry(
-  width: number,
-  height: number,
-  geometry: QRPresentationGeometry,
-  borderEnabled: boolean,
-  borderPadding: number
-): QRBackgroundPlateGeometry {
-  const availablePadding = Math.max(
-    0,
-    (geometry.quietZoneSize - geometry.qrSize) * 0.5
-  );
-  const requestedPadding = borderEnabled && Number.isFinite(borderPadding)
-    ? Math.max(0, borderPadding)
-    : 0;
-  const platePadding = Math.min(availablePadding, requestedPadding);
-  const size = geometry.qrSize + platePadding * 2;
-
+export function resolveQRMatrixFillGeometry(
+  geometry: QRPresentationGeometry
+): QRMatrixFillGeometry {
   return {
-    size,
-    x: (width - size) * 0.5,
-    y: (height - size) * 0.5,
+    size: geometry.qrSize,
+    x: geometry.qrX,
+    y: geometry.qrY,
   };
 }
 
-export function resolveQRQuietZoneOpacity(progress: number): number {
+export function resolveQRDetailFrameGeometry(
+  geometry: QRPresentationGeometry,
+  borderPadding: number,
+  detailHeight = 0
+): QRDetailFrameGeometry {
+  const padding = Number.isFinite(borderPadding)
+    ? Math.max(0, borderPadding)
+    : 0;
+  const safeDetailHeight = Number.isFinite(detailHeight)
+    ? Math.max(0, detailHeight)
+    : 0;
+
+  return {
+    x: geometry.quietZoneX - padding,
+    y: geometry.quietZoneY - padding,
+    width: geometry.quietZoneSize + padding * 2,
+    height: geometry.quietZoneSize + padding * 2 + safeDetailHeight,
+  };
+}
+
+export function resolveQRArtworkFillOpacity(progress: number): number {
   const normalized = Math.max(0, Math.min(
     1,
-    (progress - QR_QUIET_ZONE_FADE_START_PROGRESS)
-      / (1 - QR_QUIET_ZONE_FADE_START_PROGRESS)
+    (progress - QR_ARTWORK_FILL_FADE_START_PROGRESS)
+      / (1 - QR_ARTWORK_FILL_FADE_START_PROGRESS)
   ));
   return normalized * normalized * (3 - 2 * normalized);
 }
@@ -147,6 +165,54 @@ export function resolveQRQuietZoneOpacity(progress: number): number {
 function qrLightColorString(color: string): string {
   const [r, g, b] = resolveQR2DLightDisplayRgb(color);
   return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+}
+
+interface QRDetailMetrics {
+  title: string;
+  content: string;
+  hasInfo: boolean;
+  titleFontSize: number;
+  contentFontSize: number;
+  titleLineHeight: number;
+  contentLineHeight: number;
+  infoGap: number;
+  infoHeight: number;
+  padding: number;
+  infoTopGap: number;
+}
+
+function resolveQRDetailMetrics(
+  width: number,
+  state: PresentationSurfaceState
+): QRDetailMetrics {
+  const isMobile = width <= 640;
+  const title = state.title.trim().toUpperCase();
+  const content = state.showValue ? state.value : '';
+  const titleFontSize = isMobile ? 11.2 : 12;
+  const contentFontSize = isMobile ? 12 : 13.12;
+  const titleLineHeight = titleFontSize * 1.2;
+  const contentLineHeight = contentFontSize * 1.2;
+  const infoGap = title && content ? 4 : 0;
+  const infoHeight = (title ? titleLineHeight : 0)
+    + (content ? contentLineHeight : 0)
+    + infoGap;
+  const padding = state.borderEnabled && Number.isFinite(state.borderPadding)
+    ? Math.max(0, state.borderPadding)
+    : 0;
+
+  return {
+    title,
+    content,
+    hasInfo: title.length > 0 || content.length > 0,
+    titleFontSize,
+    contentFontSize,
+    titleLineHeight,
+    contentLineHeight,
+    infoGap,
+    infoHeight,
+    padding,
+    infoTopGap: QR_METADATA_TOP_GAP,
+  };
 }
 
 function fitText(
@@ -295,7 +361,7 @@ export class PresentationSurface {
 
     context.save();
     this.applyStageTransform(width, height);
-    this.drawQrQuietZone(width, height);
+    this.drawQrArtworkFill(width, height);
     context.filter = this.blurIntensity > 0.01
       ? `blur(${this.blurIntensity * 2.2}px)`
       : 'none';
@@ -367,10 +433,11 @@ export class PresentationSurface {
     this.context.fillRect(0, 0, width, height);
   }
 
-  private drawQrQuietZone(width: number, height: number): void {
-    if (!this.state.transparentBackground) return;
+  private drawQrArtworkFill(width: number, height: number): void {
+    const borderVisible = this.state.showQrDetails && this.state.borderEnabled;
+    if (!this.state.transparentBackground && !borderVisible) return;
 
-    const opacity = resolveQRQuietZoneOpacity(this.viewProgress);
+    const opacity = resolveQRArtworkFillOpacity(this.viewProgress);
     if (opacity <= 0) return;
 
     const geometry = resolveQRPresentationGeometry(
@@ -378,38 +445,33 @@ export class PresentationSurface {
       height,
       this.state.qrGridSize
     );
-    const plate = resolveQRBackgroundPlateGeometry(
-      width,
-      height,
-      geometry,
-      this.state.borderEnabled,
-      this.state.borderPadding
-    );
+    const fill = resolveQRMatrixFillGeometry(geometry);
     this.context.save();
     this.context.globalAlpha = opacity;
     this.context.fillStyle = qrLightColorString(this.state.qrLightColor);
-    if (this.state.borderEnabled) {
-      const padding = Number.isFinite(this.state.borderPadding)
-        ? Math.max(0, this.state.borderPadding)
-        : 0;
-      const frameSize = geometry.qrSize + padding * 2;
-      const frameRadius = Math.min(26, 15 + padding * 0.35);
-      const plateInset = Math.max(0, (frameSize - plate.size) * 0.5);
+    if (borderVisible) {
+      const details = resolveQRDetailMetrics(width, this.state);
+      const frame = resolveQRDetailFrameGeometry(
+        geometry,
+        details.padding,
+        details.hasInfo ? details.infoTopGap + details.infoHeight : 0
+      );
+      const radius = Math.min(26, 15 + details.padding * 0.35);
       this.context.beginPath();
       this.context.roundRect(
-        plate.x,
-        plate.y,
-        plate.size,
-        plate.size,
-        Math.max(0, frameRadius - plateInset)
+        frame.x,
+        frame.y,
+        frame.width,
+        frame.height,
+        radius
       );
       this.context.fill();
     } else {
       this.context.fillRect(
-        plate.x,
-        plate.y,
-        plate.size,
-        plate.size
+        fill.x,
+        fill.y,
+        fill.size,
+        fill.size
       );
     }
     this.context.restore();
@@ -440,49 +502,26 @@ export class PresentationSurface {
 
   private drawQrDetails(width: number, height: number): void {
     const isMobile = width <= 640;
+    const details = resolveQRDetailMetrics(width, this.state);
     const geometry = resolveQRPresentationGeometry(
       width,
       height,
       this.state.qrGridSize
     );
-    const qrSize = geometry.qrSize;
-    // Transparent mode must not enlarge the established border footprint.
-    // Its local background plate is independently capped inside this frame.
-    const artworkSize = qrSize;
-    const detailAnchorSize = this.state.transparentBackground
-      ? resolveQRBackgroundPlateGeometry(
-          width,
-          height,
-          geometry,
-          this.state.borderEnabled,
-          this.state.borderPadding
-        ).size
-      : qrSize;
+    const detailAnchorSize = geometry.quietZoneSize;
     const centerX = width * 0.5;
     const centerY = height * 0.5;
-    const title = this.state.title.trim().toUpperCase();
-    const content = this.state.showValue ? this.state.value : '';
-    const hasInfo = title.length > 0 || content.length > 0;
-    const titleFontSize = isMobile ? 11.2 : 12;
-    const contentFontSize = isMobile ? 12 : 13.12;
-    const titleLineHeight = titleFontSize * 1.2;
-    const contentLineHeight = contentFontSize * 1.2;
-    const infoGap = title && content ? 4 : 0;
-    const infoHeight = (title ? titleLineHeight : 0)
-      + (content ? contentLineHeight : 0)
-      + infoGap;
-    const padding = this.state.borderEnabled ? this.state.borderPadding : 0;
-    const infoTopGap = this.state.borderEnabled ? 12 : (isMobile ? 18 : 30);
     const presentationStyles = resolveDesignQRPresentationStyles(
       getComputedStyle(this.presentationCanvas)
     );
 
     if (this.state.borderEnabled) {
-      const frameX = centerX - artworkSize * 0.5 - padding;
-      const frameY = centerY - artworkSize * 0.5 - padding;
-      const frameWidth = artworkSize + padding * 2;
-      const frameHeight = artworkSize + padding * 2 + (hasInfo ? infoTopGap + infoHeight : 0);
-      const radius = Math.min(26, 15 + padding * 0.35);
+      const frame = resolveQRDetailFrameGeometry(
+        geometry,
+        details.padding,
+        details.hasInfo ? details.infoTopGap + details.infoHeight : 0
+      );
+      const radius = Math.min(26, 15 + details.padding * 0.35);
       this.context.save();
       this.context.strokeStyle = presentationStyles.borderColor;
       this.context.lineWidth = 1;
@@ -491,10 +530,10 @@ export class PresentationSurface {
       this.context.shadowOffsetY = 10;
       this.context.beginPath();
       this.context.roundRect(
-        frameX + 0.5,
-        frameY + 0.5,
-        frameWidth - 1,
-        frameHeight - 1,
+        frame.x + 0.5,
+        frame.y + 0.5,
+        frame.width - 1,
+        frame.height - 1,
         radius
       );
       this.context.stroke();
@@ -504,56 +543,56 @@ export class PresentationSurface {
       this.context.lineWidth = 2;
       this.context.beginPath();
       this.context.roundRect(
-        frameX + 2,
-        frameY + 2,
-        frameWidth - 4,
-        frameHeight - 4,
+        frame.x + 2,
+        frame.y + 2,
+        frame.width - 4,
+        frame.height - 4,
         Math.max(0, radius - 2)
       );
       this.context.stroke();
       this.context.restore();
     }
 
-    if (!hasInfo) return;
+    if (!details.hasInfo) return;
 
-    let lineCenterY = centerY + detailAnchorSize * 0.5 + infoTopGap;
+    let lineCenterY = centerY + detailAnchorSize * 0.5 + details.infoTopGap;
     const maxTextWidth = this.state.borderEnabled
-      ? artworkSize
+      ? detailAnchorSize
       : Math.min(isMobile ? 260 : 320, width - (isMobile ? 80 : 40));
     this.context.textAlign = 'center';
     this.context.textBaseline = 'middle';
 
-    if (title) {
+    if (details.title) {
       this.context.save();
       this.context.fillStyle = this.state.titleColor;
-      this.context.font = `700 ${titleFontSize}px ${presentationStyles.titleFontFamily}`;
+      this.context.font = `700 ${details.titleFontSize}px ${presentationStyles.titleFontFamily}`;
       const letterSpacingContext = this.context as CanvasRenderingContext2D & {
         letterSpacing?: string;
       };
       if (letterSpacingContext.letterSpacing !== undefined) {
         letterSpacingContext.letterSpacing = '0.05em';
       }
-      lineCenterY += titleLineHeight * 0.5;
+      lineCenterY += details.titleLineHeight * 0.5;
       this.context.fillText(
-        fitText(this.context, title, maxTextWidth),
+        fitText(this.context, details.title, maxTextWidth),
         centerX,
         lineCenterY,
         maxTextWidth
       );
       this.context.restore();
-      lineCenterY += titleLineHeight * 0.5 + infoGap;
+      lineCenterY += details.titleLineHeight * 0.5 + details.infoGap;
     }
 
-    if (content) {
+    if (details.content) {
       const contentMaxWidth = this.state.borderEnabled
         ? maxTextWidth
         : Math.min(isMobile ? 260 : 280, width - (isMobile ? 80 : 40));
       this.context.save();
       this.context.fillStyle = presentationStyles.contentColor;
-      this.context.font = `500 ${contentFontSize}px ${presentationStyles.bodyFontFamily}`;
-      lineCenterY += contentLineHeight * 0.5;
+      this.context.font = `500 ${details.contentFontSize}px ${presentationStyles.bodyFontFamily}`;
+      lineCenterY += details.contentLineHeight * 0.5;
       this.context.fillText(
-        fitText(this.context, content, contentMaxWidth),
+        fitText(this.context, details.content, contentMaxWidth),
         centerX,
         lineCenterY,
         contentMaxWidth

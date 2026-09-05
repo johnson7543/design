@@ -32,12 +32,16 @@ The public React player and hosted iframe define these roles under
 `.designqr-root`; they do not depend on application-level `--qr-*` tokens.
 Canvas roles are shared by the live presentation and exported PNG. Focus roles
 remain browser UI and are not exported. Theme-owned `titleColor` remains
-separate. When `transparentBackground` is enabled, the full-canvas atmosphere
-gradient is not painted. The settled 2D local plate instead reuses the same
-theme-derived lifted ground color as the QR light modules and stays inside the
-normal QR/detail-border footprint; no new base color is introduced. The
-editor-only alpha checkerboard derives from existing semantic interface tokens
-and is not part of the package canvas or PNG.
+separate. At the settled 2D endpoint, transparent output reuses the same
+theme-derived lifted ground color as the QR light modules to fill exactly the QR
+matrix footprint when Border is disabled. Enabling Border uses that color to
+fill the complete details card, including its four-module clear QR margin; no new
+base color is introduced. Opaque borderless output retains the seasonal
+background without an extra local fill. When `transparentBackground` is enabled,
+the full-canvas atmosphere gradient is not painted and pixels outside the
+matrix-sized fill or enabled Border card remain transparent. The editor-only
+alpha checkerboard derives from existing semantic interface tokens and is not
+part of the package canvas or PNG.
 
 | Role | Package variable | Approved color | Applied component mapping |
 | --- | --- | --- | --- |
@@ -69,7 +73,7 @@ by its season index or a magic color value.
 | Organic foliage | `foliageColor`, tonal roles, `foliagePaletteColors`, `foliagePaletteStops`, `foliageColorVariation`, `foliageVerticalLift`, `foliageShape`, `blossomCenterColor` | Canopy, falling foliage, and ground leaves |
 | QR foliage | `qrFoliageColor`, tonal roles, `qrFoliagePaletteColors`, `qrFoliagePaletteStops`, `qrFoliageColorVariation` | Multi-tone morph voxels and settled QR modules, with or without a logo |
 | Branches | `branchColor`, `branchShadowColor`, `branchHighlightColor`, `branchTipColor`, `branchStyle` | Procedural trunk and branch vertex colors |
-| Ground | `groundColor`, surface roles and variations, `pedestalColor` | Theme source for the shared 2D light-module and transparent-mode local-plate lift, 3D pavers, and the temporary 3D island slab |
+| Ground | `groundColor`, surface roles and variations, `pedestalColor` | Theme source for the shared 2D light-module, transparent matrix fill, and optional Border-card fill, plus 3D pavers and the temporary 3D island slab |
 | Ground decor | `groundFeature*` roles, palettes, stops, and variations | Four-band 3D grass/pixel ramps; None omits the geometry while retaining the configured roles for later reuse |
 | Finder modules | `qrFinder*` roles, palettes, stops, and variations | Multi-tone QR finder modules for Grass and Pixel; None keeps the finder modules but routes them through the QR foliage roles |
 | Atmosphere | `skyTop`, `skyBottom`, `weather*`, `ambientParticle*`, `snowflake*` | Opaque-mode presentation gradient, rain, butterflies/fireflies, and snow; sky values remain resolved but unpainted while the background is transparent |

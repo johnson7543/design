@@ -57,7 +57,7 @@ The root is a responsive 1:1 square. Set its size with `style` or `className`.
 | `tree.seed` | `number` | `0.5`; clamped to `0–1` |
 | `details.title` | `string` | `''`; max 40 characters |
 | `details.showValue` | `boolean` | `false` |
-| `details.border` | `false \| { padding?: number }` | `false`; padding defaults to `16`, range `4–32` |
+| `details.border` | `false \| { padding?: number }` | `false`; adds a filled four-module QR margin, with decorative padding defaulting to `16` px (`4–32`) |
 | `interaction.dragToRotate` | `boolean` | `true` |
 | `interaction.tapToToggleView` | `boolean` | `true` |
 | `interaction.autoRotate` | `boolean` | `false` |
@@ -86,12 +86,29 @@ exports. Theme colors, including the background and title, belong in `theme`.
 
 Set `transparentBackground` to remove the full-stage seasonal backdrop while
 keeping the tree, QR artwork, details, and exported PNG on a transparent canvas.
-At the settled QR endpoint, the theme-light local plate stays within the normal
-QR/detail-border footprint: without Border it matches the matrix, and with
-Border it expands only into the configured padding, capped at four modules.
-Pixels outside that footprint remain transparent. The hosted iframe document is
-transparent as well, so the iframe element's or parent application's background
-shows through.
+At the settled QR endpoint, transparent output paints the theme-light fill only
+inside the QR matrix footprint when `details.border` is disabled. Enabling
+Border turns its card into the optional scan-safe presentation: the filled card
+reserves four clear modules on every side before the configured decorative
+padding, frame, and metadata. Pixels outside the matrix or enabled details card
+remain transparent. The hosted iframe document is transparent as well, so the
+iframe element's or parent application's background shows through. For a
+borderless QR, the host or export destination owns any additional light margin
+needed for its scanning environment.
+
+## Error handling and limits
+
+DesignQR never substitutes, truncates, redirects, or shortens `value`. If the
+supplied value cannot be encoded, or if its generated matrix exceeds the
+temporary 57×57 interactive-rendering limit, the component renders no canvas,
+does not call `onReady`, and calls `onError` with
+`code: 'QR_GENERATION_FAILED'`. The 2,048 UTF-8-byte configuration limit still
+applies before encoding.
+
+DesignQR 0.1.5 now fails with `QR_GENERATION_FAILED` instead of silently
+substituting another QR value. Extremely dense matrices are temporarily rejected
+before interactive 3D rendering, while QR presentation retains its compact,
+matrix-sized artwork footprint unless the optional scan-safe Border is enabled.
 
 ## Keyboard and motion
 

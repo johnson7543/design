@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import {
   createTreeTheme,
+  DESIGN_QR_MAX_TITLE_CHARACTERS,
+  DESIGN_QR_MAX_VALUE_BYTES,
   DesignQR,
   type DesignQRError,
   type DesignQRHandle,
@@ -22,6 +24,14 @@ const PINK_LOGO: Required<DesignQRLogoOptions> = {
   alt: 'Pink fixture logo',
   size: 0.12,
 };
+
+const OVER_CAPACITY_VALUE = 'a'.repeat(1_274);
+const DEFAULT_PRIMARY_TITLE = 'Primary DesignQR';
+const DEFAULT_PRIMARY_VALUE = 'https://example.com/primary';
+const LONG_PRIMARY_TITLE =
+  'Primary DesignQR title intentionally extended beyond the forty-character package limit';
+const LONG_PRIMARY_VALUE =
+  '12345678901234567890123456789012345678901234567890123456789012345678901234567890';
 
 type LogoMode = 'green' | 'pink' | 'none' | 'cors-failure';
 
@@ -87,11 +97,18 @@ export function ConsumerFixture() {
   const [primaryView, setPrimaryView] = useState<'design' | 'qr'>('design');
   const [showSecondary, setShowSecondary] = useState(true);
   const [readyCount, setReadyCount] = useState(0);
+  const [failureReadyCount, setFailureReadyCount] = useState(0);
+  const [failureErrorCode, setFailureErrorCode] = useState('');
   const [exportStatus, setExportStatus] = useState('idle');
   const [logoMode, setLogoMode] = useState<LogoMode>('green');
   const [logoError, setLogoError] = useState('');
   const [logoSize, setLogoSize] = useState(0.16);
+  const [primaryTitle, setPrimaryTitle] = useState(DEFAULT_PRIMARY_TITLE);
+  const [primaryValue, setPrimaryValue] = useState(DEFAULT_PRIMARY_VALUE);
+  const [titleEnabled, setTitleEnabled] = useState(true);
+  const [contentEnabled, setContentEnabled] = useState(true);
   const [transparentBackground, setTransparentBackground] = useState(false);
+  const [borderEnabled, setBorderEnabled] = useState(true);
   const [primaryPaused, setPrimaryPaused] = useState(false);
   const [exportCornerAlpha, setExportCornerAlpha] = useState<number | null>(null);
   const scanTestMode = typeof window !== 'undefined'
@@ -108,6 +125,8 @@ export function ConsumerFixture() {
             size: logoSize,
           }
         : { ...GREEN_LOGO, size: logoSize };
+  const primaryTitleLength = Array.from(primaryTitle).length;
+  const primaryValueByteLength = new TextEncoder().encode(primaryValue).length;
 
   const selectLogoMode = (mode: LogoMode) => {
     setLogoError('');
@@ -117,6 +136,13 @@ export function ConsumerFixture() {
   const replaceLogoRapidly = () => {
     selectLogoMode('pink');
     window.setTimeout(() => selectLogoMode('green'), 0);
+  };
+
+  const setPrimaryDetails = (title: string, value: string) => {
+    setLogoError('');
+    setExportStatus('idle');
+    setPrimaryTitle(title);
+    setPrimaryValue(value);
   };
 
   const handlePrimaryError = (error: DesignQRError) => {
@@ -172,11 +198,18 @@ export function ConsumerFixture() {
     <main
       className="consumer-shell"
       data-ready-count={readyCount}
+      data-failure-ready-count={failureReadyCount}
+      data-failure-error-code={failureErrorCode}
       data-export-status={exportStatus}
       data-logo-mode={logoMode}
       data-logo-error={logoError}
       data-logo-size={logoSize}
+      data-title-enabled={titleEnabled}
+      data-content-enabled={contentEnabled}
+      data-primary-title-length={primaryTitleLength}
+      data-primary-value-byte-length={primaryValueByteLength}
       data-transparent-background={transparentBackground}
+      data-border-enabled={borderEnabled}
       data-primary-paused={primaryPaused}
       data-export-corner-alpha={exportCornerAlpha ?? ''}
     >
@@ -254,6 +287,73 @@ export function ConsumerFixture() {
         >
           Toggle transparent background
         </button>
+        <button
+          type="button"
+          data-action="toggle-border"
+          aria-pressed={borderEnabled}
+          onClick={() => setBorderEnabled((enabled) => !enabled)}
+        >
+          {borderEnabled ? 'Disable primary border' : 'Enable primary border'}
+        </button>
+        <button
+          type="button"
+          data-action="toggle-title"
+          aria-pressed={titleEnabled}
+          onClick={() => setTitleEnabled((enabled) => !enabled)}
+        >
+          {titleEnabled ? 'Hide primary title' : 'Show primary title'}
+        </button>
+        <button
+          type="button"
+          data-action="toggle-content"
+          aria-pressed={contentEnabled}
+          onClick={() => setContentEnabled((enabled) => !enabled)}
+        >
+          {contentEnabled ? 'Hide primary content' : 'Show primary content'}
+        </button>
+        <button
+          type="button"
+          data-action="details-long"
+          onClick={() => setPrimaryDetails(LONG_PRIMARY_TITLE, LONG_PRIMARY_VALUE)}
+        >
+          Use long title and content
+        </button>
+        <button
+          type="button"
+          data-action="details-reset"
+          onClick={() => setPrimaryDetails(DEFAULT_PRIMARY_TITLE, DEFAULT_PRIMARY_VALUE)}
+        >
+          Reset title and content
+        </button>
+      </div>
+
+      <div className="consumer-detail-fields" aria-label="Primary details test controls">
+        <div className="consumer-detail-field">
+          <label htmlFor="primary-title">Primary title</label>
+          <input
+            id="primary-title"
+            data-field="primary-title"
+            type="text"
+            value={primaryTitle}
+            onChange={(event) => setPrimaryDetails(event.target.value, primaryValue)}
+          />
+          <output data-output="primary-title-length" aria-live="polite">
+            {primaryTitleLength} characters · package maximum {DESIGN_QR_MAX_TITLE_CHARACTERS}
+          </output>
+        </div>
+        <div className="consumer-detail-field">
+          <label htmlFor="primary-value">Primary content / QR value</label>
+          <textarea
+            id="primary-value"
+            data-field="primary-value"
+            rows={2}
+            value={primaryValue}
+            onChange={(event) => setPrimaryDetails(primaryTitle, event.target.value)}
+          />
+          <output data-output="primary-value-length" aria-live="polite">
+            {primaryValueByteLength} UTF-8 bytes · config maximum {DESIGN_QR_MAX_VALUE_BYTES}
+          </output>
+        </div>
       </div>
 
       <div className="consumer-grid">
@@ -265,7 +365,7 @@ export function ConsumerFixture() {
         >
           <DesignQR
             ref={primaryRef}
-            value="https://example.com/primary"
+            value={primaryValue}
             design="tree"
             theme={scanTestMode ? SCAN_TEST_THEME : CUSTOMIZED_DEFAULT_THEME}
             view={primaryView}
@@ -275,13 +375,11 @@ export function ConsumerFixture() {
             onViewChange={setPrimaryView}
             onReady={() => setReadyCount((count) => count + 1)}
             onError={handlePrimaryError}
-            details={scanTestMode
-              ? undefined
-              : {
-                  title: 'Primary DesignQR',
-                  showValue: true,
-                  border: { padding: 16 },
-                }}
+            details={{
+              title: titleEnabled ? primaryTitle : '',
+              showValue: contentEnabled,
+              border: borderEnabled ? { padding: 16 } : false,
+            }}
           />
         </section>
 
@@ -307,6 +405,16 @@ export function ConsumerFixture() {
             />
           </section>
         )}
+
+        <section data-fixture="generation-failure" hidden>
+          <DesignQR
+            value={OVER_CAPACITY_VALUE}
+            logo={GREEN_LOGO}
+            ariaLabel="Over-capacity DesignQR fixture"
+            onReady={() => setFailureReadyCount((count) => count + 1)}
+            onError={(error) => setFailureErrorCode(error.code)}
+          />
+        </section>
       </div>
     </main>
   );

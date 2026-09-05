@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import puppeteer from 'puppeteer-core';
 import jsQR from 'jsqr';
+import QRCode from 'qrcode';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const host = '127.0.0.1';
@@ -334,16 +335,18 @@ async function comparePrimarySourceSnapshot(page) {
   );
 }
 
-async function decodePrimaryQR(page) {
+async function inspectPrimaryQR(page, hostBackground = '#ffffff') {
   const snapshot = await page.$eval(
     '.consumer-player:first-of-type .designqr-presentation-canvas',
-    (canvas) => {
+    (canvas, backgroundColor) => {
       const composite = document.createElement('canvas');
       composite.width = canvas.width;
       composite.height = canvas.height;
       const context = composite.getContext('2d', { willReadFrequently: true });
       if (!context) throw new Error('The primary composite context is unavailable.');
-      context.fillStyle = getComputedStyle(document.documentElement).backgroundColor;
+      // Transparent artwork delegates any surrounding quiet area to its host.
+      // Composite over the requested host before asking the independent decoder.
+      context.fillStyle = backgroundColor;
       context.fillRect(0, 0, composite.width, composite.height);
       context.drawImage(canvas, 0, 0);
       return {
@@ -353,14 +356,46 @@ async function decodePrimaryQR(page) {
           context.getImageData(0, 0, composite.width, composite.height).data
         ),
       };
-    }
+    },
+    hostBackground
   );
   return jsQR(
     Uint8ClampedArray.from(snapshot.pixels),
     snapshot.width,
     snapshot.height,
     { inversionAttempts: 'attemptBoth' }
-  )?.data ?? null;
+  );
+}
+
+async function decodePrimaryQR(page, hostBackground) {
+  return (await inspectPrimaryQR(page, hostBackground))?.data ?? null;
+}
+
+async function readPrimaryOpaqueBounds(page) {
+  return page.$eval(
+    '.consumer-player:first-of-type .designqr-presentation-canvas',
+    (canvas) => {
+      const context = canvas.getContext('2d', { willReadFrequently: true });
+      if (!context) throw new Error('The primary presentation context is unavailable.');
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      let minX = canvas.width;
+      let minY = canvas.height;
+      let maxX = -1;
+      let maxY = -1;
+
+      for (let y = 0; y < canvas.height; y += 1) {
+        for (let x = 0; x < canvas.width; x += 1) {
+          if (pixels[(y * canvas.width + x) * 4 + 3] < 250) continue;
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        }
+      }
+
+      return { minX, minY, maxX, maxY };
+    }
+  );
 }
 
 async function verifyReducedMotionViewer(browser) {
@@ -457,6 +492,43 @@ async function verifyScannableLogoSizes(browser) {
       timeout: 15_000,
     });
     await waitForConsumerReady(page);
+    const initialBorderState = await page.$eval('.consumer-shell', (element) => ({
+      enabled: element.getAttribute('data-border-enabled'),
+      pressed: document.querySelector('[data-action="toggle-border"]')
+        ?.getAttribute('aria-pressed'),
+    }));
+    if (initialBorderState.enabled !== 'true' || initialBorderState.pressed !== 'true') {
+      throw new Error(
+        `The primary Border toggle did not initialize enabled: ${JSON.stringify(initialBorderState)}.`
+      );
+    }
+    await page.click('[data-action="toggle-border"]');
+    await page.waitForFunction(
+      () => {
+        const shell = document.querySelector('.consumer-shell');
+        const toggle = document.querySelector('[data-action="toggle-border"]');
+        return shell?.getAttribute('data-border-enabled') === 'false'
+          && toggle?.getAttribute('aria-pressed') === 'false';
+      },
+      { timeout: 15_000 }
+    );
+    for (const [action, attribute] of [
+      ['toggle-title', 'data-title-enabled'],
+      ['toggle-content', 'data-content-enabled'],
+    ]) {
+      await page.click(`[data-action="${action}"]`);
+      await page.waitForFunction(
+        (stateAttribute, actionName) => {
+          const shell = document.querySelector('.consumer-shell');
+          const toggle = document.querySelector(`[data-action="${actionName}"]`);
+          return shell?.getAttribute(stateAttribute) === 'false'
+            && toggle?.getAttribute('aria-pressed') === 'false';
+        },
+        { timeout: 15_000 },
+        attribute,
+        action
+      );
+    }
     await page.$eval(primaryPlayerSelector, (element) => element.focus());
     await page.keyboard.press('Enter');
     await page.waitForFunction(
@@ -480,6 +552,97 @@ async function verifyScannableLogoSizes(browser) {
       const context = canvas.getContext('2d', { willReadFrequently: true });
       return context?.getImageData(0, 0, 1, 1).data[3] === 0;
     }, { timeout: 15_000 });
+
+    const decoded = await inspectPrimaryQR(page);
+    if (decoded?.data !== 'https://example.com/primary') {
+      throw new Error(
+        `The transparent QR did not preserve its exact payload: ${decoded?.data ?? 'no result'}.`
+      );
+    }
+    const matrixBounds = await readPrimaryOpaqueBounds(page);
+    const location = decoded.location;
+    const distance = (from, to) => Math.hypot(to.x - from.x, to.y - from.y);
+    const gridSize = QRCode.create('https://example.com/primary', {
+      errorCorrectionLevel: 'H',
+    }).modules.size;
+    const moduleWidth = (
+      distance(location.topLeftCorner, location.topRightCorner)
+      + distance(location.bottomLeftCorner, location.bottomRightCorner)
+    ) / (2 * gridSize);
+    const moduleHeight = (
+      distance(location.topLeftCorner, location.bottomLeftCorner)
+      + distance(location.topRightCorner, location.bottomRightCorner)
+    ) / (2 * gridSize);
+    const matrixFillMargins = [
+      ((location.topLeftCorner.x + location.bottomLeftCorner.x) * 0.5
+        - matrixBounds.minX) / moduleWidth,
+      (matrixBounds.maxX + 1
+        - (location.topRightCorner.x + location.bottomRightCorner.x) * 0.5)
+        / moduleWidth,
+      ((location.topLeftCorner.y + location.topRightCorner.y) * 0.5
+        - matrixBounds.minY) / moduleHeight,
+      (matrixBounds.maxY + 1
+        - (location.bottomLeftCorner.y + location.bottomRightCorner.y) * 0.5)
+        / moduleHeight,
+    ];
+    if (
+      Math.abs(
+        (matrixBounds.maxX - matrixBounds.minX)
+        - (matrixBounds.maxY - matrixBounds.minY)
+      ) > 2
+      || matrixFillMargins.some((margin) => Math.abs(margin) > 0.75)
+    ) {
+      throw new Error(
+        'The transparent QR fill extends beyond the matrix footprint: '
+        + JSON.stringify({ matrixBounds, gridSize, matrixFillMargins })
+      );
+    }
+
+    await page.click('[data-action="toggle-border"]');
+    await page.waitForFunction(
+      () => {
+        const shell = document.querySelector('.consumer-shell');
+        const toggle = document.querySelector('[data-action="toggle-border"]');
+        return shell?.getAttribute('data-border-enabled') === 'true'
+          && toggle?.getAttribute('aria-pressed') === 'true';
+      },
+      { timeout: 15_000 }
+    );
+    await waitForAnimationFrames(page);
+    const borderedDecoded = await inspectPrimaryQR(page, '#000000');
+    if (borderedDecoded?.data !== 'https://example.com/primary') {
+      throw new Error(
+        'The enabled Border did not preserve the exact payload over a dark host: '
+        + `${borderedDecoded?.data ?? 'no result'}.`
+      );
+    }
+    const borderBounds = await readPrimaryOpaqueBounds(page);
+    const borderedLocation = borderedDecoded.location;
+    const borderMargins = [
+      ((borderedLocation.topLeftCorner.x + borderedLocation.bottomLeftCorner.x) * 0.5
+        - borderBounds.minX) / moduleWidth,
+      (borderBounds.maxX + 1
+        - (borderedLocation.topRightCorner.x + borderedLocation.bottomRightCorner.x) * 0.5)
+        / moduleWidth,
+      ((borderedLocation.topLeftCorner.y + borderedLocation.topRightCorner.y) * 0.5
+        - borderBounds.minY) / moduleHeight,
+      (borderBounds.maxY + 1
+        - (borderedLocation.bottomLeftCorner.y + borderedLocation.bottomRightCorner.y) * 0.5)
+        / moduleHeight,
+    ];
+    if (borderMargins.some((margin) => margin < 3.5)) {
+      throw new Error(
+        'The enabled Border does not keep four clear modules around the matrix: '
+        + JSON.stringify({ borderBounds, gridSize, borderMargins })
+      );
+    }
+
+    await page.click('[data-action="toggle-border"]');
+    await page.waitForFunction(
+      () => document.querySelector('.consumer-shell')
+        ?.getAttribute('data-border-enabled') === 'false',
+      { timeout: 15_000 }
+    );
 
     for (const [action, size] of [
       ['logo-size-min', '0.08'],
@@ -601,12 +764,142 @@ try {
     );
   }
 
-  const initialViews = await page.$$eval('.designqr-root', (elements) => (
-    elements.map((element) => element.classList.contains('view-scan'))
-  ));
+  await page.waitForFunction(
+    () => document.querySelector('.consumer-shell')
+      ?.getAttribute('data-failure-error-code') === 'QR_GENERATION_FAILED',
+    { timeout: 15_000 }
+  );
+  const generationFailure = await page.$eval(
+    '[data-fixture="generation-failure"]',
+    (fixture) => {
+      const alert = fixture.querySelector('[role="alert"]');
+      return {
+        errorCode: alert?.getAttribute('data-designqr-error-code'),
+        failureReadyCount: document.querySelector('.consumer-shell')
+          ?.getAttribute('data-failure-ready-count'),
+        webglCanvasCount: fixture.querySelectorAll('.designqr-webgl-canvas').length,
+        presentationCanvasCount: fixture.querySelectorAll(
+          '.designqr-presentation-canvas'
+        ).length,
+        text: alert?.textContent?.trim(),
+        substitutedHomepage: fixture.textContent?.includes(
+          'https://design.johnson7543.com'
+        ),
+      };
+    }
+  );
+  if (
+    generationFailure.errorCode !== 'QR_GENERATION_FAILED'
+    || generationFailure.failureReadyCount !== '0'
+    || generationFailure.webglCanvasCount !== 0
+    || generationFailure.presentationCanvasCount !== 0
+    || generationFailure.text !== 'Unable to generate this DesignQR'
+    || generationFailure.substitutedHomepage
+  ) {
+    throw new Error(
+      `The QR generation failure contract failed: ${JSON.stringify(generationFailure)}.`
+    );
+  }
+
+  const initialViews = await page.$$eval(
+    '[data-fixture="primary"] .designqr-root, [data-fixture="secondary"] .designqr-root',
+    (elements) => elements.map((element) => element.classList.contains('view-scan'))
+  );
   if (initialViews.length !== 2 || initialViews[0] || !initialViews[1]) {
     throw new Error(`Independent initial views failed: ${JSON.stringify(initialViews)}.`);
   }
+
+  const initialDetailsControls = await page.$eval('.consumer-shell', (shell) => ({
+    titleEnabled: shell.getAttribute('data-title-enabled'),
+    contentEnabled: shell.getAttribute('data-content-enabled'),
+    titlePressed: document.querySelector('[data-action="toggle-title"]')
+      ?.getAttribute('aria-pressed'),
+    contentPressed: document.querySelector('[data-action="toggle-content"]')
+      ?.getAttribute('aria-pressed'),
+    title: document.querySelector('[data-field="primary-title"]')?.value,
+    value: document.querySelector('[data-field="primary-value"]')?.value,
+  }));
+  if (
+    initialDetailsControls.titleEnabled !== 'true'
+    || initialDetailsControls.contentEnabled !== 'true'
+    || initialDetailsControls.titlePressed !== 'true'
+    || initialDetailsControls.contentPressed !== 'true'
+    || initialDetailsControls.title !== 'Primary DesignQR'
+    || initialDetailsControls.value !== 'https://example.com/primary'
+  ) {
+    throw new Error(
+      `The title/content controls did not initialize correctly: ${JSON.stringify(initialDetailsControls)}.`
+    );
+  }
+
+  await page.click('[data-action="details-long"]');
+  await page.waitForFunction(
+    () => {
+      const shell = document.querySelector('.consumer-shell');
+      const primary = document.querySelector('[data-fixture="primary"] .designqr-root');
+      return Number(shell?.getAttribute('data-primary-title-length')) > 40
+        && Number(shell?.getAttribute('data-primary-value-byte-length')) > 70
+        && primary !== null
+        && !primary.classList.contains('designqr-error');
+    },
+    { timeout: 15_000 }
+  );
+  const longDetailsControls = await page.$eval('.consumer-shell', (shell) => ({
+    titleLength: Number(shell.getAttribute('data-primary-title-length')),
+    valueByteLength: Number(shell.getAttribute('data-primary-value-byte-length')),
+    titleCounter: document.querySelector('[data-output="primary-title-length"]')
+      ?.textContent?.trim(),
+    valueCounter: document.querySelector('[data-output="primary-value-length"]')
+      ?.textContent?.trim(),
+  }));
+  if (
+    longDetailsControls.titleLength <= 40
+    || longDetailsControls.valueByteLength <= 70
+    || !longDetailsControls.titleCounter?.includes('package maximum 40')
+    || !longDetailsControls.valueCounter?.includes('config maximum 2048')
+  ) {
+    throw new Error(
+      `The detail length fixture did not expose its boundaries: ${JSON.stringify(longDetailsControls)}.`
+    );
+  }
+
+  for (const [action, attribute] of [
+    ['toggle-title', 'data-title-enabled'],
+    ['toggle-content', 'data-content-enabled'],
+  ]) {
+    await page.click(`[data-action="${action}"]`);
+    await page.waitForFunction(
+      (stateAttribute, actionName) => {
+        const shell = document.querySelector('.consumer-shell');
+        const toggle = document.querySelector(`[data-action="${actionName}"]`);
+        return shell?.getAttribute(stateAttribute) === 'false'
+          && toggle?.getAttribute('aria-pressed') === 'false';
+      },
+      { timeout: 15_000 },
+      attribute,
+      action
+    );
+    await page.click(`[data-action="${action}"]`);
+    await page.waitForFunction(
+      (stateAttribute, actionName) => {
+        const shell = document.querySelector('.consumer-shell');
+        const toggle = document.querySelector(`[data-action="${actionName}"]`);
+        return shell?.getAttribute(stateAttribute) === 'true'
+          && toggle?.getAttribute('aria-pressed') === 'true';
+      },
+      { timeout: 15_000 },
+      attribute,
+      action
+    );
+  }
+
+  await page.click('[data-action="details-reset"]');
+  await page.waitForFunction(
+    () => document.querySelector('[data-field="primary-title"]')?.value === 'Primary DesignQR'
+      && document.querySelector('[data-field="primary-value"]')?.value
+        === 'https://example.com/primary',
+    { timeout: 15_000 }
+  );
 
   const viewerContract = await page.evaluate((selectors, styleProperties) => {
     const primary = document.querySelector(selectors.primary);

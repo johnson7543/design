@@ -142,8 +142,9 @@ Completed in the transparent-background implementation slice:
   WYSIWYG PNG path.
 - Made the live presentation surface clear to alpha without duplicating the
   renderer. The underlying WebGL artwork remains alpha-capable, while the
-  settled 2D theme-light plate stays inside the normal QR/detail-border
-  footprint and uses at most four modules of configured border padding.
+  settled 2D theme-light fill matches the QR matrix when Border is disabled;
+  enabling Border fills its card and reserves four clear QR modules before the
+  configured decorative padding and frame.
 - Added the persistent action-row toggle beside Blur, editor-only checkerboard
   preview, route-scoped transparent iframe document, responsive coverage,
   alpha/export assertions, and cross-origin QR decoding coverage.
@@ -699,8 +700,8 @@ The shared React player owns generic behavior:
 - Interaction-aware semantics, keyboard activation, focus, and cursors.
 - Package-owned presentation variables and fallbacks.
 - Details/title rendering.
-- Full-stage alpha compositing and the package-owned, footprint-bounded settled
-  QR plate.
+- Full-stage alpha compositing, the matrix-bounded transparent QR fill, and the
+  optional filled Border card with its four-module clear margin.
 - Error boundaries and public callbacks.
 - Ref methods.
 
@@ -1255,10 +1256,11 @@ loops for one instance.
 - Paint the theme background, artwork, and optional QR details on the live
   presentation surface so displayed and exported pixels share one path.
 - When `transparentBackground` is true, clear the presentation to alpha and
-  omit only the full-stage gradient. Retain a theme-derived local plate at the
-  settled 2D endpoint, but never enlarge the normal QR/detail-border footprint:
-  without Border it matches the matrix; with Border it may use configured
-  padding up to the four-module target. Keep details outside the plate.
+  omit only the full-stage gradient. With Border disabled, retain a theme-derived
+  settled fill that exactly matches the QR matrix and leave any surrounding scan
+  margin to the host or export destination. With Border enabled, fill the entire
+  rounded details card, reserve four clear modules around the matrix before the
+  configured decorative padding and frame, and place metadata after that margin.
 - Avoid relying on the editor's font imports. Package output should use a documented
   system-font fallback unless the host loads the preferred fonts.
 - Ensure the title remains derived from the theme.
@@ -1291,8 +1293,9 @@ not construct an approximation from configuration in a separate export process.
 - Capture the currently visible `design` or `qr` frame at the moment the export
   request is committed.
 - Include the exact configured background state and artwork. Transparent mode
-  must preserve PNG alpha outside the artwork and the footprint-bounded settled
-  QR plate. In QR view, include the border, padding, title, and content only
+  must preserve PNG alpha outside the artwork and either the matrix-bounded QR
+  fill or enabled Border card. In QR view, include the border, padding, title,
+  and content only
   when they are currently visible.
 - Exclude editor chrome such as the header, hints, text input, theme drawer,
   editor controls, and modals.
@@ -1370,8 +1373,9 @@ interface DesignQRHandle {
 - Unsupported design errors.
 - Numeric clamping and color validation.
 - Configuration encode/decode round trips.
-- Transparent-background default, sparse true round trip, invalid input, quiet
-  zone geometry, and endpoint opacity.
+- Transparent-background default, sparse true round trip, invalid input,
+  matrix-fill geometry, conditional four-module Border geometry, and endpoint
+  opacity.
 - Unsupported share-payload fixtures.
 - Message-envelope validation.
 
@@ -1430,10 +1434,12 @@ interface DesignQRHandle {
 - Decode exported PNGs with an independent QR decoder.
 - Cover each preset, custom themes, title/content combinations, border settings,
   logos at `0.08`, `0.16`, and `0.20`, and mobile/desktop sizes.
-- Decode transparent outputs over light, dark, and patterned host backgrounds.
-  Verify the local plate remains within the normal QR/detail-border footprint
-  while retaining as much of the four-module target as configured padding
-  permits.
+- Decode transparent outputs after compositing them over a representative
+  uniform light host background. With Border disabled, verify the local fill
+  exactly matches the QR matrix. With Border enabled, verify the filled card
+  provides four clear modules before its decorative padding, frame, and
+  metadata. Dark or patterned borderless hosts must provide their own suitable
+  light margin if scanning is required.
 - Never count matrix-generation unit tests alone as proof that the final rendered
   image scans.
 
