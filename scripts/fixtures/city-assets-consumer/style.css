@@ -1,0 +1,3 @@
+body { margin: 0; background: #e8ddcf; color: #1f3a52; font: 16px sans-serif; }
+main { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; padding: 16px; }
+.designqr-root { width: 480px; max-width: 100%; }

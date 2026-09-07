@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { CITY_CAMERA_YAW_OFFSET, fitCityCameraDistance } from '../../designs/city/layout.ts';
+import { cityEase, cityMorphState } from '../../designs/city/morph.ts';
+import { ShibuyaScene } from './ShibuyaScene.ts';
 import {
   DesignQRConfigError,
   type DesignQRLogoOptions,
@@ -35,8 +38,6 @@ import {
 
 const DEFAULT_TREE_YAW = 0.785398;
 const DEFAULT_TREE_PITCH = -0.55;
-const TREE_DESKTOP_DISTANCE = 2.85;
-const TREE_MOBILE_DISTANCE = 2.45;
 const ROTATION_RESET_DURATION_MS = 600;
 const LOGO_MAX_IMAGE_DIMENSION = 2_048;
 const LOGO_RENDER_ORDER = 10_000;
@@ -648,6 +649,7 @@ function disposeObjectResources(root: THREE.Object3D): void {
   const textures = new Set<THREE.Texture>();
 
   root.traverse((object) => {
+    if (object instanceof THREE.InstancedMesh) object.dispose();
     const renderable = object as THREE.Object3D & {
       geometry?: THREE.BufferGeometry;
       material?: THREE.Material | THREE.Material[];
@@ -681,16 +683,23 @@ export class ThreeFallbackRenderer {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
+  private previewProjection: THREE.Matrix4 | null = null;
+  private baseProjection: THREE.Matrix4 | null = null;
+  private baseProjectionInverse: THREE.Matrix4 | null = null;
+  private sourceIsPreview = false;
   private viewportProjection: QRViewportProjection;
   private animFrameId: number | null = null;
   private isRunning = false;
   private isDestroyed = false;
   public onProgressUpdate?: (progress: number, blurIntensity: number) => void;
   public onAfterRender?: () => void;
+  public onBeforeRender?: () => void;
   public onError?: (error: unknown) => void;
 
   // Tree and Meshes
   private treeData: TreeData | null = null;
+  private cityScene: ShibuyaScene | null = null;
+  public reducedMotion = false;
   private groundTilesMesh: THREE.InstancedMesh | null = null;
   private groundFallenLeavesMesh: THREE.InstancedMesh | null = null;
   private morphVoxelMesh: THREE.InstancedMesh | null = null;
@@ -849,6 +858,7 @@ export class ThreeFallbackRenderer {
   }
 
   private disposeLogoVisual() {
+    this.cityScene?.setLogoPresent(false);
     if (!this.logoGroup) return;
     this.scene.remove(this.logoGroup);
     disposeObjectResources(this.logoGroup);
@@ -1017,6 +1027,27 @@ export class ThreeFallbackRenderer {
     if (!this.logoGroup || this.logoConfig === false || !this.treeData) return;
 
     const qrWidth = this.treeData.gridSize * BLOCK_SIZE;
+    const image = this.logoGroup.children[0] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+    if (this.cityScene) {
+      this.cityScene.setLogoPresent(true);
+      const anchor = this.cityScene.getLogoAnchor();
+      const travel = cityEase(progress, .04, .94);
+      const vertical = cityMorphState(progress).vertical;
+      const billboardSize = Math.min(anchor.width / image.scale.x, anchor.height / image.scale.y) * qrWidth;
+      const scanSize = qrWidth * THREE.MathUtils.clamp(this.logoConfig.size, DESIGN_QR_LOGO_SIZE_MIN, DESIGN_QR_LOGO_SIZE_MAX);
+      this.logoGroup.position.set(
+        anchor.x * qrWidth * (1 - travel),
+        THREE.MathUtils.lerp(anchor.y * qrWidth * (1 - vertical), BLOCK_SIZE * .72, travel)
+          + qrWidth * .04 * Math.sin(Math.PI * travel),
+        anchor.z * qrWidth * (1 - travel));
+      this.logoGroup.rotation.set(0, anchor.angle ?? 0, 0);
+      this.logoGroup.quaternion.slerp(this.camera.quaternion, travel);
+      this.logoGroup.scale.setScalar(THREE.MathUtils.lerp(billboardSize, scanSize, travel));
+      this.logoGroup.visible = true;
+      image.material.depthTest = progress <= .04;
+      return;
+    }
+    image.material.depthTest = false;
     const horizontalCameraDistance = Math.hypot(
       this.camera.position.x,
       this.camera.position.z
@@ -1126,12 +1157,20 @@ export class ThreeFallbackRenderer {
   }
 
   public setTreeData(data: TreeData) {
+    const previousCity = this.treeData?.city;
     this.treeData = data;
     if (!this.hasSpawned) {
       this.spawnStartTime = performance.now();
       this.hasSpawned = true;
     }
-    this.rebuildMeshes();
+    if (this.cityScene && data.city && previousCity) {
+      this.cityScene.updateContent(data.city.modules, this.activeTheme);
+    } else {
+      this.rebuildMeshes();
+    }
+    // A manually paused/offscreen player still needs the new QR/buildings, but
+    // must not advance its actors or attach pending models just to redraw it.
+    if (data.city && !this.isRunning) this.renderOnce();
   }
 
   private getEnvConfig() {
@@ -1161,8 +1200,36 @@ export class ThreeFallbackRenderer {
     };
   }
 
+  private clearDesignMeshes() {
+    this.cityScene?.dispose();
+    for (const child of [...this.scene.children]) {
+      if (child === this.logoGroup) continue;
+      disposeObjectResources(child);
+      this.scene.remove(child);
+    }
+    this.branchesGroup.clear();
+    this.butterfliesGroup.clear();
+    this.scene.add(this.branchesGroup, this.butterfliesGroup);
+    this.groundTilesMesh = this.groundFallenLeavesMesh = this.morphVoxelMesh = null;
+    this.canopyFlowersMesh = this.groundDecorMesh = this.petalsInstancedMesh = null;
+    this.rainMesh = this.snowMesh = null;
+    this.islandBaseMesh = null;
+    this.groundPositions = [];
+    this.morphBlocks = [];
+    this.flowerBaseData = [];
+    this.butterflies = [];
+    this.cityScene = null;
+    this.lastGroundProgress = this.lastVoxelProgress = -1;
+  }
+
   private rebuildMeshes() {
     if (!this.treeData) return;
+    if (this.cityScene || this.treeData.city) this.clearDesignMeshes();
+    if (this.treeData.city) {
+      this.cityScene = new ShibuyaScene(this.treeData.city.modules, this.activeTheme);
+      this.scene.add(this.cityScene.root);
+      return;
+    }
 
     const envConfig = this.getEnvConfig();
     const isPixelFoliage = this.activeTheme.foliageShape === 'pixel';
@@ -1258,10 +1325,10 @@ export class ThreeFallbackRenderer {
           const offX = Math.cos(offAngle) * offDist;
           const offZ = Math.sin(offAngle) * offDist;
 
-          const rotSeed = Math.sin(c * 53.71 + k * 73.19 + (this.activeTheme.groundLeavesSeed + 1) * 19.31) * 43758.5453;
+          const rotSeed = Math.sin(c * 53.71 + k * 73.19 + ((this.treeData.contentVariation ?? 0) + 1) * 19.31) * 43758.5453;
           const normRot = rotSeed - Math.floor(rotSeed);
 
-          const scaleSeed = Math.sin(c * 91.37 + k * 29.47 + (this.activeTheme.groundLeavesSeed + 1) * 41.17) * 43758.5453;
+          const scaleSeed = Math.sin(c * 91.37 + k * 29.47 + ((this.treeData.contentVariation ?? 0) + 1) * 41.17) * 43758.5453;
           const normScale = scaleSeed - Math.floor(scaleSeed);
 
           leafInstances.push({
@@ -2034,9 +2101,75 @@ export class ThreeFallbackRenderer {
     this.renderFrame();
   }
 
+  public setPreviewProjection(transform: import('../previewProjection.ts').PreviewProjection | null) {
+    if (!transform) {
+      this.previewProjection = null;
+      return;
+    }
+    this.previewProjection ??= new THREE.Matrix4();
+    this.baseProjection ??= new THREE.Matrix4();
+    this.baseProjectionInverse ??= new THREE.Matrix4();
+    this.previewProjection.set(
+      transform.xx, transform.xy, 0, transform.x,
+      transform.yx, transform.yy, 0, transform.y,
+      0, 0, 1, 0,
+      0, 0, 0, 1,
+    );
+  }
+
+  /** Running players consume the latest zoom on their existing next frame. */
+  public invalidatePreview() {
+    if (this.isRunning || this.isDestroyed) return;
+    this.onBeforeRender?.();
+    this.renderScene(true);
+    this.onAfterRender?.();
+  }
+
+  /** Extra passes happen only on export, without advancing animation time. */
+  public withBaseFrame<T>(capture: () => T): T {
+    if (!this.sourceIsPreview || this.isDestroyed) return capture();
+    this.renderScene(false);
+    try {
+      return capture();
+    } finally {
+      this.renderScene(true);
+      this.onAfterRender?.();
+    }
+  }
+
+  private renderScene(preview: boolean) {
+    const projection = preview ? this.previewProjection : null;
+    if (!projection) {
+      this.renderer.render(this.scene, this.camera);
+      this.sourceIsPreview = false;
+      return;
+    }
+    const base = this.baseProjection!;
+    const inverse = this.baseProjectionInverse!;
+    base.copy(this.camera.projectionMatrix);
+    inverse.copy(this.camera.projectionMatrixInverse);
+    this.camera.projectionMatrix.premultiply(projection);
+    this.camera.projectionMatrixInverse.copy(this.camera.projectionMatrix).invert();
+    try {
+      this.renderer.render(this.scene, this.camera);
+      this.sourceIsPreview = true;
+    } finally {
+      // Raycasting, billboards, camera fitting, and the next frame always see
+      // the canonical camera. No second context, target, or larger buffer.
+      this.camera.projectionMatrix.copy(base);
+      this.camera.projectionMatrixInverse.copy(inverse);
+    }
+  }
+
   private renderFrame() {
     this.update();
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.localClippingEnabled = !!this.cityScene;
+    this.cityScene?.prepareMorphRendering(this.renderer, this.camera, this.scene);
+    const assetStatus = this.cityScene?.assetStatus;
+    if (assetStatus) this.renderer.domElement.dataset.cityAssets = assetStatus;
+    else delete this.renderer.domElement.dataset.cityAssets;
+    this.onBeforeRender?.();
+    this.renderScene(true);
     this.onAfterRender?.();
   }
 
@@ -2105,26 +2238,29 @@ export class ThreeFallbackRenderer {
       this.yaw = ((this.yaw % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
     }
 
-    const nearestYaw = this.yaw > Math.PI ? Math.PI * 2 : 0;
-    const targetYaw = THREE.MathUtils.lerp(this.yaw, nearestYaw, progress);
-    const targetPitch = THREE.MathUtils.lerp(this.pitch, -Math.PI / 2 + 0.0001, progress);
+    const designYaw = this.cityScene
+      ? ((this.yaw + CITY_CAMERA_YAW_OFFSET) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2)
+      : this.yaw;
+    const nearestYaw = designYaw > Math.PI ? Math.PI * 2 : 0;
+    const targetYaw = THREE.MathUtils.lerp(designYaw, nearestYaw, progress);
+    const designPitch = this.cityScene ? Math.max(-1.45, this.pitch - .16) : this.pitch;
+    const targetPitch = THREE.MathUtils.lerp(designPitch, -Math.PI / 2 + 0.0001, progress);
     const baseScanDist = this.viewportProjection.scanDistance;
-    // The compact distance scale belongs to QR scan framing. Reusing it for
-    // the 3D tree makes square embeds 35% smaller than narrow-phone embeds.
-    // Keep one tree distance throughout portrait and square viewports; the
-    // shared 23-degree horizontal FOV then preserves a stable visual ratio.
-    const baseTreeDist = THREE.MathUtils.lerp(
-      TREE_MOBILE_DISTANCE,
-      TREE_DESKTOP_DISTANCE,
-      this.viewportProjection.landscapeBlend
-    );
+    // One 3D baseline for every design; the City's fit is only a clipping guard,
+    // never a design-specific zoom. Hosts can change adapters without rescaling.
+    const baseDesignDist = this.viewportProjection.designDistance;
     // QR versions add modules as content grows. Move the camera by the same
     // ratio so denser QR matrices keep one stable on-screen footprint.
     const contentScale =
       (this.treeData?.gridSize ?? QR_VISUAL_REFERENCE_GRID_SIZE) /
       QR_VISUAL_REFERENCE_GRID_SIZE;
     const targetDist =
-      THREE.MathUtils.lerp(baseTreeDist, baseScanDist, progress) * contentScale;
+      THREE.MathUtils.lerp(
+        this.cityScene ? Math.max(baseDesignDist, fitCityCameraDistance(
+          this.viewportProjection.aspect, this.viewportProjection.verticalFov, designYaw, designPitch
+        )) : baseDesignDist,
+        baseScanDist, progress
+      ) * contentScale;
 
     const cx = targetDist * Math.cos(targetPitch) * Math.sin(targetYaw);
     const cy = -targetDist * Math.sin(targetPitch);
@@ -2132,16 +2268,21 @@ export class ThreeFallbackRenderer {
 
     // Keep the tree's vertical composition normalized with the camera distance.
     // Without this, larger QR versions make the scaled tree drift upward.
-    const lookTargetY = THREE.MathUtils.lerp(0.2 * contentScale, 0.0, progress);
+    const lookTargetY = THREE.MathUtils.lerp((this.cityScene ? .10 : .2) * contentScale, 0.0, progress);
     // Dynamic camera up-vector for square QR alignment
-    if (progress > 0.01) {
+    if (this.cityScene || progress > 0.01) {
       this.camera.up.set(0, Math.max(0.001, 1.0 - progress), -progress).normalize();
     } else {
       this.camera.up.set(0, 1, 0);
     }
-    this.camera.position.set(cx, cy, cz);
+    this.camera.position.set(cx, this.cityScene ? cy + lookTargetY : cy, cz);
     this.camera.lookAt(0, lookTargetY, 0);
     this.updateLogoTransform(progress);
+    if (this.cityScene) {
+      this.cityScene.update(progress, this.isRunning ? deltaSeconds : 0, this.reducedMotion, this.isRunning);
+      this.onProgressUpdate?.(progress, Math.sin(progress * Math.PI));
+      return;
+    }
 
     // Dynamic real-time ground color blending
     if (Math.abs(progress - this.lastGroundProgress) > 0.001) {
@@ -2507,12 +2648,14 @@ export class ThreeFallbackRenderer {
     this.pause();
     this.cancelLogoLoad();
 
+    this.cityScene?.dispose();
     disposeObjectResources(this.scene);
     this.scene.clear();
     this.renderer.renderLists.dispose();
     this.renderer.dispose();
     this.onProgressUpdate = undefined;
     this.onAfterRender = undefined;
+    this.onBeforeRender = undefined;
     this.onError = undefined;
   }
 }

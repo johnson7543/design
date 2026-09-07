@@ -795,6 +795,121 @@ html, body {
   justify-self: end;
 }
 
+.preview-zoom-tools {
+  position: relative;
+}
+
+.floating-zoom-toggle .floating-stage-tool-label {
+  min-width: calc(4ch + 1em);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-zoom-panel {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 2;
+  width: 240px;
+  max-width: calc(100vw - 2 * var(--qr-overlay-edge));
+  padding: var(--space-3);
+  border: 1px solid var(--qr-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--qr-surface-elevated);
+  color: var(--qr-ink);
+  box-shadow: var(--qr-shadow-control-hover);
+  font-family: var(--font-body);
+}
+
+.preview-zoom-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.preview-zoom-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--qr-ink-muted);
+  cursor: pointer;
+  transition: var(--qr-transition-control);
+}
+
+.preview-zoom-actions {
+  display: grid;
+  grid-template-columns: var(--qr-control-height) 1fr var(--qr-control-height);
+  gap: var(--qr-control-gap);
+}
+
+.preview-zoom-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--qr-control-height);
+  padding: 0;
+  border: 1px solid var(--qr-border-default);
+  border-radius: var(--radius-md);
+  background: var(--qr-surface-control);
+  color: var(--qr-ink);
+  box-shadow: var(--qr-shadow-control);
+  font: 600 var(--qr-control-font-size) var(--font-body);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: var(--qr-transition-control);
+}
+
+.preview-zoom-action:hover:not(:disabled),
+.preview-zoom-close:hover {
+  background: var(--qr-surface-control-hover);
+  border-color: var(--qr-border-hover);
+  color: var(--qr-ink);
+}
+
+.preview-zoom-action:active:not(:disabled),
+.preview-zoom-close:active,
+.floating-zoom-toggle:active {
+  background: var(--qr-surface-warm-hover);
+  border-color: var(--qr-border-accent);
+  transform: translateY(1px);
+}
+
+.preview-zoom-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.preview-zoom-reset-label {
+  color: var(--qr-ink-muted);
+  font-size: 0.66rem;
+}
+
+.preview-zoom-reset {
+  white-space: nowrap;
+}
+
+.preview-zoom-help,
+.preview-zoom-note {
+  margin: var(--space-2) 0 0;
+  color: var(--qr-ink-muted);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.preview-zoom-note {
+  font-weight: 600;
+}
+
 .floating-edit-toggle {
   display: inline-flex;
   align-items: center;
@@ -1180,6 +1295,21 @@ html, body {
   gap: var(--qr-drawer-gap);
 }
 
+/* Design selector keeps theme-specific controls out of the other design. */
+.design-type-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--qr-control-gap);
+}
+.design-type-tabs .season-chip {
+  flex: 0 0 auto;
+  padding-inline: var(--qr-control-padding-inline);
+}
+.design-type-tabs .season-chip:active,
+.city-theme-tabs .season-chip:active {
+  transform: translateY(0);
+}
+
 /* Season Tabs */
 .season-tabs {
   display: flex;
@@ -1190,6 +1320,24 @@ html, body {
 
 .season-tabs .season-chip {
   flex: 1;
+}
+
+.season-tabs.city-theme-tabs {
+  justify-content: flex-start;
+  /* A single compact preset needs no scrolling; preserve its full focus ring. */
+  overflow: visible;
+}
+
+.city-preset-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--qr-control-gap);
+  min-width: 0;
+}
+
+.city-theme-tabs .season-chip {
+  flex: 0 0 auto;
 }
 
 .custom-themes-row {
@@ -2905,14 +3053,16 @@ html, body {
     gap: 4px;
   }
 
-  .floating-right-tools .floating-edit-toggle {
+  .floating-right-tools .floating-edit-toggle,
+  .floating-zoom-toggle {
     flex: 0 0 28px;
     width: 28px;
     padding: 0;
   }
 
   .floating-right-tools .floating-stage-tool-label,
-  .floating-right-tools .floating-edit-chevron {
+  .floating-right-tools .floating-edit-chevron,
+  .floating-zoom-toggle .floating-stage-tool-label {
     display: none;
   }
 

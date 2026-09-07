@@ -6,6 +6,11 @@ Target first public version: `designqr@0.1.0`
 
 [Back to the Design QR documentation index](README.md)
 
+The first-version tree integration below is retained as implementation history.
+The current API also supports `design="city"` with `theme="shibuya"`; see the
+[Shibuya city contract](shibuya-city.md) and package README for its current
+options, editor behavior, and verification.
+
 ## 1. Purpose
 
 Turn the existing DesignQR editor and 3D tree renderer into one reusable product
@@ -128,8 +133,8 @@ Completed in the fifth implementation slice:
   guide now separates a small `createTreeTheme()` preset customization from a
   compile-checked `createTreeTheme()` call that supplies every parameter.
 - Unified `createTreeTheme()` and Add Theme dependency cascades for source
-  colors and exclusive particle selection, and moved fallen-ground placement
-  onto a theme-owned deterministic seed so preset clones render identically
+  colors and exclusive particle selection. Fallen-ground placement derives
+  deterministically from QR content so preset clones render identically
   through either integration path.
 
 Completed in the transparent-background implementation slice:
@@ -291,7 +296,6 @@ The primary developer experience should be:
 
 ```tsx
 import { createTreeTheme, DesignQR } from 'designqr';
-import 'designqr/style.css';
 
 export function ProductQRCode() {
   return (
@@ -381,7 +385,6 @@ export type TreeFoliageShape = 'blossom' | 'leaf' | 'pixel';
 
 export interface TreeDesignOptions {
   shape?: 'dome' | 'wide' | 'pine';
-  seed?: number;
 }
 
 export interface DesignQRDetailsOptions {
@@ -425,6 +428,8 @@ export interface DesignQRError {
 export interface DesignQRHandle {
   setView(view: DesignQRView): void;
   resetRotation(): void;
+  setZoom(scale: number): void;
+  resetZoom(): void;
   pause(): void;
   resume(): void;
   exportImage(): Promise<Blob>;
@@ -439,6 +444,7 @@ export interface DesignQRProps {
   defaultView?: DesignQRView;
   details?: DesignQRDetailsOptions;
   interaction?: DesignQRInteractionOptions;
+  zoom?: boolean | { pinch?: boolean; wheel?: boolean };
   logo?: false | DesignQRLogoOptions;
   transparentBackground?: boolean;
   className?: string;
@@ -446,6 +452,7 @@ export interface DesignQRProps {
   ariaLabel?: string;
   onReady?: () => void;
   onViewChange?: (view: DesignQRView) => void;
+  onZoomChange?: (scale: number) => void;
   onError?: (error: DesignQRError) => void;
 }
 ```
@@ -469,7 +476,6 @@ const DESIGN_QR_DEFAULTS = {
   defaultView: 'design',
   tree: {
     shape: 'dome',
-    seed: 0.5,
   },
   details: {
     title: '',
@@ -576,7 +582,7 @@ The public role groups are:
 | Ground | Light-module, surface, shadow, surface variations, pedestal, and four-band ground-feature ramps |
 | Finder modules | Finder body, highlight, shadow, eye, ordered distribution, stops, and RGB variation |
 | Presentation | Sky gradient and title |
-| Environment | Falling particles, ground leaves and their deterministic layout seed, weather, ambient particles, and snow |
+| Environment | Falling particles, ground leaves and their content-derived placement, weather, ambient particles, and snow |
 
 The package README lists every property in these groups. Partial custom themes
 are a current public input; normalization fills missing renderer roles.
@@ -706,8 +712,8 @@ The shared React player owns generic behavior:
 - Interaction-aware semantics, keyboard activation, focus, and cursors.
 - Package-owned presentation variables and fallbacks.
 - Details/title rendering.
-- Full-stage alpha compositing, the matrix-bounded transparent QR fill, and the
-  optional filled Border card with its four-module clear margin.
+- Full-stage alpha compositing, matrix-bounded transparent QR fill for both
+  designs, and the optional Border card that alone fills the four-module margin.
 - Error boundaries and public callbacks.
 - Ref methods.
 
@@ -1319,6 +1325,14 @@ not construct an approximation from configuration in a separate export process.
 
 ### 17.2 One visible render source
 
+The following is the default unzoomed path. Opt-in viewing zoom is the explicit
+framing exception: the same scene, camera, resolution, and shared compositor
+produce an on-demand unzoomed snapshot, restoring the preview in the same task
+without advancing animation or presenting the export framing. See the [view-only zoom contract](style-principles.md#view-only-zoom)
+and [public zoom API](../../packages/designqr/README.md#optional-viewing-zoom).
+No second renderer, persistent export target, supersampling, or per-frame export
+pass is introduced; iframe configuration and generated snippets remain unchanged.
+
 - The reusable player owns one final presentation surface for exportable pixels.
   That final surface is also the surface displayed to the user.
 - The normal display path must place the background, WebGL artwork, QR border,
@@ -1386,7 +1400,7 @@ interface DesignQRHandle {
 - Numeric clamping and color validation.
 - Configuration encode/decode round trips.
 - Transparent-background default, sparse true round trip, invalid input,
-  matrix-fill geometry, conditional four-module Border geometry, and endpoint
+  matrix-fill geometry for both designs, Border-owned four-module margin geometry, and endpoint
   opacity.
 - Unsupported share-payload fixtures.
 - Message-envelope validation.
@@ -1448,9 +1462,10 @@ interface DesignQRHandle {
   logos at `0.08`, `0.16`, and `0.20`, and mobile/desktop sizes.
 - Decode transparent outputs after compositing them over a representative
   uniform light host background. With Border disabled, verify the local fill
-  exactly matches the QR matrix. With Border enabled, verify the filled card
+  exactly matches the QR matrix for either design and leaves the outer margin transparent.
+  With Border enabled, verify the filled card
   provides four clear modules before its decorative padding, frame, and
-  metadata. Dark or patterned borderless hosts must provide their own suitable
+  metadata, including when composited over a dark host. Dark or patterned borderless hosts must provide their own suitable
   light margin if scanning is required.
 - Never count matrix-generation unit tests alone as proof that the final rendered
   image scans.

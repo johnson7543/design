@@ -1,9 +1,39 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath, URL } from 'node:url';
+import { shibuyaAssetPlugin } from './scripts/shibuya-asset-plugin.mjs';
+
+const notoNoticePath = fileURLToPath(new URL(
+  './packages/designqr/third-party-licenses/noto-cjk.txt', import.meta.url
+));
+
+const notoNoticePlugin: Plugin = {
+  name: 'designqr-noto-notice',
+  buildStart() {
+    this.addWatchFile(notoNoticePath);
+  },
+  async generateBundle() {
+    this.emitFile({
+      type: 'asset',
+      fileName: 'licenses/noto-cjk.txt',
+      source: await readFile(notoNoticePath, 'utf8'),
+    });
+  },
+  configureServer(server) {
+    server.middlewares.use('/licenses/noto-cjk.txt', async (_request, response, next) => {
+      try {
+        response.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        response.end(await readFile(notoNoticePath, 'utf8'));
+      } catch (error) {
+        next(error);
+      }
+    });
+  },
+};
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), shibuyaAssetPlugin(), notoNoticePlugin],
   resolve: {
     alias: [
       {

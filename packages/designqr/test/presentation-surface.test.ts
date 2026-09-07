@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { resolveQR2DLightDisplayRgb } from '../src/designs/tree/constants.ts';
+import { SHIBUYA_PALETTE } from '../src/designs/city/palette.ts';
 import {
   PresentationSurface,
   QR_QUIET_ZONE_MODULES,
@@ -246,6 +247,8 @@ test('fills only the matrix in transparent mode and preserves opaque artwork', (
       return { addColorStop() {} };
     },
     beginPath() { pathRect = null; },
+    rect() {},
+    clip() {},
     roundRect(x: number, y: number, width: number, height: number) {
       pathRect = { x, y, width, height };
     },
@@ -370,6 +373,42 @@ test('fills only the matrix in transparent mode and preserves opaque artwork', (
     surface.setState(createPresentationState(false, true));
     assert.equal(fills.length, 1, 'the opaque bordered view should retain its background');
     assert.equal(pathFills.length, 1, 'the opaque bordered view should fill its card');
+
+    // The same live surface must switch color treatment with the design, even
+    // when its light source color is unchanged. Exports reuse this surface.
+    for (const transparent of [true, false]) for (const border of [false, true]) {
+      fills.length = 0;
+      pathFills.length = 0;
+      const cityState: PresentationSurfaceState = {
+        ...createPresentationState(transparent, border),
+        qrLightColor: SHIBUYA_PALETTE.qrPaper,
+        qrLightColorTreatment: 'exact',
+        protectQrCardMargin: true,
+      };
+      surface.setState(cityState);
+      if (border) assert.equal(pathFills[0].fillStyle, SHIBUYA_PALETTE.qrPaper, 'Only an enabled Border fills the City card');
+      else if (transparent) {
+        assert.equal(fills.length, 1);
+        const fill = fills.at(-1)!;
+        const expected = resolveQRMatrixFillGeometry(resolveQRPresentationGeometry(100, 100, 25));
+        assert.equal(fill.fillStyle, SHIBUYA_PALETTE.qrPaper);
+        assert.deepEqual([fill.x, fill.y, fill.width, fill.height],
+          [expected.x, expected.y, expected.size, expected.size]);
+        assert.equal(fill.alpha, 1, 'The QR matrix remains opaque.');
+        assert.equal(alphaAt(fills, expected.x - 1, 50), 0, 'Border off must leave the four-module margin transparent.');
+      } else {
+        assert.equal(fills.length, 1, 'Opaque borderless City draws only the atmosphere outside its QR matrix.');
+        assert.equal(fills[0].width, 100);
+      }
+
+      fills.length = 0;
+      pathFills.length = 0;
+      surface.setState({ ...cityState, qrLightColorTreatment: 'lifted', protectQrCardMargin: false });
+      const liftedIvory = `rgb(${resolveQR2DLightDisplayRgb(SHIBUYA_PALETTE.qrPaper)
+        .map(channel => Math.round(channel * 255)).join(', ')})`;
+      if (border) assert.equal(pathFills[0].fillStyle, liftedIvory, 'Tree must restore its established lift');
+      else if (transparent) assert.equal(fills[0].fillStyle, liftedIvory);
+    }
 
     const metadataState = (borderEnabled: boolean): PresentationSurfaceState => ({
       ...createPresentationState(true, borderEnabled),

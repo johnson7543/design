@@ -42,7 +42,6 @@ export const DESIGN_QR_DEFAULTS = {
     type: 'tree',
     options: {
       shape: 'dome',
-      seed: 0.5,
     },
   },
   theme: {

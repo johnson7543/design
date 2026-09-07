@@ -15,15 +15,24 @@ import {
   VIEW_TRANSITION_SPEED_MIN,
   type DesignQRHandle,
   type DesignQRProps,
+  type DesignQRZoomOptions,
 } from '../src/index.ts';
 
 export const designQRHandle = createRef<DesignQRHandle>();
+export const pinchOnly = { pinch: true, wheel: false } satisfies DesignQRZoomOptions;
+export const zoomFixture = <DesignQR value="Pinch to inspect" zoom={pinchOnly} onZoomChange={scale => scale.toFixed(2)} />;
+// @ts-expect-error The 1000% inspection ceiling belongs to the editor canvas, not public player props.
+export const editorZoomIsNotPublic = <DesignQR value="Public limits stay unchanged" zoom previewZoomMax={10} />;
+export function setViewingZoom() {
+  designQRHandle.current?.setZoom(2);
+  designQRHandle.current?.resetZoom();
+}
 
 export const designQRProps = {
   value: 'https://example.com',
   design: 'tree',
   theme: 'spring',
-  tree: { shape: 'dome', seed: 0.5 },
+  tree: { shape: 'dome' },
   defaultView: 'design',
   details: {
     title: 'Visit our website',
@@ -86,3 +95,8 @@ export function connectDesignQRFrame(frame: HTMLIFrameElement) {
     },
   });
 }
+
+export const shibuyaCityFixture = (
+  <DesignQR value="https://example.com/shibuya" design="city" theme="shibuya"
+    defaultView="design" />
+);

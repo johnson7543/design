@@ -10,3 +10,12 @@ export const THEME_PRESET_OPTIONS = [
   name: DesignQRThemePreset;
   label: string;
 }>;
+
+/** City presets stay separate from Tree's seasonal/custom-theme selection. */
+export const CITY_THEME_PRESET_OPTIONS = [
+  { id: 'shibuya', name: 'shibuya', label: 'Shibuya' },
+] as const satisfies ReadonlyArray<{
+  id: DesignQRThemePreset;
+  name: DesignQRThemePreset;
+  label: string;
+}>;

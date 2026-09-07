@@ -1,3 +1,5 @@
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 
@@ -8,6 +10,11 @@ const require = createRequire(import.meta.url);
 const cjs = require('../dist/designqr.cjs');
 const configCjs = require('../dist/config.cjs');
 const embedCjs = require('../dist/embed.cjs');
+
+for (const entry of [esm, cjs]) {
+  const html = renderToString(createElement(entry.DesignQR, { value: '' }));
+  if (!html.includes('designqr-error')) throw new Error('SSR error markup is missing.');
+}
 
 if (!esm.DesignQR || !cjs.DesignQR) {
   throw new Error('The DesignQR component is missing from an ESM or CJS build.');

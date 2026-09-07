@@ -1,0 +1,255 @@
+{
+  "schema": "designqr-shibuya-assets",
+  "version": 2,
+  "blender": "5.2.1 LTS",
+  "authoringUp": "+Z",
+  "runtimeUp": "+Y",
+  "vehicleForward": "+Z",
+  "assets": [
+    {
+      "id": "wheel",
+      "root": "wheel",
+      "kind": "wheel",
+      "dimensions": [
+        1.2,
+        2,
+        2
+      ],
+      "axle": "+X",
+      "nodes": [
+        "wheel",
+        "wheel-body"
+      ]
+    },
+    {
+      "id": "vehicle-sedan",
+      "root": "vehicle-sedan",
+      "kind": "vehicle",
+      "dimensions": [
+        0.019,
+        0.017,
+        0.039
+      ],
+      "forward": "+Z",
+      "ground": 0,
+      "wheelRadius": 0.0036,
+      "wheelWidth": 0.0026,
+      "wheelbase": 0.02418,
+      "track": 0.019,
+      "paintRole": "vehicle-body",
+      "nodes": [
+        "vehicle-sedan",
+        "sedan-wheel-l-front",
+        "sedan-wheel-l-rear",
+        "sedan-wheel-r-front",
+        "sedan-wheel-r-rear",
+        "vehicle-sedan-body"
+      ]
+    },
+    {
+      "id": "vehicle-taxi",
+      "root": "vehicle-taxi",
+      "kind": "vehicle",
+      "dimensions": [
+        0.019,
+        0.018,
+        0.041
+      ],
+      "forward": "+Z",
+      "ground": 0,
+      "wheelRadius": 0.0036,
+      "wheelWidth": 0.0026,
+      "wheelbase": 0.02542,
+      "track": 0.019,
+      "paintRole": "vehicle-body",
+      "nodes": [
+        "vehicle-taxi",
+        "taxi-roof-sign",
+        "taxi-wheel-l-front",
+        "taxi-wheel-l-rear",
+        "taxi-wheel-r-front",
+        "taxi-wheel-r-rear",
+        "vehicle-taxi-body"
+      ]
+    },
+    {
+      "id": "vehicle-van",
+      "root": "vehicle-van",
+      "kind": "vehicle",
+      "dimensions": [
+        0.021,
+        0.024,
+        0.045
+      ],
+      "forward": "+Z",
+      "ground": 0,
+      "wheelRadius": 0.004,
+      "wheelWidth": 0.0026,
+      "wheelbase": 0.027899999999999998,
+      "track": 0.021,
+      "paintRole": "vehicle-body",
+      "nodes": [
+        "vehicle-van",
+        "van-wheel-l-front",
+        "van-wheel-l-rear",
+        "van-wheel-r-front",
+        "van-wheel-r-rear",
+        "vehicle-van-body"
+      ]
+    },
+    {
+      "id": "vehicle-bus",
+      "root": "vehicle-bus",
+      "kind": "vehicle",
+      "dimensions": [
+        0.023,
+        0.028,
+        0.065
+      ],
+      "forward": "+Z",
+      "ground": 0,
+      "wheelRadius": 0.0046,
+      "wheelWidth": 0.0026,
+      "wheelbase": 0.0403,
+      "track": 0.023,
+      "paintRole": "vehicle-body",
+      "nodes": [
+        "vehicle-bus",
+        "bus-wheel-l-front",
+        "bus-wheel-l-rear",
+        "bus-wheel-r-front",
+        "bus-wheel-r-rear",
+        "vehicle-bus-body"
+      ]
+    },
+    {
+      "id": "metro-carriage",
+      "root": "metro-carriage",
+      "kind": "metro",
+      "dimensions": [
+        0.026,
+        0.041,
+        0.076
+      ],
+      "forward": "+Z",
+      "ground": 0,
+      "carSpacing": 0.081,
+      "trackHeight": 0.106,
+      "nodes": [
+        "metro-carriage",
+        "metro-carriage-body",
+        "metro-coupler-front",
+        "metro-coupler-rear"
+      ]
+    },
+    {
+      "id": "metro-cab",
+      "root": "metro-cab",
+      "kind": "metro",
+      "dimensions": [
+        0.026,
+        0.041,
+        0.076
+      ],
+      "forward": "+Z",
+      "nodes": [
+        "metro-cab",
+        "metro-cab-body",
+        "metro-cab-end"
+      ]
+    },
+    {
+      "id": "building-qfront",
+      "root": "building-qfront",
+      "kind": "building",
+      "dimensions": [
+        1.04,
+        1.08,
+        1.04
+      ],
+      "morphProxy": "footprint",
+      "ground": 0,
+      "sourceSha256": "f046ef653f0980892a2596c6778d564f8240f85e47a410b4f3a7a1c4989239a2",
+      "logoAnchor": "qfront-logo-anchor",
+      "logoPosition": [
+        -0.26508282444052883,
+        0.67,
+        0.36651436297690243
+      ],
+      "logoYaw": -0.667155746485836,
+      "nodes": [
+        "building-qfront",
+        "building-qfront-body",
+        "qfront-logo-anchor"
+      ]
+    },
+    {
+      "id": "building-magnet",
+      "root": "building-magnet",
+      "kind": "building",
+      "dimensions": [
+        1.04,
+        1.08,
+        1.04
+      ],
+      "morphProxy": "footprint",
+      "ground": 0,
+      "sourceSha256": "f046ef653f0980892a2596c6778d564f8240f85e47a410b4f3a7a1c4989239a2",
+      "nodes": [
+        "building-magnet",
+        "building-magnet-body"
+      ]
+    }
+  ],
+  "materials": {
+    "designqr-vehicle-body": {
+      "role": "vehicle-body",
+      "swatch": "#eed883"
+    },
+    "designqr-glass": {
+      "role": "glass",
+      "swatch": "#436ea4"
+    },
+    "designqr-glassLight.001": {
+      "role": "glassLight",
+      "swatch": "#759db0"
+    },
+    "designqr-metal": {
+      "role": "metal",
+      "swatch": "#cddbe4"
+    },
+    "designqr-ink": {
+      "role": "ink",
+      "swatch": "#1f3a52"
+    },
+    "designqr-light": {
+      "role": "light",
+      "swatch": "#eed883"
+    },
+    "designqr-gold": {
+      "role": "gold",
+      "swatch": "#eed883"
+    },
+    "designqr-coral": {
+      "role": "coral",
+      "swatch": "#ea6157"
+    },
+    "designqr-ivory": {
+      "role": "ivory",
+      "swatch": "#e8ddcf"
+    },
+    "designqr-blue.001": {
+      "role": "blue",
+      "swatch": "#436ea4"
+    },
+    "designqr-roof.001": {
+      "role": "roof",
+      "swatch": "#605b53"
+    },
+    "designqr-sky.001": {
+      "role": "sky",
+      "swatch": "#809dca"
+    }
+  },
+  "provenance": "Original facades on modified PLATEAU Shibuya 2025 footprints; no reference media, external textures, or uploaded logos. See docs/design-qr/shibuya-architecture.md."
+}

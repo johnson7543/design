@@ -18,14 +18,13 @@ const fullThemeParameterNames = Object.keys(TREE_THEME_PRESETS.spring);
 const expectedSpringThemeParameterLines = Object.entries(TREE_THEME_PRESETS.spring)
   .map(([parameter, value]) => `  ${parameter}: ${formatSnippetValue(value)},`);
 const expectedDefaultAdvancedReactCode = `import { DesignQR } from 'designqr';
-import 'designqr/style.css';
 
 export function InteractiveQRCode() {
   return (
     <DesignQR
       value="https://design.johnson7543.com"
       design="tree"
-      tree={{ shape: "dome", seed: 0.5 }}
+      tree={{ shape: "dome" }}
       theme="spring"
       defaultView="design"
       details={{ title: "", showValue: false, border: false }}
@@ -95,7 +94,7 @@ function expectedCustomThemeComponent({
     <DesignQR
       value="https://design.johnson7543.com"
       design="tree"
-      tree={{ shape: "dome", seed: 0.5 }}
+      tree={{ shape: "dome" }}
       theme={customTheme}
       defaultView="${view}"
       details={${formatSnippetValue(details)}}
@@ -2059,7 +2058,7 @@ async function verifyDesignQrWysiwygExport(browser) {
         === 'Advanced, recommended for the current editor setup'
       && configuredReactState.copyLabel === 'Copy Advanced React code'
       && configuredReactState.switcherFits
-      && configuredReactState.code.includes('tree={{ shape: "dome", seed: 0.5 }}')
+      && configuredReactState.code.includes('tree={{ shape: "dome" }}')
       && configuredReactState.code.includes('theme="spring"')
       && configuredReactState.code.includes('defaultView="qr"')
       && configuredReactState.code.includes(
@@ -2236,7 +2235,8 @@ async function verifyDesignQrWysiwygExport(browser) {
 const viteBin = join(projectRoot, 'node_modules', 'vite', 'bin', 'vite.js');
 const preview = spawn(
   process.execPath,
-  [viteBin, 'preview', '--host', host, '--port', String(port), '--strictPort'],
+  [viteBin, 'preview', '--host', host, '--port', String(port), '--strictPort',
+    '--outDir', process.env.PREVIEW_DIST ?? 'dist'],
   { cwd: projectRoot, stdio: ['ignore', 'pipe', 'pipe'] }
 );
 preview.stdout.on('data', (chunk) => {

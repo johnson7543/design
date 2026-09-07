@@ -1,7 +1,7 @@
 # Design QR color mappings
 
 Status: Active product specification<br>
-Scope: Design QR seasonal artwork and renderer/component color assignments
+Scope: Design QR seasonal and City artwork and renderer/component color assignments
 
 [Back to the Design QR documentation index](README.md)
 
@@ -26,20 +26,32 @@ the rendered QR artwork.
 | Comment | `#A89888` | Generated guidance comments |
 | Punctuation | `#7D6B5C` | Brackets, operators, and separators |
 
+## Editor preview zoom chrome
+
+The left floating zoom disclosure reuses the Edit / Logo pill roles. Its
+popover uses `--qr-surface-elevated`, `--qr-border-default`, and
+`--qr-shadow-control-hover`; labels use `--qr-ink` and `--qr-ink-muted`.
+Minus, percentage/reset, and plus use `--qr-surface-control`, the existing
+control-hover and warm-pressed surfaces, accent borders, and the shared
+`--qr-focus-color` outline. Limit-disabled buttons reduce opacity only. These
+are interface roles, not new palette entries. Render-aware preview zoom applies
+no color filter and changes neither palette assignments nor exported PNG colors.
+
 ## Package presentation roles
 
 The public React player and hosted iframe define these roles under
 `.designqr-root`; they do not depend on application-level `--qr-*` tokens.
 Canvas roles are shared by the live presentation and exported PNG. Focus roles
 remain browser UI and are not exported. Theme-owned `titleColor` remains
-separate. At the settled 2D endpoint, transparent output reuses the same
-theme-derived lifted ground color as the QR light modules to fill exactly the QR
-matrix footprint when Border is disabled. Enabling Border uses that color to
+separate. At the settled 2D endpoint, transparent output reuses the QR light
+color: Tree's theme-derived lifted ground color, or City's exact derived mist
+paper without a lift. Both designs fill exactly the matrix when Border is disabled.
+Only enabling Border uses that color to
 fill the complete details card, including its four-module clear QR margin; no new
 base color is introduced. Opaque borderless output retains the seasonal
-background without an extra local fill. When `transparentBackground` is enabled,
+background outside the QR matrix without an extra local surround. When `transparentBackground` is enabled,
 the full-canvas atmosphere gradient is not painted and pixels outside the
-matrix-sized fill or enabled Border card remain transparent. The editor-only
+design-owned scan fill or enabled Border card remain transparent. The editor-only
 alpha checkerboard derives from existing semantic interface tokens and is not
 part of the package canvas or PNG.
 
@@ -77,7 +89,7 @@ by its season index or a magic color value.
 | Ground decor | `groundFeature*` roles, palettes, stops, and variations | Four-band 3D grass/pixel ramps; None omits the geometry while retaining the configured roles for later reuse |
 | Finder modules | `qrFinder*` roles, palettes, stops, and variations | Multi-tone QR finder modules for Grass and Pixel; None keeps the finder modules but routes them through the QR foliage roles |
 | Atmosphere | `skyTop`, `skyBottom`, `weather*`, `ambientParticle*`, `snowflake*` | Opaque-mode presentation gradient, rain, butterflies/fireflies, and snow; sky values remain resolved but unpainted while the background is transparent |
-| Procedural layout | `groundLeavesAmount`, `groundLeavesSeed` | Fallen-leaf count and deterministic placement shared by preset, Add Theme, and package rendering |
+| Procedural layout | `groundLeavesAmount` | Fallen-leaf count and content-derived placement shared by preset, Add Theme, and package rendering |
 | Metadata | `titleColor` | QR title rendered by the live presentation surface |
 
 Preset objects are immutable. `createTreeTheme(preset, overrides)` returns a new
@@ -127,7 +139,7 @@ roles instead of the distinct finder palette. Finder geometry remains intact
 for scanning. In particular, Winter remains the all-white decor ramp after a
 Pixel → Grass (or None) → Pixel round trip.
 
-Settled 2D output samples the QR foliage tuple and, for Grass or Pixel, the
+Tree's settled 2D output samples the QR foliage tuple and, for Grass or Pixel, the
 finder tuple above whether or not a logo is configured. None samples the
 foliage tuple for all dark modules. Logo mode retains those distributions and
 instead switches QR generation to high error correction while keeping the
@@ -244,3 +256,193 @@ and the 3D source remains intact.
    - `getGroundTileColorWithProgress()`: 3D stone terrace transition into the shared multi-tone QR distributions.
    - `createLogoVisual()`: direct, frame-free optional-logo image plane.
 4. [`packages/designqr/src/renderer/PresentationSurface.ts`](../../packages/designqr/src/renderer/PresentationSurface.ts) paints the resolved title color and package-owned content, border, and highlight roles onto the live WYSIWYG surface.
+
+
+## Shibuya city — Blue morning
+
+Shibuya uses **青の朝**, a morning direction inspired by the supplied
+`plan/color/blue_period-1.jpg` reference and the user's three proposed blue
+swatches. These are the chosen product colors, not an official manga palette.
+The three blues were added to the global allowlist at the user's request.
+The runtime sources are [`BLUE_MORNING_SWATCHES` and `SHIBUYA_PALETTE`](../../packages/designqr/src/designs/city/palette.ts).
+The existing cool white blends with mist blue for scan paper; existing gold and coral remain
+small accents. Tree's four seasonal presets retain their own color contracts.
+
+| Swatch | Hex | RGB (0–255) | Normalized RGB (0–1) | Component mapping |
+| --- | --- | --- | --- | --- |
+| 主色 · Morning blue | `#4A7FA7` | `74, 127, 167` | `[0.290, 0.498, 0.655]` | Glazing, midtone architecture, transit stripes, signs and commuter coats |
+| 陰影 · Deep blue | `#29445F` | `41, 68, 95` | `[0.161, 0.267, 0.373]` | Recesses, plinth, structural shadows, QR finder/core ink, title, content and border |
+| 晨光 · Mist blue | `#A9CDD9` | `169, 205, 217` | `[0.663, 0.804, 0.851]` | Stage atmosphere, reflected light, upper glazing bands and cool highlights |
+| 冷白 · Cool white | `#F5FAFF` | `245, 250, 255` | `[0.961, 0.980, 1.000]` | Source for mist scan paper and optional Border card; small lettering and border highlights |
+| Gold accent | `#EED883` | `238, 216, 131` | `[0.933, 0.847, 0.514]` | Amber signals, lamps, tactile paving, one taxi and selected small sign accents |
+| Coral accent | `#EA6157` | `234, 97, 87` | `[0.918, 0.380, 0.341]` | Stop signals, regulatory marks, cones, a vehicle and selected sign accents |
+
+### Material roles and composition
+
+The Mark City connecting passage uses `glass`/`glassLight` for opaque stylized
+window panes, `coolLight` for reflection bands, `stone`/`concrete` for fascia,
+mullions and piers, and `roof` for its shaded soffit. These existing roles keep
+the elevated passage in the same morning palette as the station.
+
+The station-side worksite uses `stone`/`concrete` for hoarding, scaffold tubes
+and cabin panels, `blue` for the lower fence stripe and excavator body, `roof`
+for reinforcement and tracks, and `asphaltLight` for the aggregate base.
+`glass`/`glassLight` shade windows and gate panels; restrained `warmLight`
+accents mark fence caps and the excavator boom. Work notices use the existing
+lightbox palette.
+
+The station-curb L-shaped and square gardens use `roof` for retaining walls, `concrete` for
+coping, `foliage` for shrubs and tree crowns, `foliageHighlight` for lit leaves,
+and small `coolLight`/`warmLight` blooms. Soil blends `foliage` toward `roof`.
+
+`mix(A, B, t)` below means sRGB inputs decoded to linear light, blended by `t`
+toward B, and encoded back to sRGB by `mixCityColor()`. These are derived colors,
+not additional authored bases. The table uses the swatch names above.
+
+| Runtime role | Source or derivation | Use |
+| --- | --- | --- |
+| `glass`, `blue`, `transitStripe`, `signalGo` | Morning blue | Glazing and blue city details |
+| `glassLight` | mix(Morning blue, Mist blue, .36) | Glass reflections and slab bands |
+| `concrete` | mix(Morning blue, Mist blue, .62) | Soft gray-blue walls, mullions and metal |
+| `stone` | mix(Mist blue, Cool white, .26) | Stone, pale signs, curbs and vehicle paint |
+| `roof` | mix(Deep blue, Morning blue, .15) | Roofs and structural equipment |
+| `asphalt` | mix(Deep blue, Morning blue, .22) | Dark road foundation |
+| `asphaltLight` | mix(Deep blue, Mist blue, .18) | Soft crossing reflection |
+| `pavement` | mix(Morning blue, Mist blue, .82) | Open pavement and station square |
+| `roadPaint`, `windowLight` | mix(Mist blue, Cool white, .40) | Restrained crossing, guide, narrowing-hatch and stopping-bay paint; cool shopfront/window light |
+| `roadAccent` | mix(Deep blue, Morning blue, .48) | Reference lane surfaces and the short curbside stopping patch outside the east road's outbound edge line |
+| `roadEdge` | mix(Mist blue, Gold accent, .22) | Thin muted curb accents |
+| `foliage` | mix(Morning blue, Deep blue, .25) | Blue street-tree canopies |
+| `foliageHighlight` | mix(Morning blue, Mist blue, .45) | Soft foliage highlights |
+| `ink`, `paper`, `coolLight`, `warmLight`, `coral` | Deep blue, Cool white, Mist blue, Gold accent, Coral accent respectively | Shared material and presentation roles |
+| `sky`, `dusk` | Mist blue; mix(Mist blue, Cool white, .70) | Cool atmosphere fading toward a pale horizon |
+| `qrBlue` | mix(Deep blue, Morning blue, .72) | Main blue data-cell ink |
+| `qrSlate` | mix(Deep blue, Mist blue, .12) | Cool reflected data-cell ink |
+| `qrWarm` | mix(Deep blue, mix(Gold accent, Coral accent, .55), .14) | Sparse warm-gray data-cell reflections |
+| `qrPaper` | mix(Mist blue, Cool white, .82) | Light QR cells, transparent matrix fill and enabled Border card |
+
+Blue architecture frames a softly lit crossing. The road's color transitions
+from `asphalt` at the approaches toward `asphaltLight` near the survey origin,
+using an exponential falloff with radius .17 in tile coordinates. The reflection is
+evaluated per pixel so overlapping survey polygons agree without interpolation
+stripes. A carriageway-only depth offset separates the road and its paint from
+the underlying plinth; pavement keeps its original depth relationship with low
+garden details. Geographic boundaries, triangulation, height, stair wells, markings and
+traffic paths remain unchanged. Lane surfaces use
+`roadAccent`; signs and signals retain their independent coral role. Crossing
+paint is a mist/white blend rather than the full scan-paper highlight.
+
+QFRONT retains distinct glazing/reflection bands, blue-shadow roofs and cooler
+mullions. Contextual windows reserve gold for the top 3% of the deterministic
+window sampler; the other formerly warm windows and shopfronts use `windowLight`.
+The imported landmark gold slot maps to cool window light. Content-derived landmark
+reflection bands choose among `glass`, `glassLight`, `coolLight`, and `windowLight`
+without changing structural materials or the shared asset templates. Street-tree crowns
+are blue throughout. Commuter coats use an eight-cool/two-warm repeating set;
+the fleet keeps one gold taxi and one coral sedan among cool vehicles.
+
+Fourteen original sign designs retain their six compositions and all existing
+lettering, aspect ratios, logo anchoring and restore behavior. Large backgrounds
+use blue, deep blue, concrete or pale stone. Gold/coral appear in selected small
+accents rather than whole sign backgrounds. The main QFRONT sign has deep-blue
+backing, stone lettering, a glass-light motif and blue ticker. Uploaded logos
+retain their original runtime colors.
+
+Station, police box, subway entrances, railway and Hachikō continue to consume
+the shared semantic palette. Balcony/subway glass retain 38%/28% base opacity.
+Hachikō's bronze-like shading now derives from blue roof/shadow roles with the
+existing small gold light response. JR bridge lettering retains its existing
+linear blue-times-gold blend with 12% glass-light interpolation. All source
+geometry, lettering and placement remain governed by their owning documents.
+
+### Imported materials and color space
+
+The existing GLB retains its original nine Osaka authoring swatches and twelve
+named material slots. It contains no textures or stored vertex colors. Those
+source swatches are validated against the manifest, not used as runtime paint.
+The loader retains material-role indices, normal-derived face-light weights and
+the vehicle paint mask in theme-neutral CPU templates. A landmark's generic
+blue source slot is resolved to the glass role. `createCityAssetGeometry()`
+clones a template and applies the semantic palette per player, then emits linear
+vertex colors. Concurrent instances cannot recolor one another or the cache.
+Vehicle paint only affects tagged body panels; glazing, lamps and wheels retain
+their own roles. Current public City configuration still accepts only Shibuya;
+this internal separation is a basis for future themes, not a new custom-theme API.
+
+`SHIBUYA_ASSET_SOURCE_PALETTE` keeps landmark authoring/regeneration compatible
+with the original material slots. Geometry need not be re-exported for this
+runtime palette change. Source GLB colors and runtime colors have separate tests.
+Rendering uses unlit materials with baked face illumination; Blender roughness
+and PBR lighting do not control the product appearance. Hex inputs decode once
+to Linear-sRGB; vertex colors and morph interpolation remain linear; WebGL and
+PNG output use sRGB with no tone mapping on the scan face.
+
+### Layered 2D inks and Border-owned margin
+
+The 2D artwork uses four flat, opaque inks: `ink`, `qrBlue`, `qrSlate` and
+`qrWarm`, against light `qrPaper` cells. All three finder patterns keep exact
+Deep blue `#29445F`. Data cells use deterministic 2-column × 3-row color groups,
+a broad diagonal light band and bounded cell variation to evoke facade panels.
+The palette stops are .26/.73/.95; warm reflections remain sparse. The selector
+in [`qr-colors.ts`](../../packages/designqr/src/designs/city/qr-colors.ts) uses
+cell coordinates, not animation time, Logo or Border state. It changes only
+which approved derived ink fills each existing dark cell.
+
+The four inks have calculated relative-luminance contrast of approximately
+8.96:1, 4.57:1, 5.60:1 and 5.82:1 respectively against mist paper. These are
+palette checks, not a decoding guarantee. Each module keeps one exact color;
+Tree's brightness lift and retained 3D shading do not alter the endpoint.
+The original QR matrix remains unchanged. Logo mode retains high error
+correction and the existing bounded, frame-free uploaded image; every other
+sampled cell follows the same ink selection.
+
+**Only an enabled Border fills the four-module margin.** With Border disabled,
+the local paper stops exactly at the QR matrix: opaque output reveals the
+atmosphere outside it, and transparent output leaves those pixels clear.
+The four-module metadata anchor still exists geometrically, so toggling Border
+does not move the QR, title or value. Hosts own any scanning backdrop outside
+borderless transparent artwork.
+
+Enabling Border fills the margin and details card with `qrPaper`. City reserves a
+minimum four-pixel decorative inset and bounds corner radius by that inset to
+keep the complete square margin filled even at zero requested padding.
+Border strokes and blurred shadows are clipped out of the protected quiet zone.
+Title/value anchoring remains outside the shared four-module boundary.
+
+The transparent matrix or enabled card fill fades in during the final 18% of the established morph, and reduced
+motion commits directly to the exact endpoint. Buildings, road surfaces and
+paint, pavement, signs, street/station details and visible actors pass their
+source colors to morph tiles. These retain their city colors early in the turn,
+then continuously acquire their destination's scan ink or mist paper over
+50–94% of progress. Detailed city surfaces remain opaque until tile coverage
+is established; the short handoff preserves the existing glass base opacities.
+Building sections blend into their existing palette-colored blocks from upper
+storeys downward over 8–42%, with the original solid city underneath. This is
+an opacity-only reveal: no new colors, earlier scan-paper grade, or translucent
+whole-building fade is introduced. Street/detail reveal and the 50–94% scan-color
+interpolation retain their existing timing.
+Thin crosswalk fragments use `roadPaint`, with asphalt base tiles beneath them
+rather than prematurely widening stripe samples into light squares. Dark
+asphalt supplies both dark and light destinations, so light areas form as
+individual tiles instead of a uniform road-color replacement. The canonical
+WebGL ink/paper layer takes over only in the final 6% of morph progress, keeping
+opaque tile coverage underneath until it is complete; the
+existing presentation-card fade and Border-owned margin remain unchanged.
+City geometry is absent at the endpoint. Editor, React, iframe and exported PNG
+share the same color and margin behavior.
+
+The QFRONT vision panel and MAGNET corner/side posters borrow their existing
+on-palette textures on six folding half-panels. Their unmodified artwork fades
+over 58–78% to reveal the colored tiles beneath it; no extra color grade or
+texture-to-ink shader changes the sign colors. Their original UV proportions
+survive while any lettering remains visible. The QFRONT map reflects the current
+Logo state: cleared background/ticker when branded, original lettering when
+removed. Uploaded logo pixels remain on the independent logo plane with their
+original colors and alpha; they are never sampled into morph inks or restricted
+to the authored city palette. Neither texture artwork nor its geometry is drawn
+over the completed QR.
+
+City's title, content, border and focus use deep blue; border highlight and focus
+contrast use cool white. Border/highlight opacities remain approximately 25%/45%.
+Internal presentation defaults remain below host CSS overrides. Editor interface
+tokens and user-uploaded image colors are outside this artwork palette change.

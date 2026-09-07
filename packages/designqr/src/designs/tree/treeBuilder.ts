@@ -1,3 +1,4 @@
+import { contentVariation } from '../content-variation.ts';
 import {
   BLOCK_SIZE,
   TREE_RADIUS_RATIO,
@@ -51,6 +52,8 @@ export interface GrassBlade {
 }
 
 export interface TreeData {
+  city?: { modules: boolean[][] };
+  contentVariation?: number;
   gridSize: number;
   blocks: VoxelBlock[];
   branches: BranchSegment[];
@@ -67,9 +70,9 @@ function hashNoise(a: number, b: number = 0, c: number = 0, seed: number = 0): n
 
 export function build3DTree(
   modules: boolean[][],
-  sessionSeed: number = 0.5,
   treeShape: TreeShapeStyle = 'dome'
 ): TreeData {
+  const variation = contentVariation(modules);
   const gridSize = modules.length;
   const halfGrid = gridSize / 2;
   const scale = gridSize / 29;
@@ -104,10 +107,10 @@ export function build3DTree(
     spreadMult = 0.90;
   }
 
-  // 2. Procedural tree parameters (Rock-solid trunk & main scaffolding that never shifts when typing text)
+  // 2. Trunk and main scaffolding follow the QR grid, content and silhouette.
   const trunkHeight = 0.32 * scale * heightMult;
   const trunkRadius = 0.030 * scale * radiusMult;
-  const trunkLean = (0.05 + 0.02 * hashNoise(1, 2, 1, sessionSeed)) * scale * leanMult;
+  const trunkLean = (0.05 + 0.02 * hashNoise(1, 2, 1, variation)) * scale * leanMult;
   const mainBranchCount = treeShape === 'wide' ? 6 : (treeShape === 'pine' ? 6 : 6);
   const branchLengthScale = 0.65 * spreadMult;
   const canopyBoundRadius = gridSize * TREE_RADIUS_RATIO * BLOCK_SIZE * spreadMult;
@@ -167,12 +170,12 @@ export function build3DTree(
         const bladesPerBlock = isFinder ? 26 : 20;
 
         for (let b = 0; b < bladesPerBlock; b++) {
-          const angle = (b / bladesPerBlock) * Math.PI * 2 + hashNoise(c, r, b, sessionSeed) * 1.2;
-          const rad = BLOCK_SIZE * (0.10 + 0.35 * hashNoise(c, r, b + 10, sessionSeed));
+          const angle = (b / bladesPerBlock) * Math.PI * 2 + hashNoise(c, r, b, variation) * 1.2;
+          const rad = BLOCK_SIZE * (0.10 + 0.35 * hashNoise(c, r, b + 10, variation));
           const gx = (c - halfGrid + 0.5) * BLOCK_SIZE + Math.cos(angle) * rad;
           const gz = (r - halfGrid + 0.5) * BLOCK_SIZE + Math.sin(angle) * rad;
-          const gHeight = BLOCK_SIZE * (1.6 + 1.2 * hashNoise(c, r, b + 20, sessionSeed));
-          const tilt = (hashNoise(c, r, b + 30, sessionSeed) - 0.5) * 0.38;
+          const gHeight = BLOCK_SIZE * (1.6 + 1.2 * hashNoise(c, r, b + 20, variation));
+          const tilt = (hashNoise(c, r, b + 30, variation) - 0.5) * 0.38;
 
           grass.push({
             x: gx,
@@ -180,7 +183,7 @@ export function build3DTree(
             z: gz,
             height: gHeight,
             tilt,
-            seed: hashNoise(c, r, b + 40, sessionSeed),
+            seed: hashNoise(c, r, b + 40, variation),
           });
         }
       }
@@ -627,6 +630,7 @@ export function build3DTree(
   }
 
   return {
+    contentVariation: variation,
     gridSize,
     blocks,
     branches,

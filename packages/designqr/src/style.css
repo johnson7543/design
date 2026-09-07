@@ -6,16 +6,17 @@
 }
 
 .designqr-root {
+  --designqr-core-styles: loaded;
   --stage-transform: none;
   --designqr-background-top: #f6e2d5;
   --designqr-background-bottom: #f1cdbd;
   --designqr-title-font-family: "Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --designqr-body-font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --designqr-content-color: #3F352B;
-  --designqr-border-color: rgba(95, 78, 61, 0.25);
-  --designqr-border-highlight-color: rgba(255, 255, 255, 0.45);
-  --designqr-focus-color: #3F352B;
-  --designqr-focus-contrast-color: #FFFFFF;
+  --designqr-content-color: var(--designqr-theme-content-color, #3F352B);
+  --designqr-border-color: var(--designqr-theme-border-color, rgba(95, 78, 61, 0.25));
+  --designqr-border-highlight-color: var(--designqr-theme-border-highlight-color, rgba(255, 255, 255, 0.45));
+  --designqr-focus-color: var(--designqr-theme-focus-color, #3F352B);
+  --designqr-focus-contrast-color: var(--designqr-theme-focus-contrast-color, #FFFFFF);
   position: relative;
   display: block;
   width: 100%;
@@ -47,7 +48,15 @@
   cursor: grabbing;
 }
 
-.designqr-can-toggle:focus-visible {
+.designqr-can-pinch {
+  touch-action: none;
+}
+
+.designqr-is-panning {
+  cursor: grabbing;
+}
+
+.designqr-canvas-wrapper[tabindex]:focus-visible {
   outline: 2px solid var(--designqr-focus-contrast-color);
   outline-offset: -4px;
   box-shadow: inset 0 0 0 6px var(--designqr-focus-color);

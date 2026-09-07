@@ -1,3 +1,4 @@
+import { SHIBUYA_PALETTE as CITY } from '../city/palette.ts';
 import {
   DesignQRConfigError,
   type DesignQRConfigV1,
@@ -102,7 +103,6 @@ const SPRING_THEME = Object.freeze({
   particleType: 'sakura',
   particleAmount: 16,
   groundLeavesAmount: 44,
-  groundLeavesSeed: 0,
   weatherType: 'none',
   weatherAmount: 0,
   weatherColor: '#A3CAE8',
@@ -167,7 +167,6 @@ const SUMMER_THEME = Object.freeze({
   particleType: 'none',
   particleAmount: 0,
   groundLeavesAmount: 16,
-  groundLeavesSeed: 1,
   weatherType: 'rain',
   weatherAmount: 180,
   weatherColor: '#A3CAE8',
@@ -232,7 +231,6 @@ const AUTUMN_THEME = Object.freeze({
   particleType: 'leaf',
   particleAmount: 60,
   groundLeavesAmount: 80,
-  groundLeavesSeed: 2,
   weatherType: 'none',
   weatherAmount: 0,
   weatherColor: '#A3CAE8',
@@ -301,7 +299,6 @@ const WINTER_THEME = Object.freeze({
   particleType: 'snow',
   particleAmount: 0,
   groundLeavesAmount: 0,
-  groundLeavesSeed: 3,
   weatherType: 'none',
   weatherAmount: 0,
   weatherColor: '#A3CAE8',
@@ -318,7 +315,50 @@ export const TREE_THEME_PRESETS = Object.freeze({
   summer: SUMMER_THEME,
   autumn: AUTUMN_THEME,
   winter: WINTER_THEME,
-}) satisfies Readonly<Record<DesignQRThemePreset, Readonly<ResolvedTreeTheme>>>;
+}) satisfies Readonly<Record<Exclude<DesignQRThemePreset, 'shibuya'>, Readonly<ResolvedTreeTheme>>>;
+
+/** Shared presentation/QR roles; city geometry has its own renderer. */
+export const DESIGN_QR_THEME_PRESETS = Object.freeze({
+  ...TREE_THEME_PRESETS,
+  shibuya: Object.freeze({
+    foliageColor: CITY.blue, foliageShadowColor: CITY.ink,
+    foliageHighlightColor: CITY.coolLight, foliageMidtoneColor: CITY.glassLight,
+    foliageShape: 'pixel',
+    foliagePaletteColors: colors5(CITY.ink, CITY.glass, CITY.glassLight, CITY.sky, CITY.coolLight),
+    foliagePaletteStops: stops4(.18, .44, .72, .9),
+    foliageColorVariation: 0, foliageVerticalLift: 0,
+    // Flat, contrasting inks form facade-like color groups on the scan face.
+    qrFoliagePaletteColors: colors4(CITY.ink, CITY.qrBlue, CITY.qrSlate, CITY.qrWarm),
+    qrFoliagePaletteStops: stops3(.26, .73, .95), qrFoliageColorVariation: 0,
+    qrFoliageColor: CITY.qrBlue, qrFoliageShadowColor: CITY.ink,
+    qrFoliageHighlightColor: CITY.qrSlate, qrFoliageMidtoneColor: CITY.qrBlue,
+    blossomCenterColor: CITY.warmLight,
+    branchColor: CITY.roof, branchShadowColor: CITY.ink,
+    branchHighlightColor: CITY.glassLight, branchTipColor: CITY.paper,
+    branchStyle: 'natural',
+    groundColor: CITY.qrPaper, groundFeature: 'none',
+    groundShadowColor: CITY.roof,
+    groundSurfaceColor: CITY.asphalt, groundSurfaceShadowColor: CITY.ink,
+    groundSurfaceVariation: 0, groundSurfaceShadowVariation: 0,
+    groundFeatureColor: CITY.foliage, groundFeatureHighlightColor: CITY.foliageHighlight,
+    groundFeatureShadowColor: CITY.ink,
+    groundFeaturePaletteStartColors: colors4(CITY.ink, CITY.foliage, CITY.foliageHighlight, CITY.paper),
+    groundFeaturePaletteEndColors: colors4(CITY.ink, CITY.foliage, CITY.foliageHighlight, CITY.paper),
+    groundFeaturePaletteStops: DEFAULT_FEATURE_STOPS,
+    groundFeaturePaletteVariations: variations4(0, 0, 0, 0),
+    qrFinderColor: CITY.ink, qrFinderHighlightColor: CITY.ink,
+    qrFinderShadowColor: CITY.ink, qrFinderEyeColor: CITY.ink,
+    qrFinderPaletteColors: colors4(CITY.ink, CITY.ink, CITY.ink, CITY.ink),
+    qrFinderPaletteStops: DEFAULT_FEATURE_STOPS, qrFinderColorVariation: 0,
+    pedestalColor: CITY.ink, skyTop: CITY.sky, skyBottom: CITY.dusk,
+    titleColor: CITY.ink, canopyDensity: 100,
+    particleType: 'none', particleAmount: 0,
+    groundLeavesAmount: 0,
+    weatherType: 'none', weatherAmount: 0, weatherColor: CITY.coolLight,
+    ambientParticleType: 'none', ambientParticleAmount: 0, ambientParticleColor: CITY.warmLight,
+    snowflakeAmount: 0, snowflakeColor: CITY.paper,
+  } as const satisfies ResolvedTreeTheme),
+});
 
 export type TreeThemeOverrides = Partial<ResolvedTreeTheme>;
 
@@ -445,7 +485,7 @@ export function createTreeTheme(
   preset: DesignQRThemePreset,
   overrides: TreeThemeOverrides = {}
 ): ResolvedTreeTheme {
-  const base = TREE_THEME_PRESETS[preset];
+  const base = DESIGN_QR_THEME_PRESETS[preset];
   const definedOverrides = Object.fromEntries(
     Object.entries(overrides).filter(([, value]) => value !== undefined)
   ) as TreeThemeOverrides;
@@ -647,7 +687,6 @@ function resolveCustomTreeTheme(theme: TreeTheme): ResolvedTreeTheme {
       ?? ((theme.particleType === 'leaf' || theme.particleType === 'sakura')
         ? Math.round(particleAmount * 0.85)
         : 0),
-    groundLeavesSeed: theme.groundLeavesSeed ?? 0,
     weatherType: theme.weatherType ?? 'none',
     weatherAmount: theme.weatherAmount ?? 0,
     weatherColor: theme.weatherColor ?? fallback.weatherColor,
@@ -664,7 +703,7 @@ function resolveCustomTreeTheme(theme: TreeTheme): ResolvedTreeTheme {
 /** Resolves either a preset or partial custom configuration for the renderer. */
 export function resolveTreeTheme(theme: DesignQRConfigV1['theme']): ResolvedTreeTheme {
   return theme.type === 'preset'
-    ? cloneResolvedTheme(TREE_THEME_PRESETS[theme.preset])
+    ? cloneResolvedTheme(DESIGN_QR_THEME_PRESETS[theme.preset])
     : cloneResolvedTheme(resolveCustomTreeTheme(theme.value));
 }
 

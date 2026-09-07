@@ -11,10 +11,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
 export const treeDesignAdapter: TreeDesignAdapter = {
   type: 'tree',
   defaultOptions: DESIGN_QR_DEFAULTS.design.options,
@@ -23,10 +19,7 @@ export const treeDesignAdapter: TreeDesignAdapter = {
     const shape = options.shape === 'wide' || options.shape === 'pine'
       ? options.shape
       : DESIGN_QR_DEFAULTS.design.options.shape;
-    const seed = typeof options.seed === 'number' && Number.isFinite(options.seed)
-      ? clamp(options.seed, 0, 1)
-      : DESIGN_QR_DEFAULTS.design.options.seed;
 
-    return { shape, seed };
+    return { shape };
   },
 };

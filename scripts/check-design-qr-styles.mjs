@@ -10,6 +10,7 @@ const componentFiles = [
   'src/components/FloatingFlatQRControls.tsx',
   'src/components/Header.tsx',
   'src/components/InteractiveCheckbox.tsx',
+  'src/components/PreviewZoomControls.tsx',
   'src/components/ShareModal.tsx',
   'packages/designqr/src/react/DesignQR.tsx',
   'packages/designqr/src/react/DesignQRCanvas.tsx',

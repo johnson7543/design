@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import 'designqr/style.css';
 import { ConsumerFixture } from './ConsumerFixture';
 import './style.css';
 

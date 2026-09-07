@@ -10,6 +10,8 @@ import {
   DESIGN_QR_DETAIL_FONT_SCALE_MIN,
 } from '../config/defaults.ts';
 import { resolveDesignQRPresentationStyles } from './presentationStyles.ts';
+import { DEFAULT_PREVIEW_ZOOM, type PreviewZoom } from '../interaction/previewZoom.ts';
+import { resolvePreviewProjection, type PreviewProjection } from './previewProjection.ts';
 
 export interface PresentationSurfaceState {
   backgroundTop: string;
@@ -17,6 +19,10 @@ export interface PresentationSurfaceState {
   transparentBackground: boolean;
   qrGridSize: number;
   qrLightColor: string;
+  /** Tree keeps its historical lift; City preserves the exact palette swatch. */
+  qrLightColorTreatment?: 'lifted' | 'exact';
+  /** Keep the full square quiet zone clear inside an enabled City Border card. */
+  protectQrCardMargin?: boolean;
   showQrDetails: boolean;
   title: string;
   titleScale?: number;
@@ -247,7 +253,8 @@ export function resolveQRDetailTypography(
   };
 }
 
-function qrLightColorString(color: string): string {
+function qrLightColorString(color: string, treatment: PresentationSurfaceState['qrLightColorTreatment']): string {
+  if (treatment === 'exact') return color;
   const [r, g, b] = resolveQR2DLightDisplayRgb(color);
   return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
 }
@@ -347,6 +354,8 @@ export class PresentationSurface {
   private backgroundToBottom: RgbColor;
   private backgroundTransitionStartedAt = 0;
   private viewProgress = 0;
+  private previewZoom: Readonly<PreviewZoom> = DEFAULT_PREVIEW_ZOOM;
+  private renderedPreviewMatrix: DOMMatrix | null = null;
 
   constructor(
     sourceCanvas: HTMLCanvasElement,
@@ -414,6 +423,38 @@ export class PresentationSurface {
     this.blurIntensity = Math.max(0, intensity);
   }
 
+  get hasPreviewZoom(): boolean {
+    return this.previewZoom.scale !== 1 || this.previewZoom.x !== 0 || this.previewZoom.y !== 0;
+  }
+
+  setPreviewZoom(view: Readonly<PreviewZoom>): void {
+    this.previewZoom = view;
+    if (!this.hasPreviewZoom) this.renderedPreviewMatrix = null;
+  }
+
+  getPreviewProjection(): PreviewProjection | null {
+    if (!this.hasPreviewZoom) return null;
+    const width = this.host.clientWidth;
+    const height = this.host.clientHeight;
+    this.renderedPreviewMatrix = this.zoomMatrix(width, height).multiply(this.stageMatrix(width, height));
+    return resolvePreviewProjection(this.renderedPreviewMatrix, width, height);
+  }
+
+  getPreviewAnchor(): { x: number; y: number } {
+    const width = this.host.clientWidth;
+    const height = this.host.clientHeight;
+    const center = new DOMPoint(width / 2, height / 2).matrixTransform(this.stageMatrix(width, height));
+    return {
+      x: this.previewZoom.x + (center.x - width / 2) * this.previewZoom.scale,
+      y: this.previewZoom.y + (center.y - height / 2) * this.previewZoom.scale,
+    };
+  }
+
+  private zoomMatrix(width: number, height: number): DOMMatrix {
+    return new DOMMatrix().translate(width / 2 + this.previewZoom.x, height / 2 + this.previewZoom.y)
+      .scale(this.previewZoom.scale).translate(-width / 2, -height / 2);
+  }
+
   resize(): void {
     if (
       this.presentationCanvas.width !== this.sourceCanvas.width
@@ -438,31 +479,56 @@ export class PresentationSurface {
       this.presentationCanvas.height = this.sourceCanvas.height;
     }
 
-    const scaleX = this.presentationCanvas.width / width;
-    const scaleY = this.presentationCanvas.height / height;
-    const context = this.context;
+    this.paint(this.context, width, height, this.hasPreviewZoom);
+  }
+
+  private paint(context: CanvasRenderingContext2D, width: number, height: number, preview: boolean): void {
+    const scaleX = this.sourceCanvas.width / width;
+    const scaleY = this.sourceCanvas.height / height;
     context.setTransform(scaleX, 0, 0, scaleY, 0, 0);
     context.clearRect(0, 0, width, height);
     if (!this.state.transparentBackground) {
-      this.drawBackground(width, height);
+      if (preview) {
+        context.save();
+        const zoom = this.zoomMatrix(width, height);
+        context.transform(zoom.a, zoom.b, zoom.c, zoom.d, zoom.e, zoom.f);
+        this.drawBackground(width, height, context);
+        context.restore();
+      } else this.drawBackground(width, height, context);
     }
 
     context.save();
-    this.applyStageTransform(width, height);
-    this.drawQrArtworkFill(width, height);
+    const matrix = preview
+      ? this.renderedPreviewMatrix ?? this.zoomMatrix(width, height).multiply(this.stageMatrix(width, height))
+      : this.stageMatrix(width, height);
+    context.transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
+    this.drawQrArtworkFill(width, height, context);
+    // The preview camera already applied the complete presentation transform.
+    // Composite its newly rasterized pixels 1:1, never scale its bitmap again.
+    if (preview) context.restore();
     context.filter = this.blurIntensity > 0.01
-      ? `blur(${this.blurIntensity * 2.2}px)`
+      ? `blur(${this.blurIntensity * 2.2 * (preview ? this.previewZoom.scale : 1)}px)`
       : 'none';
     context.drawImage(this.sourceCanvas, 0, 0, width, height);
     context.filter = 'none';
+    if (preview) {
+      context.save();
+      context.transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
+    }
     if (this.state.showQrDetails) {
-      this.drawQrDetails(width, height);
+      this.drawQrDetails(width, height, context);
     }
     context.restore();
   }
 
   async exportImage(): Promise<Blob> {
-    this.draw();
+    if (this.hasPreviewZoom) {
+      // Reuse the same 2D context and avoid an extra canvas allocation.
+      // toBlob snapshots synchronously before encoding.
+      // The owner restores the preview in finally, within this JS task and
+      // before the browser can present another frame. No extra canvas needed.
+      this.paint(this.context, this.host.clientWidth, this.host.clientHeight, false);
+    } else this.draw();
     return canvasToBlob(this.presentationCanvas);
   }
 
@@ -473,7 +539,9 @@ export class PresentationSurface {
     const point = new DOMPoint(
       clientX - bounds.left,
       clientY - bounds.top
-    ).matrixTransform(this.stageMatrix(width, height).inverse());
+    ).matrixTransform((this.hasPreviewZoom
+      ? this.renderedPreviewMatrix ?? this.zoomMatrix(width, height).multiply(this.stageMatrix(width, height))
+      : this.stageMatrix(width, height)).inverse());
 
     return {
       x: (point.x / width) * 2 - 1,
@@ -497,7 +565,7 @@ export class PresentationSurface {
     };
   }
 
-  private drawBackground(width: number, height: number): void {
+  private drawBackground(width: number, height: number, context = this.context): void {
     const background = this.currentBackground(performance.now());
     const centerX = width * 0.5;
     const centerY = height * 0.3;
@@ -507,7 +575,7 @@ export class PresentationSurface {
       Math.hypot(centerX, height - centerY),
       Math.hypot(width - centerX, height - centerY)
     );
-    const gradient = this.context.createRadialGradient(
+    const gradient = context.createRadialGradient(
       centerX,
       centerY,
       0,
@@ -517,11 +585,11 @@ export class PresentationSurface {
     );
     gradient.addColorStop(0, colorString(background.top));
     gradient.addColorStop(1, colorString(background.bottom));
-    this.context.fillStyle = gradient;
-    this.context.fillRect(0, 0, width, height);
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, width, height);
   }
 
-  private drawQrArtworkFill(width: number, height: number): void {
+  private drawQrArtworkFill(width: number, height: number, context = this.context): void {
     const borderVisible = this.state.showQrDetails && this.state.borderEnabled;
     if (!this.state.transparentBackground && !borderVisible) return;
 
@@ -534,47 +602,36 @@ export class PresentationSurface {
       this.state.qrGridSize
     );
     const fill = resolveQRMatrixFillGeometry(geometry);
-    this.context.save();
-    this.context.globalAlpha = opacity;
-    this.context.fillStyle = qrLightColorString(this.state.qrLightColor);
+    context.save();
+    context.globalAlpha = opacity;
+    context.fillStyle = qrLightColorString(this.state.qrLightColor, this.state.qrLightColorTreatment);
     if (borderVisible) {
       const details = resolveQRDetailMetrics(geometry.qrSize, this.state);
+      const padding = this.state.protectQrCardMargin ? Math.max(4, details.padding) : details.padding;
       const frame = resolveQRDetailFrameGeometry(
         geometry,
-        details.padding,
+        padding,
         details.hasInfo ? details.infoTopGap + details.infoHeight : 0
       );
-      const radius = Math.min(26, 15 + details.padding * 0.35);
-      this.context.beginPath();
-      this.context.roundRect(
+      const radius = Math.min(26, 15 + padding * 0.35, this.state.protectQrCardMargin ? padding : Infinity);
+      context.beginPath();
+      context.roundRect(
         frame.x,
         frame.y,
         frame.width,
         frame.height,
         radius
       );
-      this.context.fill();
+      context.fill();
     } else {
-      this.context.fillRect(
+      context.fillRect(
         fill.x,
         fill.y,
         fill.size,
         fill.size
       );
     }
-    this.context.restore();
-  }
-
-  private applyStageTransform(width: number, height: number): void {
-    const matrix = this.stageMatrix(width, height);
-    this.context.transform(
-      matrix.a,
-      matrix.b,
-      matrix.c,
-      matrix.d,
-      matrix.e,
-      matrix.f
-    );
+    context.restore();
   }
 
   private stageMatrix(width: number, height: number): DOMMatrix {
@@ -600,7 +657,7 @@ export class PresentationSurface {
       .translate(width * -0.5, height * -0.5);
   }
 
-  private drawQrDetails(width: number, height: number): void {
+  private drawQrDetails(width: number, height: number, context = this.context): void {
     const geometry = resolveQRPresentationGeometry(
       width,
       height,
@@ -615,83 +672,91 @@ export class PresentationSurface {
     );
 
     if (this.state.borderEnabled) {
+      const padding = this.state.protectQrCardMargin ? Math.max(4, details.padding) : details.padding;
       const frame = resolveQRDetailFrameGeometry(
         geometry,
-        details.padding,
+        padding,
         details.hasInfo ? details.infoTopGap + details.infoHeight : 0
       );
-      const radius = Math.min(26, 15 + details.padding * 0.35);
-      this.context.save();
-      this.context.strokeStyle = presentationStyles.borderColor;
-      this.context.lineWidth = 1;
-      this.context.shadowColor = presentationStyles.borderColor;
-      this.context.shadowBlur = 24;
-      this.context.shadowOffsetY = 10;
-      this.context.beginPath();
-      this.context.roundRect(
+      const radius = Math.min(26, 15 + padding * 0.35, this.state.protectQrCardMargin ? padding : Infinity);
+      context.save();
+      if (this.state.protectQrCardMargin) {
+        // Keep border strokes and their blurred shadows outside the scan margin.
+        context.beginPath();
+        context.rect(0, 0, width, height);
+        context.rect(geometry.quietZoneX, geometry.quietZoneY, geometry.quietZoneSize, geometry.quietZoneSize);
+        context.clip('evenodd');
+      }
+      context.strokeStyle = presentationStyles.borderColor;
+      context.lineWidth = 1;
+      context.shadowColor = presentationStyles.borderColor;
+      context.shadowBlur = 24;
+      context.shadowOffsetY = 10;
+      context.beginPath();
+      context.roundRect(
         frame.x + 0.5,
         frame.y + 0.5,
         frame.width - 1,
         frame.height - 1,
         radius
       );
-      this.context.stroke();
+      context.stroke();
 
-      this.context.shadowColor = 'transparent';
-      this.context.strokeStyle = presentationStyles.borderHighlightColor;
-      this.context.lineWidth = 2;
-      this.context.beginPath();
-      this.context.roundRect(
+      context.shadowColor = 'transparent';
+      context.strokeStyle = presentationStyles.borderHighlightColor;
+      context.lineWidth = 2;
+      context.beginPath();
+      context.roundRect(
         frame.x + 2,
         frame.y + 2,
         frame.width - 4,
         frame.height - 4,
         Math.max(0, radius - 2)
       );
-      this.context.stroke();
-      this.context.restore();
+      context.stroke();
+      context.restore();
     }
 
     if (!details.hasInfo) return;
 
     let lineCenterY = centerY + detailAnchorSize * 0.5 + details.infoTopGap;
     const maxTextWidth = detailAnchorSize;
-    this.context.textAlign = 'center';
-    this.context.textBaseline = 'middle';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
 
     if (details.title) {
-      this.context.save();
-      this.context.fillStyle = this.state.titleColor;
-      this.context.font = `700 ${details.titleFontSize}px ${presentationStyles.titleFontFamily}`;
-      const letterSpacingContext = this.context as CanvasRenderingContext2D & {
+      context.save();
+      context.fillStyle = this.state.titleColor;
+      context.font = `700 ${details.titleFontSize}px ${presentationStyles.titleFontFamily}`;
+      const letterSpacingContext = context as CanvasRenderingContext2D & {
         letterSpacing?: string;
       };
       if (letterSpacingContext.letterSpacing !== undefined) {
         letterSpacingContext.letterSpacing = '0.05em';
       }
       lineCenterY += details.titleLineHeight * 0.5;
-      this.context.fillText(
-        fitText(this.context, details.title, maxTextWidth),
+      context.fillText(
+        fitText(context, details.title, maxTextWidth),
         centerX,
         lineCenterY,
         maxTextWidth
       );
-      this.context.restore();
+      context.restore();
       lineCenterY += details.titleLineHeight * 0.5 + details.infoGap;
     }
 
     if (details.content) {
-      this.context.save();
-      this.context.fillStyle = presentationStyles.contentColor;
-      this.context.font = `500 ${details.contentFontSize}px ${presentationStyles.bodyFontFamily}`;
+      context.save();
+      context.fillStyle = presentationStyles.contentColor;
+      context.font = `500 ${details.contentFontSize}px ${presentationStyles.bodyFontFamily}`;
       lineCenterY += details.contentLineHeight * 0.5;
-      this.context.fillText(
-        fitText(this.context, details.content, maxTextWidth),
+      context.fillText(
+        fitText(context, details.content, maxTextWidth),
         centerX,
         lineCenterY,
         maxTextWidth
       );
-      this.context.restore();
+      context.restore();
     }
   }
 }

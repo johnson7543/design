@@ -2,22 +2,25 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import {
   createTreeTheme,
   resolveTreeTheme,
-  TREE_THEME_PRESETS,
+  DESIGN_QR_THEME_PRESETS,
 } from 'designqr';
 import {
   DesignQRCanvas as TreeCanvas,
   type DesignQRCanvasHandle as TreeCanvasHandle,
   RenderManager,
   build3DTree,
+  build3DCity,
   generateInteractiveQRMatrix,
   QR_BORDER_PADDING_DEFAULT,
   VIEW_TRANSITION_SPEED_DEFAULT,
   VIEW_TRANSITION_SPEED_MAX,
   VIEW_TRANSITION_SPEED_MIN,
+  PREVIEW_ZOOM_STEP,
   type TreeData,
 } from 'designqr/editor';
 import type { CustomTheme } from './editor/types';
-import { THEME_PRESET_OPTIONS } from './editor/theme-presets';
+import { CITY_THEME_PRESET_OPTIONS, THEME_PRESET_OPTIONS } from './editor/theme-presets';
+import { EDITOR_PREVIEW_ZOOM_MAX } from './editor/preview-zoom';
 import {
   DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
   DesignQRConfigError,
@@ -59,6 +62,7 @@ const CUSTOM_THEMES_STORAGE_KEY = 'magic_tree_custom_themes';
 const SHARED_CUSTOM_THEME_ID = 'shared-designqr-theme';
 const DEFAULT_URL = 'https://design.johnson7543.com';
 const EDITOR_QR_ARTWORK_SCALE = 0.88;
+const EDITOR_ZOOM_OPTIONS = { pinch: true, wheel: true };
 
 function loadSavedCustomThemes(): CustomTheme[] {
   try {
@@ -133,6 +137,7 @@ export const App: React.FC = () => {
     };
   });
 
+  const [designType, setDesignType] = useState<'tree' | 'city'>(initialConfig.design ?? 'tree');
   const [url, setUrl] = useState<string>(initialConfig.url);
   const [debouncedUrl, setDebouncedUrl] = useState<string>(initialConfig.url);
   const [activeThemeId, setActiveThemeId] = useState<string>(
@@ -161,7 +166,8 @@ export const App: React.FC = () => {
 
   const [viewMode, setViewMode] = useState<'3d' | 'scan'>(initialConfig.viewMode ?? '3d');
   const [openStageEditor, setOpenStageEditor] =
-    useState<'details' | 'logo' | null>(null);
+    useState<'details' | 'logo' | 'zoom' | null>(null);
+  const [previewZoomScale, setPreviewZoomScale] = useState(1);
   const [qrTitle, setQrTitle] = useState<string>(initialConfig.title ?? '');
   const qrTitleScale = initialConfig.titleScale
     ?? DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT;
@@ -258,8 +264,9 @@ export const App: React.FC = () => {
 
   const currentSeasonPreset = THEME_PRESET_OPTIONS[seasonId]
     ?? THEME_PRESET_OPTIONS[0];
-  const currentPresetTheme = TREE_THEME_PRESETS[currentSeasonPreset.name];
+  const currentPresetTheme = DESIGN_QR_THEME_PRESETS[designType === 'city' ? 'shibuya' : currentSeasonPreset.name];
   const rendererTheme = useMemo(() => {
+    if (designType === 'city') return resolveTreeTheme({ type: 'preset', preset: 'shibuya' });
     if (activeCustomTheme) {
       return resolveTreeTheme({ type: 'custom', value: activeCustomTheme });
     }
@@ -267,15 +274,16 @@ export const App: React.FC = () => {
       type: 'preset',
       preset: currentSeasonPreset.name,
     });
-  }, [activeCustomTheme, currentSeasonPreset.name]);
+  }, [activeCustomTheme, currentSeasonPreset.name, designType]);
 
   // Dynamic Background Gradient
   const backgroundStyle = useMemo(() => {
+    if (designType === 'city') return `radial-gradient(circle at 50% 30%, ${rendererTheme.skyTop} 0%, ${rendererTheme.skyBottom} 100%)`;
     if (activeCustomTheme) {
       return `radial-gradient(circle at 50% 30%, ${activeCustomTheme.skyTop} 0%, ${activeCustomTheme.skyBottom} 100%)`;
     }
     return `radial-gradient(circle at 50% 30%, ${currentPresetTheme.skyTop} 0%, ${currentPresetTheme.skyBottom} 100%)`;
-  }, [activeCustomTheme, currentPresetTheme]);
+  }, [activeCustomTheme, currentPresetTheme, designType, rendererTheme]);
 
   // Sync background directly to body for instant smooth updates
   useEffect(() => {
@@ -312,15 +320,20 @@ export const App: React.FC = () => {
 
   const treeData = useMemo<TreeData | null>(() => {
     if (!qrPreparation.ok) return null;
+    if (designType === 'city') {
+      return build3DCity(qrPreparation.matrix.modules);
+    }
     return build3DTree(
       qrPreparation.matrix.modules,
-      0.5,
-      activeCustomTheme?.treeShape || 'dome'
+      activeCustomTheme?.treeShape ?? initialConfig.treeShape ?? 'dome'
     );
-  }, [qrPreparation, activeCustomTheme?.treeShape]);
+  }, [qrPreparation, activeCustomTheme?.treeShape, designType, initialConfig.treeShape]);
 
   // 2. Custom Theme Management Handlers
   const handleSelectTheme = (themeId: string) => {
+    // City's sole preset is already selected. Reselecting it must not overwrite
+    // the remembered seasonal/custom Tree theme or reset shared editor settings.
+    if (designType === 'city') return;
     setActiveThemeId(themeId);
   };
 
@@ -368,6 +381,12 @@ export const App: React.FC = () => {
     setThemeModalOpen(false);
   };
 
+  const handleDesignTypeChange = (nextDesign: 'tree' | 'city') => {
+    if (nextDesign === designType) return;
+    if (themeModalOpen) handleCloseThemeModal();
+    setDesignType(nextDesign);
+  };
+
   const handleSaveCustomTheme = (theme: CustomTheme) => {
     setPreviewTheme(null);
     setCustomThemes((prev) => {
@@ -396,9 +415,11 @@ export const App: React.FC = () => {
     setIsTurntable((enabled) => !enabled);
   };
 
-  const handleResetRotation = () => {
+  const handleResetView = () => {
     setIsTurntable(false);
     renderManagerRef.current?.resetRotation();
+    // Editor convenience only: hosts keep separate rotation and zoom methods.
+    treeCanvasRef.current?.resetZoom();
   };
 
   const handleToggleAutoRotateDirection = () => {
@@ -494,6 +515,7 @@ export const App: React.FC = () => {
   const currentShareConfig = useMemo<ShareConfig>(() => ({
     url: url || DEFAULT_URL,
     season: seasonId,
+    design: designType,
     viewMode,
     title: qrTitle,
     titleScale: qrTitleScale,
@@ -502,8 +524,8 @@ export const App: React.FC = () => {
     borderEnabled: qrBorderEnabled,
     borderPadding: qrBorderPadding,
     transparentBackground,
-    customTheme: activeCustomTheme ?? undefined,
-    treeShape: activeCustomTheme?.treeShape,
+    customTheme: designType === 'tree' ? activeCustomTheme ?? undefined : undefined,
+    treeShape: activeCustomTheme?.treeShape ?? initialConfig.treeShape,
     interaction: {
       dragToRotate: true,
       tapToToggleView: true,
@@ -524,6 +546,8 @@ export const App: React.FC = () => {
     qrTitle,
     qrTitleScale,
     seasonId,
+    designType,
+    initialConfig.treeShape,
     showQrContent,
     qrContentScale,
     transparentBackground,
@@ -621,7 +645,7 @@ export const App: React.FC = () => {
     if (shareDisabled) return;
     const blob = await treeCanvasRef.current?.exportImage();
     if (!blob) return;
-    downloadImageBlob(blob, `designqr-${currentSeasonPreset.name}.png`);
+    downloadImageBlob(blob, `designqr-${designType === 'city' ? 'shibuya' : currentSeasonPreset.name}.png`);
   };
 
   // Keep the editor URL synchronized with the same canonical configuration.
@@ -653,11 +677,14 @@ export const App: React.FC = () => {
       style={{ background: backgroundStyle }}
     >
       <Header
+        designType={designType}
         viewMode={viewMode}
         onSetViewMode={handleSetViewMode}
       />
 
-      <main className={`main-viewport${transparentBackground ? ' transparency-preview' : ''}`}>
+      <main
+        className={`main-viewport${transparentBackground ? ' transparency-preview' : ''}`}
+      >
         {treeData ? (
           <TreeCanvas
             ref={treeCanvasRef}
@@ -668,19 +695,23 @@ export const App: React.FC = () => {
             onToggleScanMode={handleToggleScanMode}
             onRendererReady={(manager) => {
               renderManagerRef.current = manager;
+              setPreviewZoomScale(1);
               manager.setTransitionSpeed(transitionSpeed);
             }}
             onRendererError={handleRendererError}
             enableMotionBlur={enableMotionBlur}
+            zoom={EDITOR_ZOOM_OPTIONS}
+            previewZoomMax={EDITOR_PREVIEW_ZOOM_MAX}
+            onZoomChange={setPreviewZoomScale}
             autoRotate={isTurntable}
             autoRotateDirection={autoRotateDirection}
             logo={logo}
             transparentBackground={transparentBackground}
             backgroundTop={
-              activeCustomTheme?.skyTop ?? currentPresetTheme.skyTop
+              rendererTheme.skyTop
             }
             backgroundBottom={
-              activeCustomTheme?.skyBottom ?? currentPresetTheme.skyBottom
+              rendererTheme.skyBottom
             }
             showQrDetails={viewMode === 'scan'}
             qrTitle={qrTitle}
@@ -690,12 +721,7 @@ export const App: React.FC = () => {
             qrValue={debouncedUrl || DEFAULT_URL}
             qrBorderEnabled={qrBorderEnabled}
             qrBorderPadding={qrBorderPadding}
-            qrTitleColor={
-              activeCustomTheme?.titleColor
-              || activeCustomTheme?.foliageShadowColor
-              || activeCustomTheme?.foliageColor
-              || currentPresetTheme.titleColor
-            }
+            qrTitleColor={rendererTheme.titleColor}
             qrArtworkScale={EDITOR_QR_ARTWORK_SCALE}
           />
         ) : (
@@ -711,9 +737,11 @@ export const App: React.FC = () => {
       </main>
 
       <ControlsOverlay
+        designType={designType}
+        onDesignTypeChange={handleDesignTypeChange}
         url={url}
         onUrlChange={handleUrlChange}
-        activeThemeId={activeThemeId}
+        activeThemeId={designType === 'city' ? CITY_THEME_PRESET_OPTIONS[0].id : activeThemeId}
         onSelectTheme={handleSelectTheme}
         customThemes={customThemes}
         onOpenCreateTheme={handleOpenCreateTheme}
@@ -726,7 +754,15 @@ export const App: React.FC = () => {
         onToggleTurntable={handleToggleTurntable}
         autoRotateDirection={autoRotateDirection}
         onToggleAutoRotateDirection={handleToggleAutoRotateDirection}
-        onResetRotation={handleResetRotation}
+        onResetView={handleResetView}
+        previewZoom={{
+          scale: previewZoomScale,
+          isOpen: openStageEditor === 'zoom',
+          onToggle: () => setOpenStageEditor((editor) => editor === 'zoom' ? null : 'zoom'),
+          onClose: () => setOpenStageEditor((editor) => editor === 'zoom' ? null : editor),
+          onStep: (direction) => treeCanvasRef.current?.setZoom(previewZoomScale + direction * PREVIEW_ZOOM_STEP),
+          onReset: () => treeCanvasRef.current?.resetZoom(),
+        }}
         viewMode={viewMode}
         onToggleScanMode={handleToggleScanMode}
         isDetailsEditorOpen={openStageEditor === 'details'}
@@ -779,6 +815,7 @@ export const App: React.FC = () => {
           reactCode={reactCode}
           reactAdvancedCode={reactAdvancedCode}
           reactThemeCode={reactThemeCode}
+          customThemeSupported={designType === 'tree'}
           recommendedReactExampleMode={recommendedReactExampleMode}
           configurationError={shareConfigurationError}
           downloadDisabled={shareDisabled}

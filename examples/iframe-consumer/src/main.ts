@@ -72,7 +72,7 @@ const embedOrigin = query.get('embedOrigin') ?? 'https://design.johnson7543.com'
 frame.src = createDesignQREmbedUrl(
   {
     value: 'https://example.com/iframe-consumer',
-    design: { type: 'tree', options: { shape: 'dome', seed: 0.42 } },
+    design: { type: 'tree', options: { shape: 'dome' } },
     theme: 'spring',
     view: 'design',
     interaction: {
@@ -125,7 +125,7 @@ requiredElement<HTMLButtonElement>('#show-qr').addEventListener('click', () => {
 requiredElement<HTMLButtonElement>('#set-config').addEventListener('click', () => {
   controller.setConfig({
     value: 'https://example.com/updated-iframe',
-    design: { type: 'tree', options: { shape: 'pine', seed: 0.7 } },
+    design: { type: 'tree', options: { shape: 'pine' } },
     theme: TRANSPARENT_SCAN_THEME,
     view: 'qr',
     transparentBackground: true,

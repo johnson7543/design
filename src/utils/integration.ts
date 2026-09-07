@@ -13,7 +13,6 @@ const FULL_THEME_SECTION_END_KEYS = new Set([
   'groundFeaturePaletteVariations',
   'qrFinderColorVariation',
   'titleColor',
-  'groundLeavesSeed',
   'weatherColor',
   'ambientParticleColor',
 ]);
@@ -91,7 +90,6 @@ ${props.map((prop) => `      ${prop}`).join('\n')}
   );`;
 
   return `import { DesignQR } from 'designqr';
-import 'designqr/style.css';
 
 export function InteractiveQRCode() {
 ${component}
@@ -110,7 +108,10 @@ export function getRecommendedDesignQRReactExample(
   const currentConfig = normalizeDesignQRConfig(config);
   if (currentConfig.theme.type === 'custom') return 'theme';
 
-  const defaultConfig = normalizeDesignQRConfig({ value: currentConfig.value });
+  const defaultConfig = normalizeDesignQRConfig({
+    value: currentConfig.value,
+    design: currentConfig.design.type,
+  });
   return serializeDesignQRSetup(currentConfig) === serializeDesignQRSetup(defaultConfig)
     ? 'simple'
     : 'advanced';
@@ -119,6 +120,7 @@ export function getRecommendedDesignQRReactExample(
 export function createDesignQRReactSnippet(config: DesignQRConfigV1): string {
   return createMinimalReactModule([
     `value="${escapeJsxAttribute(config.value)}"`,
+    ...(config.design.type === 'city' ? ['design="city"'] : []),
   ]);
 }
 
@@ -132,7 +134,7 @@ ${formatFullThemeParameters(config.theme.value)}
   const props = [
     `value="${escapeJsxAttribute(config.value)}"`,
     `design="${config.design.type}"`,
-    `tree={${formatJsValue(config.design.options)}}`,
+    ...(config.design.type === 'tree' ? [`tree={${formatJsValue(config.design.options)}}`] : []),
     config.theme.type === 'preset'
       ? `theme="${config.theme.preset}"`
       : 'theme={currentTheme}',
@@ -154,7 +156,6 @@ ${formatFullThemeParameters(config.theme.value)}
     : '';
 
   return `import { DesignQR${treeThemeTypeImport} } from 'designqr';
-import 'designqr/style.css';
 
 ${declarationBlock}export function InteractiveQRCode() {
   return (
@@ -166,6 +167,7 @@ ${props.map((prop) => `      ${prop}`).join('\n')}
 }
 
 export function createDesignQRThemeReactSnippet(config: DesignQRConfigV1): string {
+  if (config.design.type === 'city') return createDesignQRAdvancedReactSnippet(config);
   const logo = formatReactLogo(config.logo);
   const logoDeclaration = logo.declaration ? `${logo.declaration}\n\n` : '';
   const basePreset = config.theme.type === 'preset'
@@ -178,7 +180,6 @@ export function createDesignQRThemeReactSnippet(config: DesignQRConfigV1): strin
   DesignQR,
   type ResolvedTreeTheme,
 } from 'designqr';
-import 'designqr/style.css';
 
 ${logoDeclaration}const customTheme = createTreeTheme('${basePreset}', {
 ${formatFullThemeParameters(fullTheme)}

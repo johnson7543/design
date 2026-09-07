@@ -1,8 +1,11 @@
+import coreStyles from '../style.css?inline';
+import { ensureDesignQRStyles } from './coreStyles.ts';
 import {
   forwardRef,
   useCallback,
   useEffect,
   useImperativeHandle,
+  useInsertionEffect,
   useMemo,
   useRef,
   useState,
@@ -23,6 +26,7 @@ import {
   generateInteractiveQRMatrix,
 } from '../designs/tree/qr.ts';
 import { build3DTree, type TreeData } from '../designs/tree/treeBuilder.ts';
+import { build3DCity } from '../designs/city/cityBuilder.ts';
 import { resolveTreeTheme } from '../designs/tree/themes.ts';
 import {
   DesignQRCanvas,
@@ -71,10 +75,8 @@ function prepareDesignQR(input: {
     const config = normalizeDesignQRConfig({
       schemaVersion: 1,
       value: input.value,
-      design: {
-        type: input.design ?? 'tree',
-        options: input.tree,
-      },
+      design: input.design ?? 'tree',
+      tree: input.tree,
       theme: input.theme,
       view: { initial: input.view },
       details: input.details,
@@ -114,11 +116,12 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
       value,
       design = 'tree',
       tree,
-      theme = 'spring',
+      theme = design === 'city' ? 'shibuya' : 'spring',
       view,
       defaultView,
       details,
       interaction,
+      zoom,
       logo = false,
       transparentBackground = false,
       className,
@@ -126,10 +129,15 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
       ariaLabel,
       onReady,
       onViewChange,
+      onZoomChange,
       onError,
     },
     ref
   ) {
+    useInsertionEffect(() => {
+      ensureDesignQRStyles(coreStyles, document);
+    }, []);
+
     const [uncontrolledView, setUncontrolledView] = useState<DesignQRView>(
       () => defaultView ?? 'design'
     );
@@ -182,11 +190,8 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     ]);
 
     const preparedValue = prepared.ok ? prepared.value.config.value : null;
-    const preparedSeed = prepared.ok
-      ? prepared.value.config.design.options.seed
-      : null;
     const preparedShape = prepared.ok
-      ? prepared.value.config.design.options.shape
+      ? prepared.value.config.design.type === 'tree' ? prepared.value.config.design.options.shape : 'dome'
       : null;
     const preparedLogoEnabled = prepared.ok
       ? prepared.value.config.logo !== false
@@ -194,7 +199,7 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     const preparedTree = useMemo<
       { ok: true; value: TreeData } | { ok: false; error: DesignQRError } | null
     >(() => {
-      if (preparedValue === null || preparedSeed === null || preparedShape === null) {
+      if (preparedValue === null || preparedShape === null) {
         return null;
       }
       try {
@@ -204,7 +209,9 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
         );
         return {
           ok: true,
-          value: build3DTree(matrix.modules, preparedSeed, preparedShape),
+          value: design === 'city'
+            ? build3DCity(matrix.modules)
+            : build3DTree(matrix.modules, preparedShape),
         };
       } catch (cause) {
         return {
@@ -216,7 +223,7 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
           ),
         };
       }
-    }, [preparedLogoEnabled, preparedSeed, preparedShape, preparedValue]);
+    }, [design, preparedLogoEnabled, preparedShape, preparedValue]);
 
     const activeError = !prepared.ok
       ? prepared.error
@@ -264,6 +271,8 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     useImperativeHandle(ref, () => ({
       setView: requestView,
       resetRotation: () => canvasRef.current?.resetRotation(),
+      setZoom: (scale) => canvasRef.current?.setZoom(scale),
+      resetZoom: () => canvasRef.current?.resetZoom(),
       pause: () => canvasRef.current?.pause(),
       resume: () => canvasRef.current?.resume(),
       exportImage: async () => {
@@ -319,6 +328,8 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
         enableMotionBlur={config.interaction.motionBlur}
         dragToRotate={config.interaction.dragToRotate}
         tapToToggleView={config.interaction.tapToToggleView}
+        zoom={zoom}
+        onZoomChange={onZoomChange}
         autoRotate={config.interaction.autoRotate}
         autoRotateDirection={config.interaction.autoRotateDirection}
         transitionSpeed={config.interaction.transitionSpeed}

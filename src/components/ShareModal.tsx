@@ -63,6 +63,7 @@ interface ShareModalProps {
   reactCode: string;
   reactAdvancedCode: string;
   reactThemeCode: string;
+  customThemeSupported?: boolean;
   recommendedReactExampleMode: ReactExampleMode;
   configurationError?: string;
   downloadDisabled?: boolean;
@@ -180,6 +181,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   reactCode,
   reactAdvancedCode,
   reactThemeCode,
+  customThemeSupported = true,
   recommendedReactExampleMode,
   configurationError = '',
   downloadDisabled = false,
@@ -498,7 +500,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                   role="group"
                   aria-label="React example type"
                 >
-                  {REACT_EXAMPLE_OPTIONS.map(({ mode, label }) => {
+                  {REACT_EXAMPLE_OPTIONS.filter(({ mode }) => customThemeSupported || mode !== 'theme').map(({ mode, label }) => {
                     const isActive = reactExampleMode === mode;
                     const isRecommended = recommendedReactExampleMode === mode;
                     const recommendationLabel = `${label}, recommended for the current editor setup`;

@@ -13,6 +13,7 @@ export {
   type QRMatrixData,
   type QRErrorCorrectionLevel,
 } from './designs/tree/qr.ts';
+export { build3DCity } from './designs/city/cityBuilder.ts';
 export {
   build3DTree,
   type TreeData,
@@ -24,5 +25,7 @@ export {
   createTreeParticleOverrides,
   resolveTreeTheme,
   TREE_THEME_PRESETS,
+  DESIGN_QR_THEME_PRESETS,
   type TreeThemeOverrides,
 } from './designs/tree/themes.ts';
+export { PREVIEW_ZOOM_MIN, PREVIEW_ZOOM_MAX, PREVIEW_ZOOM_STEP } from './interaction/previewZoom.ts';

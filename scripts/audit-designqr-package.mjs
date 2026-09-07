@@ -50,6 +50,7 @@ const requiredPaths = [
   'package.json',
   'README.md',
   'LICENSE',
+  'third-party-licenses/noto-cjk.txt',
   'dist/designqr.js',
   'dist/designqr.cjs',
   'dist/designqr.css',
@@ -75,6 +76,7 @@ for (const path of paths) {
   const allowed = path === 'package.json'
     || path === 'README.md'
     || path === 'LICENSE'
+    || path === 'third-party-licenses/noto-cjk.txt'
     || path.startsWith('dist/');
   if (!allowed) failures.push(`Tarball contains unexpected path ${path}.`);
 }

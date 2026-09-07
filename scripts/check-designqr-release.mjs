@@ -55,7 +55,7 @@ expect(
 );
 
 const publishedFiles = new Set(packageJson.files ?? []);
-for (const requiredFile of ['dist', 'README.md', 'LICENSE']) {
+for (const requiredFile of ['dist', 'README.md', 'LICENSE', 'third-party-licenses']) {
   expect(publishedFiles.has(requiredFile), `Package files must include ${requiredFile}.`);
 }
 
@@ -67,7 +67,7 @@ const lockEntry = packageLock.packages?.['packages/designqr'];
 expect(lockEntry?.version === packageJson.version, 'package-lock version must match package.json.');
 expect(lockEntry?.license === packageJson.license, 'package-lock license must match package.json.');
 
-for (const requiredPath of ['README.md', 'LICENSE']) {
+for (const requiredPath of ['README.md', 'LICENSE', 'third-party-licenses/noto-cjk.txt']) {
   try {
     await access(join(packageDirectory, requiredPath), constants.R_OK);
   } catch {

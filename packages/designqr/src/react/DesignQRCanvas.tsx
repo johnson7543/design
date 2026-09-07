@@ -14,16 +14,23 @@ import type {
 } from '../config/types.ts';
 import { DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT } from '../config/defaults.ts';
 import { RenderManager } from '../renderer/RenderManager.ts';
+import { CITY_PRESENTATION_STYLE_DEFAULTS } from '../renderer/presentationStyles.ts';
 import {
   PresentationSurface,
   type PresentationSurfaceState,
 } from '../renderer/PresentationSurface.ts';
 import type { TreeData } from '../designs/tree/treeBuilder.ts';
 import { VIEW_TRANSITION_SPEED_DEFAULT } from '../designs/tree/constants.ts';
+import type { DesignQRZoomOptions } from './types.ts';
+import type { PreviewZoomController } from '../interaction/PreviewZoomController.ts';
+import { boundPreviewZoom, DEFAULT_PREVIEW_ZOOM, normalizePreviewScale, normalizePreviewZoomMax,
+  type PreviewZoom } from '../interaction/previewZoom.ts';
 
 export interface DesignQRCanvasHandle {
   exportImage(): Promise<Blob>;
   resetRotation(): void;
+  setZoom(scale: number): void;
+  resetZoom(): void;
   pause(): void;
   resume(): void;
 }
@@ -39,6 +46,10 @@ export interface DesignQRCanvasProps {
   enableMotionBlur?: boolean;
   dragToRotate?: boolean;
   tapToToggleView?: boolean;
+  zoom?: boolean | DesignQRZoomOptions;
+  /** Editor-only inspection limit (1–10x). Public DesignQR players retain 3x. */
+  previewZoomMax?: number;
+  onZoomChange?: (scale: number) => void;
   autoRotate?: boolean;
   autoRotateDirection?: AutoRotateDirection;
   transitionSpeed?: number;
@@ -103,6 +114,9 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       enableMotionBlur = true,
       dragToRotate = true,
       tapToToggleView = true,
+      zoom = false,
+      previewZoomMax,
+      onZoomChange,
       autoRotate = false,
       autoRotateDirection = 'clockwise',
       transitionSpeed = VIEW_TRANSITION_SPEED_DEFAULT,
@@ -131,6 +145,8 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
     );
     const shouldReduceMotion = prefersReducedMotion
       ?? systemPrefersReducedMotion;
+    const qrLightColorTreatment = treeData.city ? 'exact' : 'lifted';
+    const protectQrCardMargin = !!treeData.city;
     const containerRef = useRef<HTMLDivElement>(null);
     const sourceCanvasRef = useRef<HTMLCanvasElement>(null);
     const presentationCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -154,6 +170,8 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       transparentBackground,
       qrGridSize: treeData.gridSize,
       qrLightColor: theme.groundColor,
+      qrLightColorTreatment,
+      protectQrCardMargin,
       showQrDetails,
       title: qrTitle,
       titleScale: qrTitleScale,
@@ -178,6 +196,47 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
     const intersectingRef = useRef(true);
 
     const pointerGestureRef = useRef<PointerGesture | null>(null);
+    const zoomOptions = typeof zoom === 'object' && zoom !== null ? zoom : undefined;
+    const zoomEnabled = zoom === true || zoomOptions !== undefined;
+    const pinchEnabled = zoomEnabled && zoomOptions?.pinch !== false;
+    const wheelEnabled = zoomOptions?.wheel === true;
+    const zoomMax = normalizePreviewZoomMax(previewZoomMax);
+    const zoomMaxRef = useRef(zoomMax);
+    const zoomEnabledRef = useRef(zoomEnabled);
+    const onZoomChangeRef = useRef(onZoomChange);
+    const zoomControllerRef = useRef<PreviewZoomController | null>(null);
+    const zoomViewRef = useRef<Readonly<PreviewZoom>>(DEFAULT_PREVIEW_ZOOM);
+    const pendingZoomScaleRef = useRef<number | null>(null);
+
+    useBrowserLayoutEffect(() => {
+      zoomEnabledRef.current = zoomEnabled;
+      zoomMaxRef.current = zoomMax;
+      onZoomChangeRef.current = onZoomChange;
+    }, [zoomEnabled, zoomMax, onZoomChange]);
+
+    const applyZoom = useCallback((next: Readonly<PreviewZoom>) => {
+      const previous = zoomViewRef.current;
+      zoomViewRef.current = next;
+      const surface = presentationSurfaceRef.current;
+      const manager = renderManagerRef.current;
+      if (surface && manager) {
+        surface.setPreviewZoom(next);
+        manager.onBeforeRender = surface.hasPreviewZoom
+          ? () => manager.setPreviewProjection(surface.getPreviewProjection())
+          : undefined;
+        if (!surface.hasPreviewZoom) manager.setPreviewProjection(null);
+        // Running players pick this up on their existing frame. A paused player
+        // redraws the same scene without advancing animation or allocating pixels.
+        if (contextAvailableRef.current) manager.invalidatePreview();
+      }
+      const container = containerRef.current;
+      if (container) {
+        container.dataset.zoomScale = String(next.scale);
+        container.dataset.zoomX = String(next.x);
+        container.dataset.zoomY = String(next.y);
+      }
+      if (next.scale !== previous.scale) onZoomChangeRef.current?.(next.scale);
+    }, []);
 
     useEffect(() => {
       if (
@@ -224,9 +283,20 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         if (!surface) {
           throw new Error('The DesignQR presentation is not ready to export.');
         }
-        return surface.exportImage();
+        const manager = renderManagerRef.current;
+        return manager ? manager.withBaseFrame(() => surface.exportImage()) : surface.exportImage();
       },
       resetRotation: () => renderManagerRef.current?.resetRotation(),
+      setZoom: (scale) => {
+        if (!zoomEnabledRef.current) return;
+        if (zoomControllerRef.current) zoomControllerRef.current.setScale(scale);
+        else pendingZoomScaleRef.current = normalizePreviewScale(scale, zoomMaxRef.current);
+      },
+      resetZoom: () => {
+        pendingZoomScaleRef.current = null;
+        if (zoomControllerRef.current) zoomControllerRef.current.reset();
+        else applyZoom(DEFAULT_PREVIEW_ZOOM);
+      },
       pause: () => {
         manuallyPausedRef.current = true;
         syncPlayback();
@@ -235,7 +305,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         manuallyPausedRef.current = false;
         syncPlayback();
       },
-    }), [syncPlayback]);
+    }), [applyZoom, syncPlayback]);
 
     const handleResize = useCallback(() => {
       if (!containerRef.current || !renderManagerRef.current) return;
@@ -244,6 +314,8 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       if (width > 0 && height > 0) {
         renderManagerRef.current.resize(width, height);
         presentationSurfaceRef.current?.resize();
+        zoomControllerRef.current?.resize();
+        if (presentationSurfaceRef.current?.hasPreviewZoom) renderManagerRef.current.invalidatePreview();
       }
     }, []);
 
@@ -293,6 +365,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       }
 
       renderManagerRef.current = manager;
+      manager.setReducedMotion(initial.prefersReducedMotion);
       manager.setTreeData(initial.treeData);
       manager.setTheme(initial.theme);
       manager.setTransitionSpeed(initial.transitionSpeed);
@@ -320,6 +393,51 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
     }, [handleResize, syncPlayback]);
 
     useEffect(() => {
+      const container = containerRef.current;
+      if (!container) return;
+      if (!zoomEnabled) {
+        pendingZoomScaleRef.current = null;
+        if (zoomViewRef.current !== DEFAULT_PREVIEW_ZOOM) applyZoom(DEFAULT_PREVIEW_ZOOM);
+        delete container.dataset.zoomScale;
+        delete container.dataset.zoomX;
+        delete container.dataset.zoomY;
+        return;
+      }
+      let disposed = false;
+      void import('../interaction/PreviewZoomController.ts').then(({ createPreviewZoomController }) => {
+        if (disposed) return;
+        const initialZoom = boundPreviewZoom(zoomViewRef.current, container.getBoundingClientRect(), zoomMax);
+        const controller = createPreviewZoomController(container, {
+          pinch: pinchEnabled,
+          wheel: wheelEnabled,
+          maxScale: zoomMax,
+          initial: initialZoom,
+          onChange: applyZoom,
+          cancelPrimaryGesture: () => {
+            // The native pinch controller and React drag handler share this
+            // element's capture. Clear even a not-yet-committed primary capture.
+            pointerGestureRef.current = null;
+            renderManagerRef.current?.setMousePosition(0, 0, false);
+          },
+          getAnchor: () => presentationSurfaceRef.current?.getPreviewAnchor() ?? { x: 0, y: 0 },
+        });
+        zoomControllerRef.current = controller;
+        applyZoom(initialZoom);
+        if (pendingZoomScaleRef.current !== null) {
+          controller.setScale(pendingZoomScaleRef.current);
+          pendingZoomScaleRef.current = null;
+        }
+      }).catch((error: unknown) => {
+        if (!disposed) onRendererErrorRef.current?.(error);
+      });
+      return () => {
+        disposed = true;
+        zoomControllerRef.current?.destroy();
+        zoomControllerRef.current = null;
+      };
+    }, [zoomEnabled, pinchEnabled, wheelEnabled, zoomMax, applyZoom]);
+
+    useEffect(() => {
       onRendererErrorRef.current = onRendererError;
     }, [onRendererError]);
 
@@ -330,6 +448,8 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         transparentBackground,
         qrGridSize: treeData.gridSize,
         qrLightColor: theme.groundColor,
+        qrLightColorTreatment,
+        protectQrCardMargin,
         showQrDetails,
         title: qrTitle,
         titleScale: qrTitleScale,
@@ -348,6 +468,8 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       qrBorderEnabled,
       qrBorderPadding,
       qrContentScale,
+      qrLightColorTreatment,
+      protectQrCardMargin,
       qrTitle,
       qrTitleScale,
       qrTitleColor,
@@ -380,6 +502,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       const manager = renderManagerRef.current;
       if (!manager) return;
 
+      manager.setReducedMotion(shouldReduceMotion);
       const progress = viewMode === 'scan' ? 1 : 0;
       if (shouldReduceMotion) {
         manager.toggleTurntable(false);
@@ -440,6 +563,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
 
       const handleVisibility = () => {
         documentVisibleRef.current = document.visibilityState !== 'hidden';
+        if (!documentVisibleRef.current) zoomControllerRef.current?.cancelGesture();
         syncPlayback();
       };
       document.addEventListener('visibilitychange', handleVisibility);
@@ -601,22 +725,22 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       ? `DesignQR code${qrTitle.trim() ? ` titled ${qrTitle.trim()}` : ''}${
           showQrContent ? ` for ${qrValue}` : ''
         }${logoDescription}`
-      : `DesignQR tree${logoDescription}`;
+      : `DesignQR ${treeData.city ? 'Shibuya city' : 'tree'}${logoDescription}`;
     const accessibleLabel = ariaLabel ?? (canToggle
       ? `Show ${viewMode === 'scan' ? 'design' : 'QR'} view. ${presentationLabel}`
       : presentationLabel);
     const interactionClasses = `${canDrag ? ' designqr-can-drag' : ''}${
       canToggle ? ' designqr-can-toggle' : ''
-    }`;
+    }${pinchEnabled ? ' designqr-can-pinch' : ''}`;
 
     return (
       <div
         ref={containerRef}
         className={`designqr-root designqr-canvas-wrapper view-${viewMode}${interactionClasses}${className ? ` ${className}` : ''}`}
-        style={style}
-        role={canToggle ? 'button' : 'img'}
-        tabIndex={canToggle ? 0 : undefined}
-        aria-keyshortcuts={canToggle ? 'Enter Space' : undefined}
+        style={treeData.city ? { ...CITY_PRESENTATION_STYLE_DEFAULTS, ...style } : style}
+        role={canToggle ? 'button' : zoomEnabled ? 'group' : 'img'}
+        tabIndex={canToggle || zoomEnabled ? 0 : undefined}
+        aria-keyshortcuts={[canToggle ? 'Enter Space' : '', zoomEnabled ? '+ - 0' : ''].filter(Boolean).join(' ') || undefined}
         aria-label={accessibleLabel}
         onKeyDown={canToggle ? onKeyDown : undefined}
         onPointerDown={onPointerDown}

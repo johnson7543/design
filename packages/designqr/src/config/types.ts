@@ -1,6 +1,6 @@
-export type DesignQRDesignName = 'tree';
+export type DesignQRDesignName = 'tree' | 'city';
 export type DesignQRView = 'design' | 'qr';
-export type DesignQRThemePreset = 'spring' | 'summer' | 'autumn' | 'winter';
+export type DesignQRThemePreset = 'spring' | 'summer' | 'autumn' | 'winter' | 'shibuya';
 export type AutoRotateDirection = 'clockwise' | 'counterclockwise';
 export type TreeFoliageShape = 'blossom' | 'leaf' | 'pixel';
 export type TreeGroundFeature = 'grass' | 'pixel' | 'none';
@@ -14,9 +14,9 @@ export type TreePaletteStops3 = readonly [number, number, number];
 export type TreePaletteStops4 = readonly [number, number, number, number];
 export type TreePaletteVariations4 = readonly [number, number, number, number];
 
+/** Tree silhouette. */
 export interface TreeDesignOptions {
   shape?: 'dome' | 'wide' | 'pine';
-  seed?: number;
 }
 
 /** Visual roles available to presets and consumer-authored tree themes. */
@@ -85,8 +85,6 @@ export interface TreeTheme {
   particleType: TreeParticleType;
   particleAmount?: number;
   groundLeavesAmount?: number;
-  /** Deterministic layout seed for fallen leaves and petals on the ground. */
-  groundLeavesSeed?: number;
   weatherType?: TreeWeatherType;
   weatherAmount?: number;
   weatherColor?: string;
@@ -145,7 +143,6 @@ export interface ResolvedTreeTheme extends TreeTheme {
   canopyDensity: number;
   particleAmount: number;
   groundLeavesAmount: number;
-  groundLeavesSeed: number;
   weatherType: TreeWeatherType;
   weatherAmount: number;
   weatherColor: string;
@@ -201,8 +198,10 @@ export interface DesignQRConfigInput {
   schemaVersion?: 1;
   value: string;
   design?: DesignQRDesignName | {
-    type: DesignQRDesignName;
+    type: 'tree';
     options?: TreeDesignOptions;
+  } | {
+    type: 'city';
   };
   tree?: TreeDesignOptions;
   theme?: DesignQRThemePreset
@@ -225,6 +224,8 @@ export interface DesignQRConfigV1 {
   design: {
     type: 'tree';
     options: Required<TreeDesignOptions>;
+  } | {
+    type: 'city';
   };
   theme:
     | {

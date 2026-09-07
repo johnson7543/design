@@ -72,8 +72,8 @@ with the next version.
 5. Create and push the exact matching tag:
 
 ```bash
-git tag -a designqr-v0.1.1 -m "DesignQR 0.1.1"
-git push origin designqr-v0.1.1
+git tag -a designqr-v0.2.0 -m "DesignQR 0.2.0"
+git push origin designqr-v0.2.0
 ```
 
 The tag run re-verifies the entire repository, audits the npm payload, and then
@@ -91,4 +91,6 @@ npm run audit:designqr-package
 The release contract checks package identity, semantic versioning, MIT licensing,
 registry/repository metadata, public exports, package-lock synchronization, and
 the exact release tag. The package audit permits only `dist`, `README.md`,
-`LICENSE`, and required package metadata in the npm payload.
+`LICENSE`, the required `third-party-licenses/noto-cjk.txt` notice, and package
+metadata in the npm payload. The Noto notice is required by both the release
+contract and tarball audit.

@@ -344,7 +344,7 @@ export default function DesignQREmbedRoute() {
         ref={playerRef}
         value={config.value}
         design={config.design.type}
-        tree={config.design.options}
+        tree={config.design.type === 'tree' ? config.design.options : undefined}
         theme={config.theme.type === 'preset'
           ? config.theme.preset
           : config.theme.value}

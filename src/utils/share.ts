@@ -21,6 +21,7 @@ const PRESET_BY_SEASON = [
 
 export interface ShareConfig {
   url: string;
+  design?: 'tree' | 'city';
   season: number;
   viewMode?: '3d' | 'scan';
   title?: string;
@@ -44,20 +45,17 @@ function presetForSeason(season: number): DesignQRThemePreset {
 }
 
 function seasonForPreset(preset: DesignQRThemePreset): number {
-  const index = PRESET_BY_SEASON.indexOf(preset);
+  const index = PRESET_BY_SEASON.findIndex(name => name === preset);
   return index < 0 ? 0 : index;
 }
 
 export function createDesignQRConfig(config: ShareConfig): DesignQRConfigV1 {
   return normalizeDesignQRConfig({
     value: config.url,
-    design: {
-      type: 'tree',
-      options: {
-        shape: config.treeShape,
-      },
-    },
-    theme: config.customTheme
+    design: config.design === 'city'
+      ? { type: 'city' }
+      : { type: 'tree', options: { shape: config.treeShape } },
+    theme: config.design === 'city' ? 'shibuya' : config.customTheme
       ? { type: 'custom', value: config.customTheme }
       : presetForSeason(config.season),
     view: config.viewMode === 'scan' ? 'qr' : 'design',
@@ -98,6 +96,7 @@ export function decodeShareConfig(encoded: string): ShareConfig | null {
 
   return {
     url: config.value,
+    design: config.design.type,
     season,
     viewMode: config.view.initial === 'qr' ? 'scan' : '3d',
     title: config.details.title,
@@ -109,7 +108,7 @@ export function decodeShareConfig(encoded: string): ShareConfig | null {
       ? QR_BORDER_PADDING_DEFAULT
       : config.details.border.padding,
     customTheme,
-    treeShape: config.design.options.shape,
+    treeShape: config.design.type === 'tree' ? config.design.options.shape : undefined,
     interaction: config.interaction,
     logo: config.logo,
     ...(config.transparentBackground === true

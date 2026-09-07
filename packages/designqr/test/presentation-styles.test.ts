@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
+  CITY_PRESENTATION_STYLE_DEFAULTS,
   DESIGN_QR_PRESENTATION_STYLE_DEFAULTS,
   DESIGN_QR_PRESENTATION_STYLE_PROPERTIES,
   resolveDesignQRPresentationStyles,
@@ -53,11 +54,11 @@ test('declares every presentation CSS property in the package stylesheet', async
     [DESIGN_QR_PRESENTATION_STYLE_PROPERTIES.bodyFontFamily]:
       DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.bodyFontFamily,
     [DESIGN_QR_PRESENTATION_STYLE_PROPERTIES.contentColor]:
-      DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.contentColor,
+      `var(--designqr-theme-content-color, ${DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.contentColor})`,
     [DESIGN_QR_PRESENTATION_STYLE_PROPERTIES.borderColor]:
-      DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.borderColor,
+      `var(--designqr-theme-border-color, ${DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.borderColor})`,
     [DESIGN_QR_PRESENTATION_STYLE_PROPERTIES.borderHighlightColor]:
-      DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.borderHighlightColor,
+      `var(--designqr-theme-border-highlight-color, ${DESIGN_QR_PRESENTATION_STYLE_DEFAULTS.borderHighlightColor})`,
   };
   const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -72,5 +73,14 @@ test('declares every presentation CSS property in the package stylesheet', async
       fallback.replace(/\s+/g, ' ').trim().toLowerCase(),
       `${property} must match its package fallback.`
     );
+  }
+});
+
+test('City presentation defaults use only navy and ivory without overriding public host properties', () => {
+  assert.deepEqual(Object.values(CITY_PRESENTATION_STYLE_DEFAULTS),
+    ['#29445f', '#29445f40', '#f5faff73', '#29445f', '#f5faff']);
+  for (const property of Object.keys(CITY_PRESENTATION_STYLE_DEFAULTS)) {
+    assert.match(property, /^--designqr-theme-/);
+    assert.ok(!(Object.values(DESIGN_QR_PRESENTATION_STYLE_PROPERTIES) as string[]).includes(property));
   }
 });

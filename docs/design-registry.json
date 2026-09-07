@@ -33,6 +33,13 @@
         "/qr/embed"
       ],
       "sourcePaths": [
+        "assets/design-qr/shibuya",
+        "scripts/blender",
+        "scripts/build-shibuya-road.py",
+        "scripts/build-shibuya-buildings.py",
+        "scripts/build-shibuya-lettering.py",
+        "scripts/shibuya-asset-plugin.mjs",
+        "scripts/fixtures/city-assets-consumer",
         "examples/iframe-consumer",
         "examples/react-vite-consumer",
         "packages/designqr",

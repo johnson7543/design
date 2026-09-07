@@ -9,6 +9,9 @@ export const QR_SCAN_DESKTOP_VERTICAL_FOV = 42;
 export const QR_SCAN_MOBILE_HORIZONTAL_FOV = 23;
 export const QR_SCAN_DESKTOP_DISTANCE = 2.4;
 export const QR_SCAN_MOBILE_DISTANCE = 2.2;
+// All 3D adapters share Tree's established 1× framing, independently of QR density.
+export const DESIGN_DESKTOP_DISTANCE = 2.85;
+export const DESIGN_MOBILE_DISTANCE = 2.45;
 export const QR_COMPACT_DENSITY_START_ASPECT = 0.68;
 export const QR_COMPACT_DENSITY_END_ASPECT = 0.86;
 export const QR_COMPACT_DISTANCE_SCALE_MAX = 1.35;
@@ -24,6 +27,7 @@ export interface QRViewportProjection {
   landscapeBlend: number;
   wideViewportBlend: number;
   desktopBlend: number;
+  designDistance: number;
   scanDistance: number;
   verticalFov: number;
 }
@@ -86,6 +90,8 @@ export function resolveQRViewportProjection(
     landscapeBlend,
     wideViewportBlend,
     desktopBlend,
+    designDistance: DESIGN_MOBILE_DISTANCE
+      + (DESIGN_DESKTOP_DISTANCE - DESIGN_MOBILE_DISTANCE) * landscapeBlend,
     scanDistance: compactScanDistance
       + (QR_SCAN_DESKTOP_DISTANCE - compactScanDistance) * desktopBlend,
     verticalFov: compactVerticalFov
@@ -93,7 +99,7 @@ export function resolveQRViewportProjection(
   };
 }
 
-// One hue-preserving grade gives every settled 2D dark module enough scan
+// Tree's hue-preserving grade gives its settled 2D dark modules enough scan
 // contrast without changing when a logo is enabled. Theme palettes remain the
 // source colors; 3D artwork and light modules do not receive this grade.
 export const QR_2D_DEPTH_FILTER = Object.freeze({
@@ -101,8 +107,8 @@ export const QR_2D_DEPTH_FILTER = Object.freeze({
   lightnessScale: 0.874,
 });
 
-// Convert theme ground channels from linear values to their displayed sRGB
-// values for the light modules on the settled QR face.
+// Preserve Tree's historical linear-to-sRGB lift for settled light modules.
+// City instead displays its exact ground swatch and bypasses this treatment.
 export const QR_2D_LIGHT_FILTER = Object.freeze({
   linearThreshold: 0.0031308,
   linearScale: 12.92,

@@ -3,7 +3,11 @@
 [![npm](https://img.shields.io/npm/v/designqr?logo=npm)](https://www.npmjs.com/package/designqr)
 [![npm downloads](https://img.shields.io/npm/dm/designqr?logo=npm)](https://www.npmjs.com/package/designqr)
 
-React component for an interactive 3D tree and scannable 2D QR.
+React component that turns interactive 3D Tree or Shibuya City artwork into a
+scannable 2D QR code.
+
+[Quick start](#quick-start) · [Props](#props) · [Themes](#themes) ·
+[Logo](#logo) · [Advanced usage](#advanced-usage)
 
 ## Install
 
@@ -11,36 +15,63 @@ React component for an interactive 3D tree and scannable 2D QR.
 npm install designqr
 ```
 
-Requires React 18.2+ and a browser with WebGL.
+Requires React and React DOM 18.2+ and a browser with WebGL. TypeScript types are
+included. Core styles load automatically.
 
 ## Quick start
 
 ```tsx
 import { DesignQR } from 'designqr';
-import 'designqr/style.css';
 
 export function Example() {
-  return <DesignQR value="https://example.com" />;
+  return (
+    <DesignQR
+      value="https://github.com/johnson7543/design"
+      style={{ width: '100%', maxWidth: 480 }}
+    />
+  );
 }
 ```
 
-The root is a responsive 1:1 square. Set its size with `style` or `className`.
-Artwork projection responds to both aspect ratio and usable CSS width, so a
-wide portrait host uses balanced desktop proportions instead of retaining a
-phone-sized composition.
+The player defaults to a square Tree with the Spring theme. Drag to rotate it,
+or tap to switch between the artwork and QR views. Set its dimensions through
+`style` or `className`. Add `defaultView="qr"` to start in QR view.
+
+In server-rendered React projects, render the interactive component in a client
+component. Package imports also support ESM and CommonJS.
+
+## Choose a design
+
+Use `design="tree"` (the default) or `design="city"`:
+
+```tsx
+import { DesignQR } from 'designqr';
+
+export function CityExample() {
+  return <DesignQR value="https://github.com/johnson7543/design" design="city" />;
+}
+```
+
+Change `value` to update the QR code and artwork.
+
+## Themes
+
+Tree presets are `spring`, `summer`, `autumn`, and `winter`. City defaults to
+`shibuya`. Set `theme="summer"`, for example, to select the Summer Tree preset.
 
 ## Props
 
 | Prop | Type | Default |
 | --- | --- | --- |
 | `value` | `string` | Required |
-| `design` | `'tree'` | `'tree'` |
-| `tree` | `TreeDesignOptions` | `{ shape: 'dome', seed: 0.5 }` |
-| `theme` | `DesignQRThemePreset \| TreeTheme` | `'spring'` |
+| `design` | `'tree' \| 'city'` | `'tree'` |
+| `tree` | `TreeDesignOptions` | `{ shape: 'dome' }` |
+| `theme` | `DesignQRThemePreset \| TreeTheme` | `'spring'` for Tree; `'shibuya'` for City |
 | `view` | `'design' \| 'qr'` | Uncontrolled |
 | `defaultView` | `'design' \| 'qr'` | `'design'` |
 | `details` | `DesignQRDetailsOptions` | `{ title: '', titleScale: 1, showValue: false, contentScale: 1, border: false }` |
 | `interaction` | `DesignQRInteractionOptions` | See below |
+| `zoom` | `boolean \| DesignQRZoomOptions` | `false` |
 | `logo` | `false \| DesignQRLogoOptions` | `false` |
 | `transparentBackground` | `boolean` | `false` |
 | `className` | `string` | — |
@@ -48,37 +79,189 @@ phone-sized composition.
 | `ariaLabel` | `string` | Generated |
 | `onReady` | `() => void` | — |
 | `onViewChange` | `(view) => void` | — |
+| `onZoomChange` | `(scale: number) => void` | — |
 | `onError` | `(error: DesignQRError) => void` | — |
-
-`view` is controlled. When both `view` and `defaultView` are set, `view` wins.
 
 ### Nested options
 
 | Option | Type | Default / range |
 | --- | --- | --- |
 | `tree.shape` | `'dome' \| 'wide' \| 'pine'` | `'dome'` |
-| `tree.seed` | `number` | `0.5`; clamped to `0–1` |
 | `details.title` | `string` | `''`; max 40 characters |
 | `details.titleScale` | `number` | `1`; responsive font-size multiplier clamped to `0.75–1.5` |
 | `details.showValue` | `boolean` | `false` |
 | `details.contentScale` | `number` | `1`; responsive font-size multiplier clamped to `0.75–1.5` |
-| `details.border` | `false \| { padding?: number }` | `false`; adds a filled four-module QR margin, with decorative padding defaulting to `16` px (`4–32`) |
+| `details.border` | `false \| { padding?: number }` | `false`; padding defaults to `16` px, clamped to `4–32` |
 | `interaction.dragToRotate` | `boolean` | `true` |
 | `interaction.tapToToggleView` | `boolean` | `true` |
 | `interaction.autoRotate` | `boolean` | `false` |
 | `interaction.autoRotateDirection` | `'clockwise' \| 'counterclockwise'` | `'clockwise'` |
 | `interaction.transitionSpeed` | `number` | `1`; clamped to `0.25–2` |
 | `interaction.motionBlur` | `boolean` | `true` |
+| `zoom.pinch` | `boolean` | `true` when zoom is enabled |
+| `zoom.wheel` | `boolean` | `false` |
 
-The package exports `DESIGN_QR_DETAIL_FONT_SCALE_MIN`,
-`DESIGN_QR_DETAIL_FONT_SCALE_MAX`, `DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT`, and
-`DESIGN_QR_DETAIL_FONT_SCALE_STEP` for compatible controls and diagnostics.
+## Details, borders, and transparency
 
-## Styling
+```tsx
+<DesignQR
+  value="https://github.com/johnson7543/design"
+  defaultView="qr"
+  details={{
+    title: 'Visit our website',
+    showValue: true,
+    border: { padding: 16 },
+  }}
+  transparentBackground
+/>
+```
 
-`designqr/style.css` scopes its rules and defaults to `.designqr-root`. Use
-`className` for CSS-variable overrides; canvas detail overrides appear in both
-the live player and `exportImage()`.
+`details` adds a title, visible QR value, and optional card to the QR view.
+`titleScale` and `contentScale` independently adjust the responsive text sizes.
+
+`transparentBackground` removes the full-stage background while keeping the
+artwork and details. Areas outside the artwork or card become transparent.
+
+- With `details.border: false` (the default), the light QR background ends at
+  the matrix edge. Provide a clear scanning margin in the surrounding layout.
+- With `details.border: {}`, the package fills a four-module margin around the
+  QR and displays the details card. `padding` controls additional decorative
+  spacing; it does not remove the four-module margin.
+
+## Logo
+
+```tsx
+import brandLogoUrl from './assets/logo.webp';
+
+<DesignQR
+  value="https://github.com/johnson7543/design"
+  logo={{ src: brandLogoUrl, alt: 'Example brand', size: 0.16 }}
+/>
+```
+
+Pass a URL string as `logo.src`:
+
+| Asset location | `src` |
+| --- | --- |
+| `public/logo.webp` | `'/logo.webp'` |
+| Bundled asset | Imported URL, as above |
+| Remote asset | HTTPS URL with CORS |
+| Inline asset | PNG, JPEG, or WebP data URL |
+
+| Field | Contract |
+| --- | --- |
+| File types | PNG, JPEG, or WebP |
+| `alt` | Optional; max 80 characters |
+| `size` | QR-width fraction; default `0.16`, range `0.08–0.20` |
+| Remote files | Must allow CORS |
+| `src` length | Max 8,192 characters |
+| Image limits | 2 MiB and 2,048 px per edge |
+
+Logo paths resolve against the page displaying `DesignQR`. Set `logo={false}`
+to remove the logo. On Tree, the logo appears in the canopy; on City, it appears
+on the QFRONT billboard. In QR view, it appears at the center of the QR code.
+
+## Viewing zoom
+
+Enable viewing zoom with `zoom`:
+
+```tsx
+<DesignQR value="https://github.com/johnson7543/design" zoom={{ pinch: true, wheel: false }} />
+```
+
+`zoom` alone enables the same defaults. The viewing range is 1–3×.
+
+- Pinch with two fingers to zoom; move both fingers to pan. Trackpad pinch is
+  also supported.
+- Set `wheel: true` to use ordinary mouse-wheel or trackpad scrolling for zoom.
+- On desktop, Shift + drag or middle-button drag pans.
+- With the player focused, `+` and `-` zoom, and `0` resets the view.
+
+Pinch-enabled players capture touch gestures within their bounds; scrolling
+outside the player is unaffected. One-finger rotation and tap-to-toggle remain
+available when their interaction options are enabled.
+
+Use `onZoomChange` to display the current scale, or `setZoom()` and `resetZoom()`
+from the [ref API](#ref-api-and-png-export) for your own controls. Disabling
+`zoom` resets scale and pan. `setZoom()` requires zoom to be enabled and clamps
+scales to 1–3; non-finite values reset to 1.
+
+Zoom persists across artwork and view changes.
+
+## Keyboard and reduced motion
+
+With `interaction.tapToToggleView` enabled, the player joins the tab order and
+Enter or Space switches views. Disabling that option disables keyboard view
+toggling. Set `ariaLabel` to provide a custom accessible name.
+
+With `prefers-reduced-motion: reduce`, automatic rotation and motion blur are
+disabled, transitions settle immediately, and City activity is frozen.
+
+## Advanced usage
+
+Use these options when you need controlled React state, CSS overrides,
+programmatic controls, PNG exports, error handling, or custom Tree themes.
+
+### Control the view
+
+Use `defaultView="qr"` to start in QR view while letting the player manage later
+changes. For controlled state, provide both `view` and `onViewChange`:
+
+```tsx
+import { useState } from 'react';
+import { DesignQR, type DesignQRView } from 'designqr';
+
+export function ControlledExample() {
+  const [view, setView] = useState<DesignQRView>('design');
+
+  return (
+    <>
+      <button onClick={() => setView(view === 'design' ? 'qr' : 'design')}>
+        {view === 'design' ? 'Show QR' : 'Show artwork'}
+      </button>
+      <DesignQR
+        value="https://github.com/johnson7543/design"
+        view={view}
+        onViewChange={setView}
+      />
+    </>
+  );
+}
+```
+
+Update controlled state in `onViewChange` to accept tap, keyboard, and ref-based
+view requests. Use `defaultView` only for uncontrolled state.
+`interaction.transitionSpeed` controls the turn speed: `0.5` is
+slower and `2` is faster than the default `1`.
+
+### Styling
+
+Core styles load automatically. To load them through your own stylesheet pipeline
+or include them before client hydration, you can still import:
+
+```ts
+import 'designqr/style.css';
+```
+
+Load this stylesheet before mounting the player to avoid automatic inline-style
+insertion. For a Content Security Policy that permits nonce-authorized inline
+styles, provide your server-generated nonce through
+`<meta property="csp-nonce" content="…">`; the automatic stylesheet uses it.
+
+Use `className` to scope CSS-variable overrides to a player:
+
+```tsx
+<DesignQR value="https://github.com/johnson7543/design" className="brand-qr" />
+```
+
+```css
+.brand-qr {
+  width: 100%;
+  max-width: 480px;
+  --designqr-title-font-family: Georgia, serif;
+  --designqr-body-font-family: system-ui, sans-serif;
+}
+```
 
 | Variable | Default | Use |
 | --- | --- | --- |
@@ -90,79 +273,111 @@ the live player and `exportImage()`.
 | `--designqr-focus-color` | `#3F352B` | Keyboard focus ring |
 | `--designqr-focus-contrast-color` | `#FFFFFF` | Contrasting focus-ring edge |
 
-The focus variables affect browser focus UI only and are not drawn into image
-exports. Theme colors, including the background and title, belong in `theme`.
-Title and visible-value typography scale with the projected QR artwork inside
-the package renderer, with the value intentionally smaller than the title,
-compact minimums, and restrained large-artwork caps. `details.titleScale` and
-`details.contentScale` adjust those responsive sizes independently rather than
-replacing them with fixed pixels.
+Font files are not downloaded by the package. Load your preferred fonts in the
+page or supply fallback families through these variables.
 
-The React component, editor helper, hosted player, and exported PNG therefore
-use the same metadata proportions. The package stylesheet declares `Outfit`
-and `Plus Jakarta Sans` as its preferred families but deliberately does not
-download font files. Load those families in the host to match the reference
-editor exactly, as the React Vite fixture does, or override the documented font
-variables; the sizing logic remains package-owned either way.
+Focus-ring variables affect the player only. For Tree artwork colors, use a
+[custom theme](#custom-themes).
 
-Set `transparentBackground` to remove the full-stage seasonal backdrop while
-keeping the tree, QR artwork, details, and exported PNG on a transparent canvas.
-At the settled QR endpoint, transparent output paints the theme-light fill only
-inside the QR matrix footprint when `details.border` is disabled. Enabling
-Border turns its card into the optional scan-safe presentation: the filled card
-reserves four clear modules on every side before the configured decorative
-padding, frame, and metadata. Pixels outside the matrix or enabled details card
-remain transparent. The hosted iframe document is transparent as well, so the
-iframe element's or parent application's background shows through. For a
-borderless QR, the host or export destination owns any additional light margin
-needed for its scanning environment.
+### Ref API and PNG export
 
-## Error handling and limits
+Attach a ref to call player methods. Wait for `onReady` before exporting, and
+handle export errors:
 
-DesignQR never substitutes, truncates, redirects, or shortens `value`. If the
-supplied value cannot be encoded, or if its generated matrix exceeds the
-temporary 57×57 interactive-rendering limit, the component renders no canvas,
-does not call `onReady`, and calls `onError` with
-`code: 'QR_GENERATION_FAILED'`. The 2,048 UTF-8-byte configuration limit still
-applies before encoding.
+```tsx
+import { useRef, useState } from 'react';
+import { DesignQR, type DesignQRHandle } from 'designqr';
 
-DesignQR 0.1.5 now fails with `QR_GENERATION_FAILED` instead of silently
-substituting another QR value. Extremely dense matrices are temporarily rejected
-before interactive 3D rendering, while QR presentation retains its compact,
-matrix-sized artwork footprint unless the optional scan-safe Border is enabled.
-Border decoration no longer changes metadata truncation, visible values use a
-smaller default size than titles, and both sizes now have bounded responsive
-multipliers.
+export function ExportExample() {
+  const player = useRef<DesignQRHandle>(null);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
-## Keyboard and motion
+  async function exportPng() {
+    if (!player.current) return;
+    setError('');
+    try {
+      const blob = await player.current.exportImage();
+      const reader = new FileReader();
+      reader.onload = () => setImageUrl(String(reader.result));
+      reader.readAsDataURL(blob);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Export failed.');
+    }
+  }
 
-When `interaction.tapToToggleView` is enabled, the player uses interactive
-semantics, joins the tab order, and toggles view with Enter or Space. When it is
-disabled, those keyboard actions and button semantics are absent. Pointer
-cursors likewise reflect the enabled tap and drag actions.
+  return (
+    <>
+      <DesignQR
+        ref={player}
+        value="https://github.com/johnson7543/design"
+        onReady={() => setReady(true)}
+        onError={error => setError(error.message)}
+      />
+      <button disabled={!ready} onClick={exportPng}>Prepare PNG</button>
+      {imageUrl && <a href={imageUrl} download="designqr.png">Download PNG</a>}
+      {error && <p role="alert">{error}</p>}
+    </>
+  );
+}
+```
 
-With `prefers-reduced-motion: reduce`, automatic rotation and motion blur are
-disabled. View and theme-background changes settle immediately without an
-animated morph or background blend.
+| Method | Result |
+| --- | --- |
+| `setView('design' \| 'qr')` | Requests a view change |
+| `resetRotation()` | Restores the default camera angle and stops automatic rotation |
+| `setZoom(scale)` | Sets viewing scale to 1–3× when zoom is enabled |
+| `resetZoom()` | Restores viewing scale and pan to 1x |
+| `pause()` | Stops animation |
+| `resume()` | Restarts animation |
+| `exportImage()` | Returns a PNG as `Promise<Blob>` |
 
-## Custom themes
+Exports capture the current view with its details, logo, theme, CSS text/card
+styling, and transparency. Viewing zoom and pan are excluded. To export the QR
+view, switch to `qr` and allow the transition to finish before calling
+`exportImage()`.
 
-| Level | API | Use |
-| --- | --- | --- |
-| Preset | `theme="spring"` | Built-in theme |
-| Custom | `createTreeTheme('spring', overrides)` | High-level changes; same resolver as Add Theme |
-| Full | `createTreeTheme('spring', { ... } satisfies ResolvedTreeTheme)` | Every renderer field; broader than the Add Theme UI |
+### Errors and content limits
 
-Presets: `spring`, `summer`, `autumn`, `winter`.
+Use `onError` to display or log errors:
 
-### Customize a preset
+```tsx
+<DesignQR
+  value="https://github.com/johnson7543/design"
+  onError={({ code, message }) => console.error(code, message)}
+/>
+```
 
-`createTreeTheme()` derives dependent palettes and QR roles from the supplied
-high-level fields.
+| Code | Meaning |
+| --- | --- |
+| `INVALID_CONFIG` | Invalid settings, unsupported theme combination, or oversized configuration |
+| `UNSUPPORTED_DESIGN` | Unrecognized design name |
+| `QR_GENERATION_FAILED` | The value cannot be encoded or exceeds the interactive QR size limit |
+| `LOGO_LOAD_FAILED` | The logo could not be loaded; the QR remains usable |
+| `WEBGL_UNAVAILABLE` | The browser cannot create a WebGL player |
+| `WEBGL_CONTEXT_LOST` | The browser lost the active WebGL context |
+| `EXPORT_FAILED` | PNG export failed; `exportImage()` also rejects |
+
+`value` must be a non-empty string within 2,048 UTF-8 bytes. The player supports
+QR matrices up to 57×57 modules; usable content length depends on the content and
+whether a logo is enabled. Values are encoded as supplied. If a value exceeds
+these limits, shorten it before passing it to the component. When QR generation
+fails, no canvas is rendered and `onReady` is not called.
+
+### Custom themes
+
+Custom themes are supported for Tree. City does not yet support custom themes.
+
+`TREE_THEME_PRESETS` contains the four seasonal Tree themes.
+`DESIGN_QR_THEME_PRESETS` contains those themes plus `shibuya`.
+
+Use `createTreeTheme(preset, overrides)` to customize a preset while keeping
+related colors coordinated. `tree.shape` controls the silhouette independently
+of theme settings.
 
 ```tsx
 import { createTreeTheme, DesignQR } from 'designqr';
-import 'designqr/style.css';
 
 const customTheme = createTreeTheme('spring', {
   foliageShape: 'pixel',
@@ -173,36 +388,21 @@ const customTheme = createTreeTheme('spring', {
 export function CustomThemeExample() {
   return (
     <DesignQR
-      value="https://example.com"
-      tree={{ shape: 'wide', seed: 0.5 }}
+      value="https://github.com/johnson7543/design"
+      tree={{ shape: 'wide' }}
       theme={customTheme}
-      details={{
-        title: 'Visit our website',
-        titleScale: 1,
-        showValue: true,
-        contentScale: 0.9,
-        border: { padding: 16 },
-      }}
-      interaction={{
-        dragToRotate: true,
-        tapToToggleView: true,
-        autoRotate: true,
-        autoRotateDirection: 'counterclockwise',
-        transitionSpeed: 1.5,
-        motionBlur: true,
-      }}
     />
   );
 }
 ```
 
-### Full renderer theme
+For full control, use `satisfies ResolvedTreeTheme` to validate every theme field:
 
-Use `satisfies ResolvedTreeTheme` to check that every theme field is present.
+<details>
+<summary>Complete theme example</summary>
 
 ```tsx
 import { createTreeTheme, DesignQR, type ResolvedTreeTheme } from 'designqr';
-import 'designqr/style.css';
 
 const fullTheme = createTreeTheme('summer', {
   foliageColor: '#02983B',
@@ -261,7 +461,6 @@ const fullTheme = createTreeTheme('summer', {
   particleType: 'none',
   particleAmount: 0,
   groundLeavesAmount: 16,
-  groundLeavesSeed: 1,
   weatherType: 'rain',
   weatherAmount: 120,
   weatherColor: '#A3CAE8',
@@ -273,100 +472,31 @@ const fullTheme = createTreeTheme('summer', {
 } satisfies ResolvedTreeTheme);
 
 export function FullThemeExample() {
-  return <DesignQR value="https://example.com" theme={fullTheme} />;
+  return <DesignQR value="https://github.com/johnson7543/design" theme={fullTheme} />;
 }
 ```
 
-`tree.shape` is a component option, not a theme field. Add Theme metadata values
-such as `id`, `label`, and `isCustom` are not part of the package theme.
+</details>
 
-## Logo
+## Inspiration
 
-```tsx
-import brandLogoUrl from './assets/logo.webp';
+The built-in color palettes are inspired by 『配色アイデア手帖 日本の美しい色と言葉』.
+Shibuya's blue palette is inspired by the manga *Blue Period* (『ブルーピリオド』／《藍色時期》).
 
-<DesignQR
-  value="https://example.com"
-  logo={{ src: brandLogoUrl, alt: 'Example brand', size: 0.16 }}
-/>
-```
+## License and attribution
 
-The imported asset is a URL string, not image bytes.
+Package code is licensed under [MIT](LICENSE).
 
-| Asset location | `src` |
-| --- | --- |
-| `public/logo.webp` | `'/logo.webp'` |
-| Bundled asset | Imported URL, as above |
-| Remote asset | HTTPS URL with CORS |
-| Inline asset | PNG, JPEG, or WebP data URL |
+Shibuya artwork includes modified geometry from
+**3D都市モデル（Project PLATEAU）渋谷区（2025年度）**, provided by MLIT's Urban Bureau
+through [Project PLATEAU](https://www.geospatial.jp/ckan/dataset/plateau-13113-shibuya-ku-2025).
+Reuse follows the [PLATEAU site policy](https://www.mlit.go.jp/plateau/site-policy/)
+(PDL 1.0 / CC BY 4.0-compatible terms). Modifications include projection,
+clipping, simplification, extrusion, and visual styling. Crossing markings are
+interpreted from [GSI aerial imagery](https://maps.gsi.go.jp/development/ichiran.html).
+The artwork is a stylized representation, not a navigation or engineering map.
 
-| Field | Contract |
-| --- | --- |
-| `src` | PNG, JPEG, or WebP data URL; same-origin path; or HTTPS URL |
-| `alt` | Optional; max 80 characters |
-| `size` | QR-width fraction; default `0.16`, range `0.08–0.20` |
-| Remote files | Must allow CORS |
-| `src` length | Max 8,192 characters |
-| Image limits | 2 MiB and 2,048 px per edge |
-| Failure | Calls `onError` with `LOGO_LOAD_FAILED`; QR remains usable |
-
-Editor Share, Embed, and generated React examples retain the configured logo
-source. An uploaded logo is emitted as its exact inline data URL, so copied TSX
-runs without a replacement asset. For maintained application code, prefer a
-public path, bundled import, or hosted HTTPS URL. Paths resolve against the page
-running `DesignQR`.
-
-## Ref API
-
-Attach a `RefObject<DesignQRHandle>` to the component.
-
-| Method | Result |
-| --- | --- |
-| `setView('design' \| 'qr')` | Requests a view change |
-| `resetRotation()` | Restores the default camera angle |
-| `pause()` | Stops animation |
-| `resume()` | Restarts animation |
-| `exportImage()` | Returns `Promise<Blob>` containing the visible PNG |
-
-## Hosted iframe
-
-For non-React hosts, use `designqr/embed`:
-
-```ts
-import {
-  connectDesignQREmbed,
-  createDesignQREmbedUrl,
-  createDesignQRIframeMarkup,
-} from 'designqr/embed';
-
-const frame = document.querySelector<HTMLIFrameElement>('#designqr')!;
-frame.src = createDesignQREmbedUrl({
-  value: 'https://example.com',
-  theme: 'spring',
-  view: 'design',
-});
-
-const html = createDesignQRIframeMarkup(frame.src);
-const player = connectDesignQREmbed(frame);
-
-player.setView('qr');
-const png = await player.exportImage();
-player.destroy();
-```
-
-```html
-<iframe
-  id="designqr"
-  title="Interactive DesignQR"
-  sandbox="allow-scripts allow-same-origin"
-  referrerpolicy="no-referrer"
-></iframe>
-```
-
-The default hosted player is `https://design.johnson7543.com/qr/embed`. Pass
-`{ origin }` for another host. Keep both sandbox permissions so commands can run
-with exact-origin checks. Encoded URLs are readable transport, not encryption.
-
-## License
-
-[MIT](LICENSE)
+Station lettering includes Noto CJK glyph outlines (Adobe, SIL OFL 1.1;
+[license notice](third-party-licenses/noto-cjk.txt)) and the JR East vector mark
+sourced through [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:JR_East_logo.svg).
+These asset notices are separate from the package's code license.

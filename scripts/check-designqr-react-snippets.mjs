@@ -8,6 +8,7 @@ import { createTreeTheme, resolveTreeTheme } from 'designqr';
 import { normalizeDesignQRConfig } from 'designqr/config';
 import {
   createDesignQRAdvancedReactSnippet,
+  createDesignQRReactSnippet,
   createDesignQRThemeReactSnippet,
   getRecommendedDesignQRReactExample,
 } from '../src/utils/integration.ts';
@@ -17,12 +18,23 @@ const inlineLogo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAA
 
 const examples = [
   {
+    name: 'shibuya-city',
+    config: normalizeDesignQRConfig({
+      value: 'https://design.example.com/shibuya',
+      design: 'city', theme: 'shibuya',
+      view: 'qr', details: { title: 'Shibuya', titleScale: 1.1, showValue: true, contentScale: 0.85, border: { padding: 16 } },
+      interaction: { dragToRotate: false, tapToToggleView: false, autoRotate: true,
+        autoRotateDirection: 'counterclockwise', transitionSpeed: 1.5, motionBlur: false },
+      logo: { src: inlineLogo }, transparentBackground: true,
+    }),
+  },
+  {
     name: 'preset-url-logo',
     config: normalizeDesignQRConfig({
       value: 'https://design.example.com/winter-release',
       design: {
         type: 'tree',
-        options: { shape: 'wide', seed: 0.73 },
+        options: { shape: 'wide' },
       },
       theme: 'winter',
       view: 'qr',
@@ -55,7 +67,7 @@ const examples = [
       value: 'https://design.example.com/spring-event',
       design: {
         type: 'tree',
-        options: { shape: 'pine', seed: 0.31 },
+        options: { shape: 'pine' },
       },
       theme: {
         foliageColor: '#F4B4CF',
@@ -102,7 +114,6 @@ assert.equal(
 const advancedRecommendationInputs = [
   ['preset theme', { theme: 'summer' }],
   ['tree shape', { tree: { shape: 'wide' } }],
-  ['tree seed', { tree: { seed: 0.72 } }],
   ['initial view', { view: 'qr' }],
   ['details title', { details: { title: 'Current setup' } }],
   ['title scale', { details: { titleScale: 1.2 } }],
@@ -155,8 +166,11 @@ function assertExecutableExample(source, name, config) {
     `${name} leaves view behavior as comment-only guidance.`
   );
 
-  assert.ok(source.includes(`shape: "${config.design.options.shape}"`), `${name} omits tree.shape.`);
-  assert.ok(source.includes(`seed: ${config.design.options.seed}`), `${name} omits tree.seed.`);
+  if (config.design.type === 'tree') {
+    assert.ok(source.includes(`shape: "${config.design.options.shape}"`), `${name} omits tree.shape.`);
+  } else {
+    assert.ok(!source.includes('tree={{'), `${name} incorrectly emits tree options.`);
+  }
   assert.ok(source.includes(config.details.title), `${name} omits details.title.`);
   assert.ok(
     source.includes(`titleScale: ${config.details.titleScale}`),
@@ -195,6 +209,13 @@ function formatSnippetValue(value) {
 }
 
 const generatedFiles = [];
+const simpleCityConfig = normalizeDesignQRConfig({ value: 'Shibuya', design: 'city' });
+assert.equal(getRecommendedDesignQRReactExample(simpleCityConfig), 'simple');
+const simpleCitySource = createDesignQRReactSnippet(simpleCityConfig);
+assert.match(simpleCitySource, /design="city"/);
+assert.doesNotMatch(simpleCitySource, /createTreeTheme|theme=|tree=/);
+generatedFiles.push({ name: 'shibuya-city-simple', source: simpleCitySource });
+
 for (const example of examples) {
   const snippets = [
     {
@@ -209,7 +230,10 @@ for (const example of examples) {
 
   for (const snippet of snippets) {
     assertExecutableExample(snippet.source, snippet.name, example.config);
-    if (snippet.name.endsWith('-custom-theme')) {
+    if (example.config.design.type === 'city') {
+      assert.doesNotMatch(snippet.source, /createTreeTheme|theme=\{customTheme\}/);
+      assert.match(snippet.source, /theme="shibuya"/);
+    } else if (snippet.name.endsWith('-custom-theme')) {
       const resolvedTheme = resolveTreeTheme(example.config.theme);
       const basePreset = example.config.theme.type === 'preset'
         ? example.config.theme.preset

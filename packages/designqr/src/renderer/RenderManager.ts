@@ -5,12 +5,14 @@ import type {
 } from '../config/types.ts';
 import type { TreeData } from '../designs/tree/treeBuilder.ts';
 import { ThreeFallbackRenderer } from './webgl/ThreeFallbackRenderer.ts';
+import type { PreviewProjection } from './previewProjection.ts';
 
 export class RenderManager {
   private readonly canvas: HTMLCanvasElement;
   private renderer: ThreeFallbackRenderer | null = null;
   public onProgressUpdate?: (progress: number, blurIntensity: number) => void;
   public onAfterRender?: () => void;
+  public onBeforeRender?: () => void;
   public onError?: (error: unknown) => void;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -26,6 +28,7 @@ export class RenderManager {
       this.renderer.onAfterRender = () => {
         this.onAfterRender?.();
       };
+      this.renderer.onBeforeRender = () => this.onBeforeRender?.();
       this.renderer.onError = (error) => {
         this.onError?.(error);
       };
@@ -48,6 +51,10 @@ export class RenderManager {
     if (this.renderer) {
       this.renderer.targetProgress = progress;
     }
+  }
+
+  public setReducedMotion(enabled: boolean) {
+    if (this.renderer) this.renderer.reducedMotion = enabled;
   }
 
   public setProgressImmediate(progress: number) {
@@ -108,11 +115,24 @@ export class RenderManager {
     this.renderer?.resize(width, height);
   }
 
+  public setPreviewProjection(projection: PreviewProjection | null) {
+    this.renderer?.setPreviewProjection(projection);
+  }
+
+  public invalidatePreview() {
+    this.renderer?.invalidatePreview();
+  }
+
+  public withBaseFrame<T>(capture: () => T): T {
+    return this.renderer ? this.renderer.withBaseFrame(capture) : capture();
+  }
+
   public destroy() {
     this.renderer?.destroy();
     this.renderer = null;
     this.onProgressUpdate = undefined;
     this.onAfterRender = undefined;
+    this.onBeforeRender = undefined;
     this.onError = undefined;
   }
 }

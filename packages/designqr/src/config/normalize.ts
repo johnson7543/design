@@ -552,21 +552,6 @@ function normalizeTreeTheme(input: unknown): TreeTheme {
     );
   }
 
-  if (input.groundLeavesSeed !== undefined) {
-    if (typeof input.groundLeavesSeed !== 'number' || !Number.isFinite(input.groundLeavesSeed)) {
-      throw new DesignQRConfigError(
-        'INVALID_CONFIG',
-        'theme.groundLeavesSeed must be a finite number.'
-      );
-    }
-    theme.groundLeavesSeed = normalizeInteger(
-      input.groundLeavesSeed,
-      0,
-      0,
-      1_000_000
-    );
-  }
-
   if (input.weatherAmount !== undefined) {
     theme.weatherAmount = normalizeInteger(
       input.weatherAmount,
@@ -605,6 +590,7 @@ export function normalizeDesignQRTheme(input: unknown): DesignQRConfigV1['theme'
     'summer',
     'autumn',
     'winter',
+    'shibuya',
   ];
 
   if (typeof input === 'string') {
@@ -711,6 +697,15 @@ function normalizeConfig(input: unknown, requireSchemaVersion: boolean): DesignQ
   const designOptions = isRecord(designInput)
     ? designInput.options
     : input.tree;
+  const theme = normalizeDesignQRTheme(
+    input.theme ?? (adapter.type === 'city' ? 'shibuya' : undefined)
+  );
+  if (adapter.type === 'city' && (theme.type !== 'preset' || theme.preset !== 'shibuya')) {
+    throw new DesignQRConfigError(
+      'INVALID_CONFIG',
+      'City currently supports only the Shibuya preset; custom themes are available for Tree.'
+    );
+  }
   const details = isRecord(input.details) ? input.details : {};
   const interaction = isRecord(input.interaction) ? input.interaction : {};
   const transparentBackground = normalizeBoolean(
@@ -733,11 +728,10 @@ function normalizeConfig(input: unknown, requireSchemaVersion: boolean): DesignQ
   return {
     schemaVersion: DESIGN_QR_SCHEMA_VERSION,
     value: input.value,
-    design: {
-      type: adapter.type,
-      options: adapter.normalizeOptions(designOptions),
-    },
-    theme: normalizeDesignQRTheme(input.theme),
+    design: adapter.type === 'city'
+      ? { type: 'city' }
+      : { type: 'tree', options: adapter.normalizeOptions(designOptions) },
+    theme,
     view: {
       initial: normalizeView(input.view, input.defaultView),
     },

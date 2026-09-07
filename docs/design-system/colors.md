@@ -58,6 +58,8 @@ value.
 #f6f4d7  #f7e95e  #f8d2e3  #f8d9e5  #f8f0ec  #f9d3e3  #fbbf24  #fce0af
 #fceef5  #fdf0f5  #fef6e9  #ffea44  #ffedf4  #fff9f1  #fff9f7  #fffaf3
 #fffbf9  #fffcfa  #ffffff
+#809dca  #cddbe4  #436ea4  #eed883  #759db0  #1f3a52  #605b53  #ea6157  #e8ddcf
+#4a7fa7  #29445f  #a9cdd9
 ```
 
 <!-- approved-colors:end -->

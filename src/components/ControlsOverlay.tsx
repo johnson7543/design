@@ -1,5 +1,7 @@
 import {
   Type,
+  Building2,
+  Trees,
   X,
   Flower2,
   Sun,
@@ -29,13 +31,16 @@ import {
 } from 'designqr/editor';
 import type { AutoRotateDirection, DesignQRLogoOptions } from 'designqr/config';
 import type { CustomTheme } from '../editor/types';
-import { THEME_PRESET_OPTIONS } from '../editor/theme-presets';
+import { CITY_THEME_PRESET_OPTIONS, THEME_PRESET_OPTIONS } from '../editor/theme-presets';
+import { PreviewZoomControls, type PreviewZoomControlsProps } from './PreviewZoomControls';
 import {
   FloatingLogoControls,
   FloatingQRDetailsControls,
 } from './FloatingFlatQRControls';
 
 interface ControlsOverlayProps {
+  designType: 'tree' | 'city';
+  onDesignTypeChange: (design: 'tree' | 'city') => void;
   url: string;
   onUrlChange: (newUrl: string) => void;
   activeThemeId: string;
@@ -49,7 +54,8 @@ interface ControlsOverlayProps {
   onToggleTurntable: () => void;
   autoRotateDirection: AutoRotateDirection;
   onToggleAutoRotateDirection: () => void;
-  onResetRotation: () => void;
+  onResetView: () => void;
+  previewZoom: PreviewZoomControlsProps;
   viewMode: '3d' | 'scan';
   onToggleScanMode?: () => void;
   isDetailsEditorOpen?: boolean;
@@ -83,6 +89,8 @@ function formatTransitionSpeed(speed: number): string {
 }
 
 export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
+  designType,
+  onDesignTypeChange,
   url,
   onUrlChange,
   activeThemeId,
@@ -96,7 +104,8 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   onToggleTurntable,
   autoRotateDirection,
   onToggleAutoRotateDirection,
-  onResetRotation,
+  onResetView,
+  previewZoom,
   viewMode,
   onToggleScanMode,
   isDetailsEditorOpen = false,
@@ -125,8 +134,9 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   onTransitionSpeedChange,
 }) => {
   const transitionSpeedLabel = formatTransitionSpeed(transitionSpeed);
+  const themeOptions = designType === 'city' ? CITY_THEME_PRESET_OPTIONS : THEME_PRESET_OPTIONS;
 
-  const getSeasonIcon = (name: string) => {
+  const getThemeIcon = (name: string) => {
     switch (name) {
       case 'spring':
         return <Flower2 size={15} />;
@@ -136,6 +146,8 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
         return <Leaf size={15} />;
       case 'winter':
         return <Snowflake size={15} />;
+      case 'shibuya':
+        return <Building2 size={15} aria-hidden="true" />;
       default:
         return <Flower2 size={15} />;
     }
@@ -170,7 +182,9 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
         )}
 
         <div className="floating-top-tools-row">
-          <div className="floating-edge-tools floating-left-tools" />
+          <div className="floating-edge-tools floating-left-tools">
+            <PreviewZoomControls {...previewZoom} />
+          </div>
 
           {/* The mode hint stays anchored to the true horizontal center. */}
           <div className="floating-center-tools">
@@ -182,7 +196,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
                 title="Switch to 2D QR"
               >
                 <Sparkles size={14} className="hint-icon" />
-                <span>Tap tree for QR code</span>
+                <span>Tap {designType === 'city' ? 'city' : 'tree'} for QR code</span>
               </button>
             ) : (
               <div className="floating-qr-tools-bar">
@@ -190,7 +204,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
                   type="button"
                   className="canvas-hint-badge"
                   onClick={onToggleScanMode}
-                  title="Switch to 3D Tree"
+                  title={designType === 'city' ? 'Switch to 3D City' : 'Switch to 3D Tree'}
                 >
                   <Scan size={13} className="hint-icon animate-pulse" />
                   <span>Tap for 3D</span>
@@ -262,23 +276,35 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
 
       {/* 2. Customizer & Actions Drawer */}
       <div className="customizer-card glass-panel">
-        {/* 4 Season Selector Tabs + Compact '+' Add Theme button */}
-        <div className="season-tabs">
-          {THEME_PRESET_OPTIONS.map((season) => (
+        <div className="design-type-tabs" role="group" aria-label="Design type">
+          <button type="button" className={`season-chip ${designType === 'tree' ? 'active' : ''}`}
+            aria-pressed={designType === 'tree'} onClick={() => onDesignTypeChange('tree')}>
+            <Trees size={15} /><span>Tree</span>
+          </button>
+          <button type="button" className={`season-chip ${designType === 'city' ? 'active' : ''}`}
+            aria-pressed={designType === 'city'} onClick={() => onDesignTypeChange('city')}>
+            <Building2 size={15} /><span>City</span>
+          </button>
+        </div>
+        {/* Each design keeps its presets in the same row; custom themes are Tree-only. */}
+        <div className={designType === 'city' ? 'city-preset-row' : 'tree-preset-row'}>
+        <div className={`season-tabs${designType === 'city' ? ' city-theme-tabs' : ''}`}
+          role="group" aria-label={designType === 'city' ? 'City theme' : 'Tree theme'}>
+          {themeOptions.map((theme) => (
             <button
               type="button"
-              key={season.id}
-              className={`season-chip ${activeThemeId === String(season.id) ? 'active' : ''}`}
-              onClick={() => onSelectTheme(String(season.id))}
-              aria-pressed={activeThemeId === String(season.id)}
+              key={theme.id}
+              className={`season-chip ${activeThemeId === String(theme.id) ? 'active' : ''}`}
+              onClick={() => onSelectTheme(String(theme.id))}
+              aria-pressed={activeThemeId === String(theme.id)}
             >
-              {getSeasonIcon(season.name)}
-              <span>{season.label}</span>
+              {getThemeIcon(theme.name)}
+              <span>{theme.label}</span>
             </button>
           ))}
 
           {/* Add Custom Theme Button ("+" only) */}
-          <button
+          {designType === 'tree' && <button
             type="button"
             className="season-chip add-theme-chip-compact"
             onClick={onOpenCreateTheme}
@@ -286,11 +312,12 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
             aria-label="Add Theme"
           >
             <Plus size={16} />
-          </button>
+          </button>}
+        </div>
         </div>
 
         {/* Custom Themes Row — displayed when custom themes are saved */}
-        {customThemes.length > 0 && (
+        {designType === 'tree' && customThemes.length > 0 && (
           <div className="custom-themes-row">
             {customThemes.map((theme) => (
               <div
@@ -362,13 +389,13 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
                 : <RefreshCcw size={16} />}
             </button>
 
-            {/* Reset the tree to its original viewing angle. */}
+            {/* Restore the editor's angle, magnification, and pan together. */}
             <button
               type="button"
               className="drawer-icon-btn"
-              onClick={onResetRotation}
-              title="Reset rotation"
-              aria-label="Reset rotation"
+              onClick={onResetView}
+              title="Reset view"
+              aria-label="Reset view"
             >
               <RotateCcw size={16} />
             </button>

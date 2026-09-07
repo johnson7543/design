@@ -63,7 +63,6 @@ export const FULL_PARAMETER_THEME = createTreeTheme('summer', {
   particleType: 'none',
   particleAmount: 0,
   groundLeavesAmount: 16,
-  groundLeavesSeed: 1,
   weatherType: 'rain',
   weatherAmount: 120,
   weatherColor: '#A3CAE8',

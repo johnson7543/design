@@ -1,3 +1,5 @@
+import { SHIBUYA_PALETTE } from '../designs/city/palette.ts';
+
 export interface DesignQRPresentationStyles {
   titleFontFamily: string;
   bodyFontFamily: string;
@@ -59,3 +61,12 @@ export function resolveDesignQRPresentationStyles(
     ),
   };
 }
+
+/** Theme defaults sit below the public CSS variables, so host overrides still win. */
+export const CITY_PRESENTATION_STYLE_DEFAULTS = Object.freeze({
+  '--designqr-theme-content-color': SHIBUYA_PALETTE.ink,
+  '--designqr-theme-border-color': `${SHIBUYA_PALETTE.ink}40`,
+  '--designqr-theme-border-highlight-color': `${SHIBUYA_PALETTE.paper}73`,
+  '--designqr-theme-focus-color': SHIBUYA_PALETTE.ink,
+  '--designqr-theme-focus-contrast-color': SHIBUYA_PALETTE.paper,
+});

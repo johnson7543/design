@@ -179,7 +179,7 @@ test('normalizes defaults into the canonical v1 shape', () => {
     value: 'https://example.com',
     design: {
       type: 'tree',
-      options: { shape: 'dome', seed: 0.5 },
+      options: { shape: 'dome' },
     },
     theme: { type: 'preset', preset: 'spring' },
     view: { initial: 'design' },
@@ -360,7 +360,7 @@ test('normalizes the public view transition speed', () => {
 test('normalizes custom themes and strips editor-only fields', () => {
   const config = normalizeDesignQRConfig({
     value: 'https://example.com',
-    design: { type: 'tree', options: { shape: 'wide', seed: 8 } },
+    design: { type: 'tree', options: { shape: 'wide' } },
     theme: {
       type: 'custom',
       value: {
@@ -386,7 +386,8 @@ test('normalizes custom themes and strips editor-only fields', () => {
     },
   });
 
-  assert.deepEqual(config.design.options, { shape: 'wide', seed: 1 });
+  assert.equal(config.design.type, 'tree');
+  assert.deepEqual(config.design.type === 'tree' && config.design.options, { shape: 'wide' });
   assert.equal(config.details.title.length, 40);
   assert.deepEqual(config.details.border, { padding: 28 });
   assert.equal(config.theme.type, 'custom');
@@ -415,8 +416,6 @@ test('exports complete immutable presets without sharing mutable copies', () => 
   assert.equal(TREE_THEME_PRESETS.summer.weatherType, 'rain');
   assert.equal(TREE_THEME_PRESETS.winter.snowflakeAmount, 300);
   assert.equal(TREE_THEME_PRESETS.winter.groundFeature, 'pixel');
-  assert.equal(TREE_THEME_PRESETS.spring.groundLeavesSeed, 0);
-  assert.equal(TREE_THEME_PRESETS.autumn.groundLeavesSeed, 2);
   assert.equal(TREE_THEME_PRESETS.autumn.qrFinderEyeColor, '#5D4C35');
   assert.deepEqual(
     TREE_THEME_PRESETS.spring.foliagePaletteColors,
@@ -571,7 +570,6 @@ test('ignores explicit undefined helper overrides and preserves independent copi
   const custom = createTreeTheme('winter', {
     foliagePaletteColors: undefined,
     groundFeature: undefined,
-    groundLeavesSeed: undefined,
   });
   assert.deepEqual(custom, TREE_THEME_PRESETS.winter);
   assert.notEqual(custom.foliagePaletteColors, TREE_THEME_PRESETS.winter.foliagePaletteColors);
@@ -650,7 +648,6 @@ test('normalizes every complete theme role and rejects invalid role values', () 
     assert.equal(complete.theme.value.ambientParticleAmount, 60);
     assert.equal(complete.theme.value.snowflakeAmount, 500);
     assert.equal(complete.theme.value.branchColor, '#908176');
-    assert.equal(complete.theme.value.groundLeavesSeed, 3);
     assert.equal(complete.theme.value.qrFoliageColor, '#7DA3C4');
     assert.deepEqual(
       complete.theme.value.foliagePaletteColors,

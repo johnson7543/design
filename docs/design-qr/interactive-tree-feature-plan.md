@@ -372,7 +372,7 @@ all foliage styles, so switching style no longer changes `treeShape`, crown
 bounds, or the settled QR.
 
 Follow-up verification (2026-08-31): passed. Blossom and Pixel were compared in
-the real editor at 1440×900 with the same URL, seed, density, and Dome shape;
+the real editor at 1440×900 with the same URL, density, and Dome shape;
 Pixel was also exercised through 3D→2D→3D. `npm run check` passed all 24 package
 tests, declarations, documentation/style/color contracts, builds, React and
 iframe consumers, desktop/mobile production layouts, and WYSIWYG export.

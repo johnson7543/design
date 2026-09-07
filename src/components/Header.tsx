@@ -27,12 +27,14 @@ function formatGitHubStarCount(count: number): string {
 }
 
 interface HeaderProps {
+  designType?: 'tree' | 'city';
   viewMode: '3d' | 'scan';
   onSetViewMode: (mode: '3d' | 'scan') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   viewMode,
+  designType = 'tree',
   onSetViewMode,
 }) => {
   const [githubStarCount, setGitHubStarCount] = useState(
@@ -138,11 +140,11 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               className={`mode-btn ${viewMode === '3d' ? 'active' : ''}`}
               onClick={() => onSetViewMode('3d')}
-              title="3D Tree"
+              title={designType === 'city' ? '3D City' : '3D Tree'}
               aria-pressed={viewMode === '3d'}
             >
               <Box size={16} />
-              <span className="btn-label">3D Tree</span>
+              <span className="btn-label">3D {designType === 'city' ? 'City' : 'Tree'}</span>
             </button>
 
             <button
