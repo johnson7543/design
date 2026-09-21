@@ -1,7 +1,7 @@
-import { BufferGeometry, DynamicDrawUsage, Float32BufferAttribute, Mesh, MeshBasicMaterial, type Texture } from 'three';
+import { BufferGeometry, DynamicDrawUsage, Float32BufferAttribute, Mesh, MeshBasicMaterial } from 'three';
 import { cityPanelAnchor, type CityFacadePanel } from './architecture.ts';
 import { CITY_SIGN_DESIGNS } from './sign-artwork.ts';
-import { cityEase, cityMorphPose, type CityMorphVoxel } from './morph.ts';
+import { cityEase, cityMorphPose, cityMorphProgress, type CityMorphVoxel } from './morph.ts';
 import type { CityMorphTile } from './morph-sources.ts';
 
 /** A bounded pilot: three panels on two landmarks, never the uploaded logo. */
@@ -37,13 +37,13 @@ export function cityMorphSignState(progress: number) {
  * proportions; the rectangle only squares AFTER its lettering has dissolved. */
 export function cityMorphSignPose(tile: CityMorphTile, grid: number, progress: number) {
   const pose = cityMorphPose(tile.source, tile.target, grid, progress, tile.motion);
-  const state = cityMorphSignState(progress), cell = 1.002 / grid;
+  const state = cityMorphSignState(cityMorphProgress(progress, tile.motion)), cell = 1.002 / grid;
   const scale = 1 + (cell / Math.max(tile.source.width, tile.source.height) - 1) * state.fit;
   return { ...pose, width: tile.source.width * scale * (1 - state.square) + cell * state.square,
     height: tile.source.height * scale * (1 - state.square) + cell * state.square, tilt: state.tilt };
 }
 
-type Sign = { panel: CityFacadePanel; mesh: Mesh<BufferGeometry, MeshBasicMaterial> };
+type Sign = { panel: CityFacadePanel; mesh: Mesh<BufferGeometry, MeshBasicMaterial>; uvRect?: readonly [number, number, number, number] };
 
 const corners = [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, -.5], [.5, .5], [-.5, .5]];
 
@@ -55,35 +55,47 @@ export class CityMorphSigns {
   readonly mesh: Mesh<BufferGeometry, MeshBasicMaterial[]>;
   private readonly materials = new Map<string, MeshBasicMaterial>();
   private parts: CityMorphTile[] = [];
+  private materialParts: number[] = [];
   private grid = 1;
   private lastProgress = NaN;
+  private readonly ids: readonly string[];
 
-  constructor() {
+  constructor(ids: readonly string[] = CITY_MORPH_SIGN_IDS) {
+    this.ids = ids;
+    const vertices = ids.length * 12;
     const geometry = new BufferGeometry();
     for (const [name, size] of [['position', 3], ['uv', 2]] as const) {
-      const attribute = new Float32BufferAttribute(new Float32Array(36 * size), size);
+      const attribute = new Float32BufferAttribute(new Float32Array(vertices * size), size);
       if (name === 'position') attribute.setUsage(DynamicDrawUsage);
       geometry.setAttribute(name, attribute);
     }
     // MeshBasic does not light these faces, but HAS_NORMAL is part of Three's
     // program key. Retain the original sign's attribute layout to reuse it.
-    const normals = new Float32Array(36 * 3);
-    for (let i = 0; i < 36; i++) normals[i * 3 + 2] = 1;
+    const normals = new Float32Array(vertices * 3);
+    for (let i = 0; i < vertices; i++) normals[i * 3 + 2] = 1;
     geometry.setAttribute('normal', new Float32BufferAttribute(normals, 3));
     this.mesh = new Mesh(geometry, []);
     this.mesh.name = 'shibuya-morph-sign-detail'; this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 2.1; this.mesh.visible = false;
   }
 
-  private material(id: string, map: Texture) {
+  private material(id: string, source: MeshBasicMaterial) {
     let material = this.materials.get(id);
-    if (material) { material.map = map; return material; }
     // Same map/UV/side shader variant as the existing landmark sign. Fading
     // reveals the palette-colored tile underneath instead of compiling a new
     // texture-to-ink shader on the user's first turn.
-    material = new MeshBasicMaterial({ map, transparent: true, depthWrite: false });
-    material.name = id;
-    this.materials.set(id, material);
+    if (!material) {
+      material = new MeshBasicMaterial({ transparent: true, depthWrite: false });
+      material.name = id; this.materials.set(id, material);
+    }
+    material.map = source.map;
+    // Animated sign shaders borrow the same frozen uniforms as their live
+    // artwork. Ordinary Shibuya/City sign materials retain the default shader.
+    if (material.onBeforeCompile !== source.onBeforeCompile || material.customProgramCacheKey !== source.customProgramCacheKey) {
+      material.onBeforeCompile = source.onBeforeCompile;
+      material.customProgramCacheKey = source.customProgramCacheKey;
+      material.needsUpdate = true;
+    }
     return material;
   }
 
@@ -97,23 +109,25 @@ export class CityMorphSigns {
     const geometry = this.mesh.geometry, attributes = geometry.attributes;
     const byId = new Map(tiles.filter(t => t.source.kind === 'sign').map(t => [t.source.id, t]));
     const materials: MeshBasicMaterial[] = [];
-    this.parts = []; this.grid = grid; this.lastProgress = NaN;
+    this.parts = []; this.materialParts = []; this.grid = grid; this.lastProgress = NaN;
     geometry.clearGroups(); let vertex = 0;
-    for (const { panel, mesh } of signs) {
-      if (!retained(panel) || !mesh.material.map) continue;
+    for (const { panel, mesh, uvRect = [0, 0, 1, 1] } of signs) {
+      if (!this.ids.includes(panel.id) || panel.path.length !== 2 || !mesh.material.map) continue;
       const start = vertex;
       for (const [half, side] of [-1, 1].entries()) {
         const tile = byId.get(`${panel.id}-${side}`);
         if (!tile) continue;
         this.parts.push(tile);
         for (const [x, y] of corners) {
-          attributes.uv.setXY(vertex, (x + .5 + half) / 2, y + .5);
+          attributes.uv.setXY(vertex, uvRect[0] + (x + .5 + half) / 2 * (uvRect[2] - uvRect[0]),
+            uvRect[1] + (y + .5) * (uvRect[3] - uvRect[1]));
           vertex++;
         }
       }
       if (vertex === start) continue;
+      this.materialParts.push(start / 6);
       geometry.addGroup(start, vertex - start, materials.length);
-      materials.push(this.material(panel.id, mesh.material.map));
+      materials.push(this.material(panel.id, mesh.material));
     }
     this.mesh.material = materials;
     for (const [id, material] of this.materials) if (!materials.includes(material)) {
@@ -126,9 +140,13 @@ export class CityMorphSigns {
   update(progress: number) {
     if (progress === this.lastProgress) return;
     this.lastProgress = progress;
-    const state = cityMorphSignState(progress);
-    this.mesh.visible = state.opacity > 0 && this.mesh.geometry.drawRange.count > 0;
-    for (const material of this.mesh.material) material.opacity = state.opacity;
+    this.mesh.visible = false;
+    for (let i = 0; i < this.mesh.material.length; i++) {
+      const state = cityMorphSignState(cityMorphProgress(progress, this.parts[this.materialParts[i]]?.motion));
+      this.mesh.material[i].opacity = state.opacity;
+      this.mesh.visible ||= state.opacity > 0;
+    }
+    this.mesh.visible &&= this.mesh.geometry.drawRange.count > 0;
     if (!this.mesh.visible) return;
     const position = this.mesh.geometry.getAttribute('position'); let vertex = 0;
     for (const tile of this.parts) {

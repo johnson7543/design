@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath, URL } from 'node:url';
+import { dotonboriAssetPlugin } from './scripts/dotonbori-asset-plugin.mjs';
 import { shibuyaAssetPlugin } from './scripts/shibuya-asset-plugin.mjs';
 
 const notoNoticePath = fileURLToPath(new URL(
@@ -33,7 +34,7 @@ const notoNoticePlugin: Plugin = {
 };
 
 export default defineConfig({
-  plugins: [react(), shibuyaAssetPlugin(), notoNoticePlugin],
+  plugins: [react(), shibuyaAssetPlugin(), dotonboriAssetPlugin(), notoNoticePlugin],
   resolve: {
     alias: [
       {

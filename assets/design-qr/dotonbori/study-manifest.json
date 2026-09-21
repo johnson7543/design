@@ -1,0 +1,828 @@
+{
+  "schema": "designqr-dotonbori-study",
+  "version": 1,
+  "status": "Source geometry study; bridge and facade reconstruction incomplete",
+  "sourceMeshSha256": "99218a7baf59ab151ca58d6f1b34ec2ce0dc2b855fa7d6d95f8a9881a33d16c4",
+  "sourceAuditSha256": "823420fbf6913de6029447c0f0ee994d0f4354ad52a56e7d9a968ff47d693ce6",
+  "blenderVersion": "5.2.1 LTS",
+  "units": "metres",
+  "blenderAxes": [
+    "east",
+    "north",
+    "source-height"
+  ],
+  "gltfAxes": [
+    "east",
+    "source-height",
+    "south"
+  ],
+  "originLongitudeLatitude": [
+    135.50125,
+    34.66905
+  ],
+  "cropSizeM": 160,
+  "sourceBuildingCount": 73,
+  "lodCounts": {
+    "1": 7,
+    "2": 66
+  },
+  "sourceTriangleCount": 5018,
+  "studyTriangleCount": 4796,
+  "glbBytes": 390488,
+  "glbSha256": "c984c6700846569a42c091913aee3351a3f76e14bfbdb2a3d6c198f01c646adc",
+  "blendBytes": 311298,
+  "blendSha256": "8fdefe867f92962158749ef2422f7f5399a7cbd9f6e595d616fc7d2d1e294245",
+  "generatorSha256": "9a92e70b84df0961e66611104250e2a4fc3a5d45d3f1d8d694ad4a89794a2039",
+  "blenderValidationSha256": "c9326c0cad4560699665804cb9e1b394715137d22d09280af439713e354278cd",
+  "bridgeStudy": {
+    "id": "ebisubashi-deck-dimension-study",
+    "status": "Incomplete dimensional envelope; not finished pavement or complete bridge",
+    "sourceSha256": "c4d4242e3154c32dc27752b11045badb0842604e54657062509ebad8c892b0e7",
+    "generatorSha256": "512ec95b4b0d6d2f29f46312c13db17564467a69eee9204762e0f5205a09e0cb",
+    "glbBytes": 25148,
+    "glbSha256": "b9a69574e81bf72b2a02778f77f6b230dfea1bff8fb3c26484b31861f411a2a2",
+    "triangles": 860,
+    "unresolved": [
+      "31mm center elevation discrepancy between section A and the profile table",
+      "crossfall and finished surface reconciliation",
+      "ramp profiles and connections",
+      "stair placement and finished tread levels",
+      "rail and girder detailing",
+      "benchmark epoch and local height registration"
+    ]
+  },
+  "materials": {
+    "dotonbori-source-wall": {
+      "role": "source-wall",
+      "swatch": "#e8ddcf"
+    },
+    "dotonbori-source-roof": {
+      "role": "source-roof",
+      "swatch": "#cddbe4"
+    },
+    "dotonbori-lod1-unresolved": {
+      "role": "lod1-unresolved",
+      "swatch": "#ea6157"
+    },
+    "dotonbori-authoring-cut": {
+      "role": "authoring-cut",
+      "swatch": "#eed883"
+    },
+    "dotonbori-map-line": {
+      "role": "map-line",
+      "swatch": "#cddbe4"
+    },
+    "dotonbori-water-plan": {
+      "role": "water-plan",
+      "swatch": "#759db0"
+    },
+    "dotonbori-reference-board": {
+      "role": "reference-board",
+      "swatch": "#1f3a52"
+    },
+    "dotonbori-bridge-dimension-study": {
+      "role": "bridge-dimension-study",
+      "swatch": "#ea6157"
+    }
+  },
+  "objects": [
+    {
+      "sourceId": "bldg_05ec86aa-79f1-4aaa-8e93-0bf011542f99",
+      "auditLabel": "B001",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B001 study bldg_05ec86aa-79f1-4aaa-8e93-0bf011542f99"
+    },
+    {
+      "sourceId": "bldg_8cfb1e65-5be3-47bb-8e54-600452e7395d",
+      "auditLabel": "B002",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B002 study bldg_8cfb1e65-5be3-47bb-8e54-600452e7395d"
+    },
+    {
+      "sourceId": "bldg_76ce85c5-2269-4ea7-aae0-26df40684b10",
+      "auditLabel": "B003",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 2,
+      "studyObject": "B003 study bldg_76ce85c5-2269-4ea7-aae0-26df40684b10"
+    },
+    {
+      "sourceId": "bldg_97ff7748-df43-4444-9eb0-23cc6f494ee3",
+      "auditLabel": "B004",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B004 study bldg_97ff7748-df43-4444-9eb0-23cc6f494ee3"
+    },
+    {
+      "sourceId": "bldg_fc4e8d81-ae3d-4f37-9d4f-37c39142094b",
+      "auditLabel": "B005",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B005 study bldg_fc4e8d81-ae3d-4f37-9d4f-37c39142094b"
+    },
+    {
+      "sourceId": "bldg_2de00e94-da2b-43f6-851e-31ccd3170afa",
+      "auditLabel": "B006",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B006 study bldg_2de00e94-da2b-43f6-851e-31ccd3170afa"
+    },
+    {
+      "sourceId": "bldg_7ad08c54-9183-462f-bf96-9eb346a14310",
+      "auditLabel": "B007",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B007 study bldg_7ad08c54-9183-462f-bf96-9eb346a14310"
+    },
+    {
+      "sourceId": "bldg_05785215-b10c-434c-99b8-a700f76f8adc",
+      "auditLabel": "B008",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B008 study bldg_05785215-b10c-434c-99b8-a700f76f8adc"
+    },
+    {
+      "sourceId": "bldg_f7b7d534-49ca-4a79-b03a-08128ff697c0",
+      "auditLabel": "B009",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B009 study bldg_f7b7d534-49ca-4a79-b03a-08128ff697c0"
+    },
+    {
+      "sourceId": "bldg_a62f6dcd-8d14-4408-980d-0c6ad7f40f25",
+      "auditLabel": "B010",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 2,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B010 study bldg_a62f6dcd-8d14-4408-980d-0c6ad7f40f25"
+    },
+    {
+      "sourceId": "bldg_d2d3b308-6155-4ce2-ba9f-588e8c873fb1",
+      "auditLabel": "B011",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B011 study bldg_d2d3b308-6155-4ce2-ba9f-588e8c873fb1"
+    },
+    {
+      "sourceId": "bldg_711d3b15-de26-4d47-a8a3-5d0e1f7e5d8d",
+      "auditLabel": "B012",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B012 study bldg_711d3b15-de26-4d47-a8a3-5d0e1f7e5d8d"
+    },
+    {
+      "sourceId": "bldg_85c14406-5eae-4678-a80b-fa9cc1f14dcc",
+      "auditLabel": "B013",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B013 study bldg_85c14406-5eae-4678-a80b-fa9cc1f14dcc"
+    },
+    {
+      "sourceId": "bldg_fa021df6-6040-4cd5-8773-63d12e3ccf27",
+      "auditLabel": "B014",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B014 study bldg_fa021df6-6040-4cd5-8773-63d12e3ccf27"
+    },
+    {
+      "sourceId": "bldg_484c9eab-7b24-4cdb-b22a-6cca97c92210",
+      "auditLabel": "B015",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B015 study bldg_484c9eab-7b24-4cdb-b22a-6cca97c92210"
+    },
+    {
+      "sourceId": "bldg_d589d364-22d5-4c9c-85c3-4416c222ec92",
+      "auditLabel": "B016",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B016 study bldg_d589d364-22d5-4c9c-85c3-4416c222ec92"
+    },
+    {
+      "sourceId": "bldg_91ce1b36-b134-4def-bdf5-ed78a1e948cb",
+      "auditLabel": "B017",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B017 study bldg_91ce1b36-b134-4def-bdf5-ed78a1e948cb"
+    },
+    {
+      "sourceId": "bldg_69381567-48c9-40b7-a6d3-478623f7e2f6",
+      "auditLabel": "B018",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B018 study bldg_69381567-48c9-40b7-a6d3-478623f7e2f6"
+    },
+    {
+      "sourceId": "bldg_eff919e5-aa90-4f6c-aa5f-09d49d9aafcc",
+      "auditLabel": "B019",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B019 study bldg_eff919e5-aa90-4f6c-aa5f-09d49d9aafcc"
+    },
+    {
+      "sourceId": "bldg_78df6bc0-eb7a-4496-922d-cbc429fec37d",
+      "auditLabel": "B020",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B020 study bldg_78df6bc0-eb7a-4496-922d-cbc429fec37d"
+    },
+    {
+      "sourceId": "bldg_287f76c8-2d0e-4b57-9009-138de636f3ea",
+      "auditLabel": "B021",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B021 study bldg_287f76c8-2d0e-4b57-9009-138de636f3ea"
+    },
+    {
+      "sourceId": "bldg_412fb575-c91d-47c2-8887-bbce1a985622",
+      "auditLabel": "B022",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B022 study bldg_412fb575-c91d-47c2-8887-bbce1a985622"
+    },
+    {
+      "sourceId": "bldg_ee83e0d9-4ba0-4a72-bec8-c77447ef2a8e",
+      "auditLabel": "B023",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B023 study bldg_ee83e0d9-4ba0-4a72-bec8-c77447ef2a8e"
+    },
+    {
+      "sourceId": "bldg_cdc316af-5973-4869-8a8d-5c4bc84bf49f",
+      "auditLabel": "B024",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B024 study bldg_cdc316af-5973-4869-8a8d-5c4bc84bf49f"
+    },
+    {
+      "sourceId": "bldg_992fac86-aa37-4398-a10e-6850c9cac9f9",
+      "auditLabel": "B025",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B025 study bldg_992fac86-aa37-4398-a10e-6850c9cac9f9"
+    },
+    {
+      "sourceId": "bldg_af2493d8-cf34-4855-a45b-e070f8c4ba6b",
+      "auditLabel": "B026",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B026 study bldg_af2493d8-cf34-4855-a45b-e070f8c4ba6b"
+    },
+    {
+      "sourceId": "bldg_8a1583f8-f560-4137-9938-b49420c3515f",
+      "auditLabel": "B027",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B027 study bldg_8a1583f8-f560-4137-9938-b49420c3515f"
+    },
+    {
+      "sourceId": "bldg_36dfa3b9-6bbd-4d27-9567-629b27f1fbf4",
+      "auditLabel": "B028",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B028 study bldg_36dfa3b9-6bbd-4d27-9567-629b27f1fbf4"
+    },
+    {
+      "sourceId": "bldg_09cdf410-c611-4b54-9454-593bd587d1bd",
+      "auditLabel": "B029",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B029 study bldg_09cdf410-c611-4b54-9454-593bd587d1bd"
+    },
+    {
+      "sourceId": "bldg_0642fc6c-6d3b-4bb8-b8a1-1b18eb05cdaf",
+      "auditLabel": "B030",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B030 study bldg_0642fc6c-6d3b-4bb8-b8a1-1b18eb05cdaf"
+    },
+    {
+      "sourceId": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4",
+      "auditLabel": "B031",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B031 study bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4"
+    },
+    {
+      "sourceId": "bldg_90585470-1c85-41a2-b1d1-08c7e7456fc0",
+      "auditLabel": "B032",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B032 study bldg_90585470-1c85-41a2-b1d1-08c7e7456fc0"
+    },
+    {
+      "sourceId": "bldg_1fa7973c-e3bf-41a8-ae40-fc1460305e35",
+      "auditLabel": "B033",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B033 study bldg_1fa7973c-e3bf-41a8-ae40-fc1460305e35"
+    },
+    {
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "auditLabel": "B034",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B034 study bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73"
+    },
+    {
+      "sourceId": "bldg_52193e01-cf9a-489d-9baf-06917e3b056c",
+      "auditLabel": "B035",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B035 study bldg_52193e01-cf9a-489d-9baf-06917e3b056c"
+    },
+    {
+      "sourceId": "bldg_e95a0f5f-11e1-46f8-b5da-37619d297fc4",
+      "auditLabel": "B036",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 5,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B036 study bldg_e95a0f5f-11e1-46f8-b5da-37619d297fc4"
+    },
+    {
+      "sourceId": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "auditLabel": "B037",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B037 study bldg_7bf89cd8-a58a-4891-a357-3162812dde2d"
+    },
+    {
+      "sourceId": "bldg_fd5276cc-91fe-4ca0-a80f-afdbbbcf3b9e",
+      "auditLabel": "B038",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B038 study bldg_fd5276cc-91fe-4ca0-a80f-afdbbbcf3b9e"
+    },
+    {
+      "sourceId": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742",
+      "auditLabel": "B039",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B039 study bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742"
+    },
+    {
+      "sourceId": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+      "auditLabel": "B040",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B040 study bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614"
+    },
+    {
+      "sourceId": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85",
+      "auditLabel": "B041",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B041 study bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85"
+    },
+    {
+      "sourceId": "bldg_e5544ca4-cb61-4b2e-a70d-8aee283a67f5",
+      "auditLabel": "B042",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B042 study bldg_e5544ca4-cb61-4b2e-a70d-8aee283a67f5"
+    },
+    {
+      "sourceId": "bldg_b64bf000-9dcd-42bc-af79-2acb3651aaeb",
+      "auditLabel": "B043",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B043 study bldg_b64bf000-9dcd-42bc-af79-2acb3651aaeb"
+    },
+    {
+      "sourceId": "bldg_80a96e74-6934-4bca-b090-fc736ff4fc87",
+      "auditLabel": "B044",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B044 study bldg_80a96e74-6934-4bca-b090-fc736ff4fc87"
+    },
+    {
+      "sourceId": "bldg_1910ceab-f4fe-4995-ba10-79dcf616cf77",
+      "auditLabel": "B045",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B045 study bldg_1910ceab-f4fe-4995-ba10-79dcf616cf77"
+    },
+    {
+      "sourceId": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+      "auditLabel": "B046",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 2,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B046 study bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a"
+    },
+    {
+      "sourceId": "bldg_7548efc6-1187-4138-ab0f-5e94709ed687",
+      "auditLabel": "B047",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B047 study bldg_7548efc6-1187-4138-ab0f-5e94709ed687"
+    },
+    {
+      "sourceId": "bldg_f3e79f73-b62f-48c0-a3f3-dd4849d1a867",
+      "auditLabel": "B048",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 2,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B048 study bldg_f3e79f73-b62f-48c0-a3f3-dd4849d1a867"
+    },
+    {
+      "sourceId": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429",
+      "auditLabel": "B049",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B049 study bldg_855dffaa-1263-4a5f-bd07-8ed04eded429"
+    },
+    {
+      "sourceId": "bldg_8cee6021-11a5-4653-8418-f12e6173b4cc",
+      "auditLabel": "B050",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B050 study bldg_8cee6021-11a5-4653-8418-f12e6173b4cc"
+    },
+    {
+      "sourceId": "bldg_8bcee197-1f52-417e-a67f-28480a319821",
+      "auditLabel": "B051",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B051 study bldg_8bcee197-1f52-417e-a67f-28480a319821"
+    },
+    {
+      "sourceId": "bldg_1f987142-0572-4544-9529-9a21c0c24447",
+      "auditLabel": "B052",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B052 study bldg_1f987142-0572-4544-9529-9a21c0c24447"
+    },
+    {
+      "sourceId": "bldg_fee60d6a-ed22-4cb1-863e-d4aa94a1d2e1",
+      "auditLabel": "B053",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 1,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B053 study bldg_fee60d6a-ed22-4cb1-863e-d4aa94a1d2e1"
+    },
+    {
+      "sourceId": "bldg_740f4b5a-00b3-43d4-83d6-c45e82f2e494",
+      "auditLabel": "B054",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B054 study bldg_740f4b5a-00b3-43d4-83d6-c45e82f2e494"
+    },
+    {
+      "sourceId": "bldg_081a1c94-4b22-4245-b41d-bce24cdd94d1",
+      "auditLabel": "B055",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B055 study bldg_081a1c94-4b22-4245-b41d-bce24cdd94d1"
+    },
+    {
+      "sourceId": "bldg_d1c14616-11d6-420f-a194-b00d109cd088",
+      "auditLabel": "B056",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B056 study bldg_d1c14616-11d6-420f-a194-b00d109cd088"
+    },
+    {
+      "sourceId": "bldg_c2481bab-de3d-4885-ac93-4a4468dac9fa",
+      "auditLabel": "B057",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B057 study bldg_c2481bab-de3d-4885-ac93-4a4468dac9fa"
+    },
+    {
+      "sourceId": "bldg_e9a16744-1518-44eb-a8ad-55525ed6ac48",
+      "auditLabel": "B058",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B058 study bldg_e9a16744-1518-44eb-a8ad-55525ed6ac48"
+    },
+    {
+      "sourceId": "bldg_83ec56aa-2338-4b9e-b1e3-c0dd4a1d1ca3",
+      "auditLabel": "B059",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B059 study bldg_83ec56aa-2338-4b9e-b1e3-c0dd4a1d1ca3"
+    },
+    {
+      "sourceId": "bldg_67ee9dba-9301-4e9d-9fd9-25e33057186f",
+      "auditLabel": "B060",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B060 study bldg_67ee9dba-9301-4e9d-9fd9-25e33057186f"
+    },
+    {
+      "sourceId": "bldg_21552a83-46b7-4eea-a049-9fe29dbd3cb9",
+      "auditLabel": "B061",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 2,
+      "studyObject": "B061 study bldg_21552a83-46b7-4eea-a049-9fe29dbd3cb9"
+    },
+    {
+      "sourceId": "bldg_fca861ee-3cbf-45ce-97c0-36cf40a755b5",
+      "auditLabel": "B062",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B062 study bldg_fca861ee-3cbf-45ce-97c0-36cf40a755b5"
+    },
+    {
+      "sourceId": "bldg_010ce473-cf92-496b-8905-0f16a250ed1a",
+      "auditLabel": "B063",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B063 study bldg_010ce473-cf92-496b-8905-0f16a250ed1a"
+    },
+    {
+      "sourceId": "bldg_2260a3a1-9ab2-48bf-80c9-09d3a718b74f",
+      "auditLabel": "B064",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B064 study bldg_2260a3a1-9ab2-48bf-80c9-09d3a718b74f"
+    },
+    {
+      "sourceId": "bldg_94780c64-d2d7-4e0b-b465-93a3429e6533",
+      "auditLabel": "B065",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B065 study bldg_94780c64-d2d7-4e0b-b465-93a3429e6533"
+    },
+    {
+      "sourceId": "bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1",
+      "auditLabel": "B066",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B066 study bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1"
+    },
+    {
+      "sourceId": "bldg_25f7a5fb-7d9b-4992-8936-a1a8b4a6ad52",
+      "auditLabel": "B067",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B067 study bldg_25f7a5fb-7d9b-4992-8936-a1a8b4a6ad52"
+    },
+    {
+      "sourceId": "bldg_77df5e65-77a7-41f2-8c15-5e3793bf149d",
+      "auditLabel": "B068",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 0,
+      "studyObject": "B068 study bldg_77df5e65-77a7-41f2-8c15-5e3793bf149d"
+    },
+    {
+      "sourceId": "bldg_c657204f-1a56-4972-aba9-70ac9edc3226",
+      "auditLabel": "B069",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B069 study bldg_c657204f-1a56-4972-aba9-70ac9edc3226"
+    },
+    {
+      "sourceId": "bldg_b9fc7be2-2a9a-4a61-a0ef-528fa05f3e0e",
+      "auditLabel": "B070",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B070 study bldg_b9fc7be2-2a9a-4a61-a0ef-528fa05f3e0e"
+    },
+    {
+      "sourceId": "bldg_2c945096-d6a8-4590-b6f7-d0c31ef03b7a",
+      "auditLabel": "B071",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B071 study bldg_2c945096-d6a8-4590-b6f7-d0c31ef03b7a"
+    },
+    {
+      "sourceId": "bldg_ac5c2ec2-0b06-431e-b6b9-2af0d6c1b8a3",
+      "auditLabel": "B072",
+      "lod": 2,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B072 study bldg_ac5c2ec2-0b06-431e-b6b9-2af0d6c1b8a3"
+    },
+    {
+      "sourceId": "bldg_f7b27726-11e9-4848-92a2-7879b0483bbc",
+      "auditLabel": "B073",
+      "lod": 1,
+      "cropDuplicateVerticesRemoved": 0,
+      "float32DegenerateFacesRemoved": 0,
+      "zeroAreaExportTrianglesRemoved": 0,
+      "authoringCutFaces": 1,
+      "studyObject": "B073 study bldg_f7b27726-11e9-4848-92a2-7879b0483bbc"
+    }
+  ],
+  "unresolved": [
+    "bridge surface reconciliation, ramps, stairs, rails and girders",
+    "local bank elevations and connections",
+    "registered facade detail and sign placement",
+    "scene capture date"
+  ],
+  "referenceGuides": "Plan guides and reference board have author-chosen display Z; they are not terrain and are excluded from GLB.",
+  "attribution": "Derived from Osaka City PLATEAU source geometry and GSI optimized vector map references; processed by this repository."
+}

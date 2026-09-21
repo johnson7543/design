@@ -11,6 +11,7 @@ async function collectMarkdownFiles(directory) {
   const files = [];
 
   for (const entry of entries) {
+    if (directory === projectRoot && entry.name === 'plan') continue;
     if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
@@ -45,7 +46,7 @@ for (const absolutePath of markdownFiles) {
     }
   }
 
-  const markdownLinkPattern = /(?<!!)\[[^\]]*\]\(([^)]+)\)/g;
+  const markdownLinkPattern = /!?\[[^\]]*\]\(([^)]+)\)/g;
   for (const match of source.matchAll(markdownLinkPattern)) {
     let target = match[1].trim();
     if (target.startsWith('<') && target.endsWith('>')) target = target.slice(1, -1);
@@ -76,6 +77,11 @@ for (const absolutePath of markdownFiles) {
     }
 
     const resolvedTarget = resolve(dirname(absolutePath), decodedPath);
+    const localPlanDirectory = join(projectRoot, 'plan');
+    if (resolvedTarget === localPlanDirectory || resolvedTarget.startsWith(`${localPlanDirectory}${sep}`)) {
+      failures.push(`${repositoryPath}:${line}: references to local-only plan material are not allowed: ${target}`);
+      continue;
+    }
     if (!resolvedTarget.startsWith(`${projectRoot}${sep}`) && resolvedTarget !== projectRoot) {
       failures.push(`${repositoryPath}:${line}: link escapes the repository: ${target}`);
       continue;
@@ -94,25 +100,40 @@ if (!markdownFiles.some((path) => relative(projectRoot, path).split(sep).join('/
   failures.push('docs/README.md: required documentation index is missing');
 }
 
-for (const areaEntry of await readdir(docsRoot, { withFileTypes: true })) {
-  if (!areaEntry.isDirectory()) continue;
-  const documentationArea = areaEntry.name;
-  const documentationDirectory = join(docsRoot, documentationArea);
-  const indexPath = join(documentationDirectory, 'README.md');
-  let documentationIndex;
-  try {
-    documentationIndex = await readFile(indexPath, 'utf8');
-  } catch {
-    failures.push(`docs/${documentationArea}/README.md: every documentation area requires an index`);
-    continue;
-  }
-  for (const entry of await readdir(documentationDirectory, { withFileTypes: true })) {
-    if (!entry.isFile() || entry.name === 'README.md' || extname(entry.name) !== '.md') continue;
-    if (!documentationIndex.includes(`(${entry.name})`)) {
-      failures.push(`docs/${documentationArea}/${entry.name}: add this document to docs/${documentationArea}/README.md`);
+async function checkDocumentationDirectory(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const documents = entries.filter(entry => entry.isFile() && extname(entry.name) === '.md');
+  const childAreas = [];
+  for (const entry of entries) {
+    if (entry.isDirectory() && await checkDocumentationDirectory(join(directory, entry.name))) {
+      childAreas.push(entry.name);
     }
   }
+  // Supporting data does not require a Markdown index of its own.
+  if (documents.length === 0 && childAreas.length === 0) return false;
+  const area = relative(projectRoot, directory).split(sep).join('/');
+  const indexPath = join(directory, 'README.md');
+  let index;
+  try {
+    index = await readFile(indexPath, 'utf8');
+  } catch {
+    failures.push(`${area}/README.md: every documentation area requires an index`);
+    return true;
+  }
+  for (const document of documents) {
+    if (document.name !== 'README.md' && !index.includes(`(${document.name})`)) {
+      failures.push(`${area}/${document.name}: add this document to ${area}/README.md`);
+    }
+  }
+  for (const child of childAreas) {
+    if (!index.includes(`(${child}/README.md)`)) {
+      failures.push(`${area}/${child}/README.md: link this area from ${area}/README.md`);
+    }
+  }
+  return true;
 }
+
+await checkDocumentationDirectory(docsRoot);
 
 if (failures.length > 0) {
   console.error('Documentation contract failed:\n');

@@ -111,6 +111,7 @@ export function getRecommendedDesignQRReactExample(
   const defaultConfig = normalizeDesignQRConfig({
     value: currentConfig.value,
     design: currentConfig.design.type,
+    ...(currentConfig.design.type === 'city' ? { theme: currentConfig.theme } : {}),
   });
   return serializeDesignQRSetup(currentConfig) === serializeDesignQRSetup(defaultConfig)
     ? 'simple'
@@ -121,6 +122,9 @@ export function createDesignQRReactSnippet(config: DesignQRConfigV1): string {
   return createMinimalReactModule([
     `value="${escapeJsxAttribute(config.value)}"`,
     ...(config.design.type === 'city' ? ['design="city"'] : []),
+    ...(config.design.type === 'city' && config.theme.type === 'preset'
+      ? [`theme="${config.theme.preset}"`]
+      : []),
   ]);
 }
 

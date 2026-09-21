@@ -32,7 +32,7 @@ test('content reproduces artwork after another value is generated', () => {
 test('city rejects custom and seasonal themes instead of partially applying unsupported colors', () => {
   for (const theme of ['spring', resolveTreeTheme({ type: 'preset', preset: 'spring' })]) {
     assert.throws(() => normalizeDesignQRConfig({ value: 'city', design: 'city', theme }),
-      { code: 'INVALID_CONFIG', message: /only the Shibuya preset/ });
+      { code: 'INVALID_CONFIG', message: /Shibuya, Dōtonbori and Tokyo Tower presets/ });
   }
 });
 

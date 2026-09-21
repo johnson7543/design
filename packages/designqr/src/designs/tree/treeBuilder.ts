@@ -1,3 +1,4 @@
+import type { DesignQRCityPreset } from '../../config/types.ts';
 import { contentVariation } from '../content-variation.ts';
 import {
   BLOCK_SIZE,
@@ -52,7 +53,7 @@ export interface GrassBlade {
 }
 
 export interface TreeData {
-  city?: { modules: boolean[][] };
+  city?: { modules: boolean[][]; preset?: DesignQRCityPreset };
   contentVariation?: number;
   gridSize: number;
   blocks: VoxelBlock[];

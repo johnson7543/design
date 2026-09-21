@@ -40,11 +40,11 @@ export interface DesignQRZoomOptions {
 export interface DesignQRProps {
   /** Text or URL encoded by the QR. */
   value: string;
-  /** Visual design adapter. Choose `tree` or the Shibuya `city`. */
+  /** Visual design adapter. Choose `tree` or a Japan `city` preset. */
   design?: DesignQRDesignName;
   /** Deterministic tree silhouette. */
   tree?: TreeDesignOptions;
-  /** Tree preset/custom theme, or `shibuya` for City (custom city themes are not supported). */
+  /** Tree preset/custom theme, or `shibuya` / `dotonbori` / `tokyo-tower` for City (custom city themes are not supported). */
   theme?: DesignQRThemePreset | TreeTheme;
   /** Controlled view. Use `defaultView` for uncontrolled usage. */
   view?: DesignQRView;

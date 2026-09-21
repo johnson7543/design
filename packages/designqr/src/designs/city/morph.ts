@@ -1,12 +1,9 @@
+import { cityEase, cityMorphState } from './morph-state.ts';
+export { cityEase, cityMorphState } from './morph-state.ts';
 import type { CityBuilding } from './layout.ts';
 import { CITY_PAVEMENT_HEIGHT, cityPointInPolygon, citySurfaceContainsBounds } from './road-network.ts';
 import { SHIBUYA_PALETTE } from './palette.ts';
 import { cityStationMassingHeight } from './station-frontage-layout.ts';
-
-export function cityEase(progress: number, start = 0, end = 1) {
-  const t = Math.max(0, Math.min(1, (progress - start) / (end - start)));
-  return t * t * (3 - 2 * t);
-}
 
 export interface CityMorphVoxel {
   x: number; y: number; z: number;
@@ -18,7 +15,20 @@ export interface CityMorphVoxel {
   group?: string;
 }
 
-export interface CityMorphMotion { x: number; z: number; settle: number }
+export interface CityMorphMotion {
+  x: number; z: number; settle: number;
+  /** A source group's interval within the shared reversible transition. */
+  timing?: { start: number; end: number; lift: number };
+}
+
+export function cityMorphProgress(progress: number, motion?: CityMorphMotion) {
+  const timing = motion?.timing;
+  return timing ? Math.max(0, Math.min(1, (progress - timing.start) / (timing.end - timing.start))) : progress;
+}
+
+export function cityMorphLift(progress: number, lift = 0) {
+  return lift * Math.sin(Math.PI * cityEase(progress, .08, .88));
+}
 
 export const CITY_BUILDING_REVEAL_START = .08;
 
@@ -98,33 +108,16 @@ export function buildCityMorphVoxels(targets: readonly { x: number; z: number }[
   return result;
 }
 
-export function cityMorphState(progress: number) {
-  // Building blocks reveal gradually in roof-to-base sections beforehand;
-  // streets/details keep this coverage-first handoff. Never fade the original
-  // city throughout the reveal: that exposes back faces and looks glassy.
-  const handoff = cityEase(progress, .40, .46);
-  return {
-    cityOpacity: 1 - handoff,
-    voxelOpacity: handoff,
-    vertical: cityEase(progress, .02, .92),
-    // Full-color city tiles supply BOTH light and dark cells. The canonical
-    // paper/ink layer is only a final, pixel-identical endpoint handoff.
-    // Keep coverage beneath the final QR until it is fully opaque, too.
-    tileOpacity: progress < 1 ? cityEase(progress, .30, .42) : 0,
-    qrOpacity: cityEase(progress, .94, 1),
-    plateOpacity: cityEase(progress, .94, 1),
-  };
-}
-
 export function cityMorphPose(source: CityMorphVoxel, target: { x: number; z: number; light?: boolean }, grid: number,
   progress: number, motion: CityMorphMotion = { x: 0, z: 0, settle: .54 }) {
+  progress = cityMorphProgress(progress, motion);
   const vertical = cityMorphState(progress).vertical;
   const travel = cityEase(progress, .42, .90);
   const settle = cityEase(progress, motion.settle, .94);
   const mix = (a: number, b: number, t: number) => a + (b - a) * t;
   return {
     x: source.x + motion.x * travel + (target.x - source.x - motion.x) * settle,
-    y: mix(source.y, target.light ? -.002 : .001, vertical),
+    y: mix(source.y, target.light ? -.002 : .001, vertical) + cityMorphLift(progress, motion.timing?.lift),
     z: source.z + motion.z * travel + (target.z - source.z - motion.z) * settle,
     width: mix(source.width, 1.002 / grid, settle),
     height: mix(source.height, .002, vertical),

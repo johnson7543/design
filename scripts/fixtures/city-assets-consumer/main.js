@@ -10,14 +10,14 @@ function App() {
   const first = useRef(), second = useRef();
   useEffect(() => { window.fixture = { update: patch => setState(s => ({ ...s, ...patch })), first, second }; }, []);
   const common = { interaction: { motionBlur: false }, onError: error => { window.fixtureError = error; } };
-  return React.createElement('main', null,
+  return React.createElement('main', { 'data-theme': state.theme },
     state.show && React.createElement(DesignQR, { ...common, key: 'first', ref: first, value: state.value,
-      design: state.design, logo: state.logo, className: 'first', details: state.details,
+      design: state.design, theme: state.theme, logo: state.logo, className: 'first', details: state.details,
       zoom: state.zoom, onZoomChange: scale => { window.fixtureZoom = scale; },
       onReady: () => { if (state.readyZoom !== null) first.current?.setZoom(state.readyZoom); },
       transparentBackground: state.transparentBackground }),
     state.second && React.createElement(DesignQR, { ...common, key: 'second', ref: second,
-      value: 'https://example.com/second', design: 'city',
+      value: 'https://example.com/second', design: 'city', theme: state.secondTheme,
       logo: state.secondLogo, className: 'second' }));
 }
 createRoot(document.getElementById('root')).render(React.createElement(App));

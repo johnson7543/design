@@ -5,8 +5,8 @@
   ],
   "designs": [
     {
-      "id": "design-platform",
-      "name": "Design platform",
+      "id": "home-page",
+      "name": "Home page UI",
       "routes": [
         "/",
         "*"
@@ -16,9 +16,10 @@
         "public/favicon",
         "src/main.tsx",
         "src/platform",
-        "src/platform.css"
+        "src/platform.css",
+        "public/previews"
       ],
-      "docsDirectory": "docs/design-platform",
+      "docsDirectory": "docs/home-page",
       "documents": {
         "index": "README.md",
         "style": "style-principles.md",
@@ -26,36 +27,55 @@
       }
     },
     {
-      "id": "design-qr",
-      "name": "Design QR",
+      "id": "designqr-package",
+      "name": "DesignQR package",
       "routes": [
-        "/qr",
         "/qr/embed"
       ],
       "sourcePaths": [
+        "assets/design-qr/dotonbori",
         "assets/design-qr/shibuya",
         "scripts/blender",
         "scripts/build-shibuya-road.py",
         "scripts/build-shibuya-buildings.py",
         "scripts/build-shibuya-lettering.py",
         "scripts/shibuya-asset-plugin.mjs",
+        "scripts/dotonbori-asset-plugin.mjs",
         "scripts/fixtures/city-assets-consumer",
         "examples/iframe-consumer",
         "examples/react-vite-consumer",
         "packages/designqr",
-        "public/previews",
-        "src/App.tsx",
-        "src/components",
-        "src/editor",
-        "src/index.css",
         "src/routes",
-        "src/utils"
+        "assets/design-qr/tokyo-tower",
+        "scripts/build-tokyo-tower-assets.ts",
+        "scripts/fixtures/tokyo-tower"
       ],
-      "docsDirectory": "docs/design-qr",
+      "docsDirectory": "docs/designqr-package",
       "documents": {
         "index": "README.md",
         "style": "style-principles.md",
         "colors": "color-palettes.md"
+      }
+    },
+    {
+      "id": "designqr-editor",
+      "name": "DesignQR editor UI",
+      "routes": [
+        "/qr"
+      ],
+      "sourcePaths": [
+        "scripts/build-city-label-font.py",
+        "src/App.tsx",
+        "src/components",
+        "src/editor",
+        "src/index.css",
+        "src/utils"
+      ],
+      "docsDirectory": "docs/designqr-editor",
+      "documents": {
+        "index": "README.md",
+        "style": "style-principles.md",
+        "colors": "color-mappings.md"
       }
     }
   ]

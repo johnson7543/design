@@ -1,3 +1,4 @@
+import { isCityPreset } from '../designs/city/presets.ts';
 import coreStyles from '../style.css?inline';
 import { ensureDesignQRStyles } from './coreStyles.ts';
 import {
@@ -190,6 +191,8 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
     ]);
 
     const preparedValue = prepared.ok ? prepared.value.config.value : null;
+    const cityPreset = prepared.ok && prepared.value.config.theme.type === 'preset'
+      && isCityPreset(prepared.value.config.theme.preset) ? prepared.value.config.theme.preset : 'shibuya';
     const preparedShape = prepared.ok
       ? prepared.value.config.design.type === 'tree' ? prepared.value.config.design.options.shape : 'dome'
       : null;
@@ -210,7 +213,7 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
         return {
           ok: true,
           value: design === 'city'
-            ? build3DCity(matrix.modules)
+            ? build3DCity(matrix.modules, cityPreset)
             : build3DTree(matrix.modules, preparedShape),
         };
       } catch (cause) {
@@ -223,7 +226,7 @@ export const DesignQR = forwardRef<DesignQRHandle, DesignQRProps>(
           ),
         };
       }
-    }, [design, preparedLogoEnabled, preparedShape, preparedValue]);
+    }, [design, cityPreset, preparedLogoEnabled, preparedShape, preparedValue]);
 
     const activeError = !prepared.ok
       ? prepared.error

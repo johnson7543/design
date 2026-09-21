@@ -125,6 +125,14 @@ export function createCityMorphCrosswalks(): CityMorphVoxel[] {
  * Local parcel matching and object groups avoid a city-wide particle scramble. */
 export function buildCityMorphBase(targets: readonly CityMorphTarget[], buildings: readonly CityBuilding[],
   ground: readonly CityMorphGround[]): CityMorphPair[] {
+  return buildCitySurfaceMorphBase(targets, ground, skyline => buildCityMorphVoxels(skyline, buildings));
+}
+
+/** Shared City correspondence, independent of the source city's geometry.
+ * Buildings supply dark skyline cells. Occluded light cells use exposed ground.
+ * Each preset packs only its own real envelopes in createVolumes. */
+export function buildCitySurfaceMorphBase(targets: readonly CityMorphTarget[], ground: readonly CityMorphGround[],
+  createVolumes: (skyline: readonly CityMorphTarget[]) => CityMorphVoxel[]): CityMorphPair[] {
   const grid = Math.round(Math.sqrt(ground.length));
   const at = (p: { x: number; z: number }) => ground[Math.min(grid - 1, Math.max(0, Math.floor((p.z + .5) * grid))) * grid
     + Math.min(grid - 1, Math.max(0, Math.floor((p.x + .5) * grid)))];
@@ -151,7 +159,7 @@ export function buildCityMorphBase(targets: readonly CityMorphTarget[], building
     return ground[best];
   };
   const skyline = targets.filter(target => !target.light && (at(target).kind === 'pavement' || !at(target).open));
-  const volumes = buildCityMorphVoxels(skyline, buildings);
+  const volumes = createVolumes(skyline);
   const byTarget = new Map(matchCityMorphBuildings(volumes, skyline).map(({ source, target }) => [target, source]));
   return targets.map(target => {
     const building = byTarget.get(target);
@@ -168,7 +176,18 @@ export function buildCityMorphBase(targets: readonly CityMorphTarget[], building
 export function buildCityMorphPlan(targets: readonly CityMorphTarget[], buildings: readonly CityBuilding[],
   ground: readonly CityMorphGround[], details: readonly CityMorphVoxel[],
   base = buildCityMorphBase(targets, buildings, ground)): CityMorphTile[] {
-  return cohereCityMorphTiles([...base, ...matchCityMorphDetails(details, targets, Math.round(Math.sqrt(ground.length)))]);
+  return cohereCityMorphTiles([...base, ...matchCityMorphDetails(boundedCityMorphDetails(details), targets, Math.round(Math.sqrt(ground.length)))]);
+}
+
+/** Preserve sign halves/actors, then distribute the remaining detail budget
+ * across static surfaces. Fine façade density must not enlarge the QR batch. */
+export function boundedCityMorphDetails(details: readonly CityMorphVoxel[], limit = 512): readonly CityMorphVoxel[] {
+  if (details.length <= limit) return details;
+  const active = details.filter(s => s.kind === 'sign' || s.kind === 'people' || s.kind === 'vehicle' || s.kind === 'train');
+  const staticDetails = details.filter(s => !active.includes(s));
+  const sample = (items: readonly CityMorphVoxel[], count: number) => Array.from({ length: count }, (_, i) => items[Math.floor((i + .5) / count * items.length)]);
+  if (active.length >= limit) return sample(active, limit);
+  return [...active, ...sample(staticDetails, limit - active.length)];
 }
 
 /** Cache a few palette-colored surface fragments per immutable static mesh.

@@ -1,0 +1,54 @@
+{
+  "schema": "designqr-dotonbori-waterfront-review",
+  "version": 3,
+  "status": "All 58 selected buildings visible from every rotation, with QR-generated architecture and compact, bridge-centered Ebisu Tower placement; 8 cropped edge fragments and 6 displaced context buildings omitted; not a surveyed reconstruction",
+  "units": "metres",
+  "axes": [
+    "east",
+    "north",
+    "height"
+  ],
+  "objectCount": 406,
+  "content": {
+    "value": "https://example.com/dotonbori",
+    "grid": 29
+  },
+  "reviewViews": {
+    "east": {
+      "eye": [
+        211,
+        128,
+        245
+      ],
+      "target": [
+        4.196907421216137,
+        2.1639323405262125,
+        10
+      ]
+    },
+    "default": {
+      "eye": [
+        103.27992679785108,
+        214.64815309870247,
+        145.35999999999996
+      ],
+      "target": [
+        4.196907421216137,
+        2.1639323405262125,
+        10
+      ]
+    }
+  },
+  "triangleCount": 392407,
+  "runtimeSnapshotSha256": "d9ebadc251a19dc3114b84feaeb86f58733bb2607f25250f810c1b5aab258f12",
+  "generatorSha256": "3a12d4cfbe7c5e17a11b822d3f9ce06946c3dbe09b208a860981f229a8c514f7",
+  "blendSha256": "3ee0fc115202492fca17df99e091bfc564b9791572d592aea06b44bb7847483d",
+  "blendBytes": 22043260,
+  "artwork": {
+    "glico-panel.png": "9385b26be4e723a42e6b1e2d904393849a0fe0a2cfe3d9ee4c01c1446061e84e",
+    "bridge-name.png": "8495a4f62f5a878d043a970f51551762aadbea3aad6412a472f0b6e7f539af53",
+    "night-signs.png": "96117deeb88bd3f851b7cceaff709a1f8b8f84140fa2a9ed3372988e38b296c9",
+    "generated-signs.png": "8ed690266443a6c97a6165832fef3ad852ed923b4bf01c341d623fa5d5efc601",
+    "storefronts.png": "01dda5e67ec29351eff2ea24f8ffdb30ac988f8497abb29b02e39f5e06f94647"
+  }
+}

@@ -37,10 +37,13 @@
  * surfaces, borders, control heights, or interaction timing.
  */
 .app-root {
+  --qr-city-font-family: 'DesignQR City Japanese', var(--font-sans);
   --qr-ink: var(--color-dark);
   --qr-ink-muted: var(--color-muted);
   --qr-ink-placeholder: #a89888;
   --qr-on-accent: var(--color-light);
+  --qr-on-night-stage: var(--color-light);
+  --qr-night-stage-border: color-mix(in srgb, var(--color-light) 45%, transparent);
 
   --qr-accent: #c07a3a;
   --qr-accent-strong: #a45e22;

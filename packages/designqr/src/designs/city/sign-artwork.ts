@@ -32,7 +32,7 @@ export const CITY_SIGN_DESIGNS: readonly Readonly<CitySignDesign>[] = Object.fre
 
 /** Paint once per sign; only the configured-logo billboard needs repainting.
  * Flat colors stay on-palette. No external fonts, images, or per-frame uploads. */
-export function paintCitySign(context: CanvasRenderingContext2D, design: Readonly<CitySignDesign>, hasLogo = false) {
+export function paintCitySign(context: CanvasRenderingContext2D, design: Readonly<CitySignDesign>, hasLogo = false, paintText = paintCitySignText) {
   const { width: w, height: h } = context.canvas;
   const d = design;
   const rect = (x: number, y: number, width: number, height: number, color: string) => {
@@ -40,7 +40,7 @@ export function paintCitySign(context: CanvasRenderingContext2D, design: Readonl
     context.fillRect(x * w, y * h, width * w, height * h);
   };
   const text = (label: string, x: number, y: number, size: number, width: number, color: string, font = '900') => {
-    paintCitySignText(context, label, x * w, y * h, size * h, width * w, color, font);
+    paintText(context, label, x * w, y * h, size * h, width * w, color, font);
   };
   const disk = (x: number, y: number, radius: number, color: string) => {
     context.fillStyle = color;

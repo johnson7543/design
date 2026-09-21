@@ -1,0 +1,1028 @@
+{
+  "schema": "designqr-dotonbori-focus",
+  "version": 5,
+  "units": "metres",
+  "gltfAxes": [
+    "east",
+    "source-height",
+    "south"
+  ],
+  "blenderVersion": "5.2.1 LTS",
+  "sourceMeshSha256": "ede42a5691140bd7b44df32ae62be6c10030a9f4ab94ec725e0a257c92e0cb79",
+  "layoutSha256": "d0b78a95e1d0c790b11bf57b5f49ef0da66aec1dfc8a33060c588f1527938863",
+  "generatorSha256": "11e1b1b6cb4de960e6647dfd623663b5abdafde671c6dc9d186843480cf0905d",
+  "sourceBuildingCount": 132,
+  "focusedBuildingCount": 58,
+  "triangleCount": 3732,
+  "glbBytes": 306896,
+  "glbSha256": "5c9d25d23f4a9d55525797d7f72259c0f0f113f621aaed4cc5d3eb8338c2b4eb",
+  "blendSha256": "0916f1059f86d8c9828ea366df8e6ce08fbace5620c30ecf22dcf31d46b1a2f1",
+  "materials": {
+    "dotonbori-focus-source-wall": {
+      "role": "source-wall",
+      "swatch": "#e8ddcf"
+    },
+    "dotonbori-focus-source-roof": {
+      "role": "source-roof",
+      "swatch": "#cddbe4"
+    },
+    "dotonbori-focus-lod1-unresolved": {
+      "role": "lod1-unresolved",
+      "swatch": "#ea6157"
+    },
+    "dotonbori-focus-authoring-cut": {
+      "role": "authoring-cut",
+      "swatch": "#eed883"
+    }
+  },
+  "objects": [
+    {
+      "sourceId": "bldg_05ec86aa-79f1-4aaa-8e93-0bf011542f99",
+      "auditLabel": "B001",
+      "lod": 1,
+      "variationIndex": 0,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 34,
+      "authoringCutFaces": 2,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 6,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 15.1899995803833
+    },
+    {
+      "sourceId": "bldg_97ff7748-df43-4444-9eb0-23cc6f494ee3",
+      "auditLabel": "B004",
+      "lod": 2,
+      "variationIndex": 3,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 156,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 52,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 28.66699981689453
+    },
+    {
+      "sourceId": "bldg_fc4e8d81-ae3d-4f37-9d4f-37c39142094b",
+      "auditLabel": "B005",
+      "lod": 2,
+      "variationIndex": 4,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 40,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 8,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 12.593999862670898
+    },
+    {
+      "sourceId": "bldg_2de00e94-da2b-43f6-851e-31ccd3170afa",
+      "auditLabel": "B006",
+      "lod": 1,
+      "variationIndex": 5,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 28,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 6,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 9.460000038146973
+    },
+    {
+      "sourceId": "bldg_7ad08c54-9183-462f-bf96-9eb346a14310",
+      "auditLabel": "B007",
+      "lod": 2,
+      "variationIndex": 6,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 76,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 28,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 14.270000457763672
+    },
+    {
+      "sourceId": "bldg_05785215-b10c-434c-99b8-a700f76f8adc",
+      "auditLabel": "B008",
+      "lod": 2,
+      "variationIndex": 7,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 88,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 46,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 18.344005584716797
+    },
+    {
+      "sourceId": "bldg_f7b7d534-49ca-4a79-b03a-08128ff697c0",
+      "auditLabel": "B009",
+      "lod": 2,
+      "variationIndex": 8,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 94,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 17,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 58.327999114990234
+    },
+    {
+      "sourceId": "bldg_711d3b15-de26-4d47-a8a3-5d0e1f7e5d8d",
+      "auditLabel": "B012",
+      "lod": 2,
+      "variationIndex": 11,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 56,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 30,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 19.43199920654297
+    },
+    {
+      "sourceId": "bldg_fa021df6-6040-4cd5-8773-63d12e3ccf27",
+      "auditLabel": "B014",
+      "lod": 2,
+      "variationIndex": 13,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 80,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 42,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 17.110000610351562
+    },
+    {
+      "sourceId": "bldg_484c9eab-7b24-4cdb-b22a-6cca97c92210",
+      "auditLabel": "B015",
+      "lod": 1,
+      "variationIndex": 14,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 4,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 14.829999923706055
+    },
+    {
+      "sourceId": "bldg_d589d364-22d5-4c9c-85c3-4416c222ec92",
+      "auditLabel": "B016",
+      "lod": 2,
+      "variationIndex": 15,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 222,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 90,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 28.215999603271484
+    },
+    {
+      "sourceId": "bldg_91ce1b36-b134-4def-bdf5-ed78a1e948cb",
+      "auditLabel": "B017",
+      "lod": 2,
+      "variationIndex": 16,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 56,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 30,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 18.656999588012695
+    },
+    {
+      "sourceId": "bldg_69381567-48c9-40b7-a6d3-478623f7e2f6",
+      "auditLabel": "B018",
+      "lod": 2,
+      "variationIndex": 17,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 132,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 53,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 24.200000762939453
+    },
+    {
+      "sourceId": "bldg_eff919e5-aa90-4f6c-aa5f-09d49d9aafcc",
+      "auditLabel": "B019",
+      "lod": 2,
+      "variationIndex": 18,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 12,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 14.741999626159668
+    },
+    {
+      "sourceId": "bldg_412fb575-c91d-47c2-8887-bbce1a985622",
+      "auditLabel": "B022",
+      "lod": 2,
+      "variationIndex": 21,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 120,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 32,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 29.430999755859375
+    },
+    {
+      "sourceId": "bldg_ee83e0d9-4ba0-4a72-bec8-c77447ef2a8e",
+      "auditLabel": "B023",
+      "lod": 2,
+      "variationIndex": 22,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 148,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 76,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 48.13199996948242
+    },
+    {
+      "sourceId": "bldg_cdc316af-5973-4869-8a8d-5c4bc84bf49f",
+      "auditLabel": "B024",
+      "lod": 2,
+      "variationIndex": 23,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 40,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 22,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 25.750999450683594
+    },
+    {
+      "sourceId": "bldg_992fac86-aa37-4398-a10e-6850c9cac9f9",
+      "auditLabel": "B025",
+      "lod": 2,
+      "variationIndex": 24,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 48,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 26,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 37.79600143432617
+    },
+    {
+      "sourceId": "bldg_36dfa3b9-6bbd-4d27-9567-629b27f1fbf4",
+      "auditLabel": "B028",
+      "lod": 2,
+      "variationIndex": 27,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 4,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 20.809999465942383
+    },
+    {
+      "sourceId": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4",
+      "auditLabel": "B031",
+      "lod": 2,
+      "variationIndex": 30,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 32,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 18,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 37.88399887084961
+    },
+    {
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "auditLabel": "B034",
+      "lod": 2,
+      "variationIndex": 33,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 76,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 40,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 50.446998596191406
+    },
+    {
+      "sourceId": "bldg_52193e01-cf9a-489d-9baf-06917e3b056c",
+      "auditLabel": "B035",
+      "lod": 2,
+      "variationIndex": 34,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 28,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 16,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 30.652000427246094
+    },
+    {
+      "sourceId": "bldg_e95a0f5f-11e1-46f8-b5da-37619d297fc4",
+      "auditLabel": "B036",
+      "lod": 2,
+      "variationIndex": 35,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 120,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 62,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 44.775001525878906
+    },
+    {
+      "sourceId": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "auditLabel": "B037",
+      "lod": 2,
+      "variationIndex": 36,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 40,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 22,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 35.606998443603516
+    },
+    {
+      "sourceId": "bldg_fd5276cc-91fe-4ca0-a80f-afdbbbcf3b9e",
+      "auditLabel": "B038",
+      "lod": 1,
+      "variationIndex": 37,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 12,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 8,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 36.65999984741211
+    },
+    {
+      "sourceId": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742",
+      "auditLabel": "B039",
+      "lod": 2,
+      "variationIndex": 38,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 110,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 57,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 30.83300018310547
+    },
+    {
+      "sourceId": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+      "auditLabel": "B040",
+      "lod": 2,
+      "variationIndex": 39,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 12,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 35.540000915527344
+    },
+    {
+      "sourceId": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85",
+      "auditLabel": "B041",
+      "lod": 2,
+      "variationIndex": 40,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 24,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 14,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 28.108999252319336
+    },
+    {
+      "sourceId": "bldg_e5544ca4-cb61-4b2e-a70d-8aee283a67f5",
+      "auditLabel": "B042",
+      "lod": 2,
+      "variationIndex": 41,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 36,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 20,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 25.010000228881836
+    },
+    {
+      "sourceId": "bldg_b64bf000-9dcd-42bc-af79-2acb3651aaeb",
+      "auditLabel": "B043",
+      "lod": 2,
+      "variationIndex": 42,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 32,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 18,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 32.82699966430664
+    },
+    {
+      "sourceId": "bldg_80a96e74-6934-4bca-b090-fc736ff4fc87",
+      "auditLabel": "B044",
+      "lod": 2,
+      "variationIndex": 43,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 104,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 54,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 31.082000732421875
+    },
+    {
+      "sourceId": "bldg_1910ceab-f4fe-4995-ba10-79dcf616cf77",
+      "auditLabel": "B045",
+      "lod": 2,
+      "variationIndex": 44,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 60,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 32,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 30.85700035095215
+    },
+    {
+      "sourceId": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+      "auditLabel": "B046",
+      "lod": 2,
+      "variationIndex": 45,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 96,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 50,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 41.194000244140625
+    },
+    {
+      "sourceId": "bldg_7548efc6-1187-4138-ab0f-5e94709ed687",
+      "auditLabel": "B047",
+      "lod": 2,
+      "variationIndex": 46,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 76,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 32,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 20.107999801635742
+    },
+    {
+      "sourceId": "bldg_f3e79f73-b62f-48c0-a3f3-dd4849d1a867",
+      "auditLabel": "B048",
+      "lod": 2,
+      "variationIndex": 47,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 52,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 28,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 22.236000061035156
+    },
+    {
+      "sourceId": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429",
+      "auditLabel": "B049",
+      "lod": 2,
+      "variationIndex": 48,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 92,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 48,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 39.99399948120117
+    },
+    {
+      "sourceId": "bldg_8cee6021-11a5-4653-8418-f12e6173b4cc",
+      "auditLabel": "B050",
+      "lod": 2,
+      "variationIndex": 49,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 86,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 20,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 30.974000930786133
+    },
+    {
+      "sourceId": "bldg_8bcee197-1f52-417e-a67f-28480a319821",
+      "auditLabel": "B051",
+      "lod": 2,
+      "variationIndex": 50,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 12,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 8,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 27.420000076293945
+    },
+    {
+      "sourceId": "bldg_1f987142-0572-4544-9529-9a21c0c24447",
+      "auditLabel": "B052",
+      "lod": 2,
+      "variationIndex": 51,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 46,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 25,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 13.22599983215332
+    },
+    {
+      "sourceId": "bldg_fee60d6a-ed22-4cb1-863e-d4aa94a1d2e1",
+      "auditLabel": "B053",
+      "lod": 2,
+      "variationIndex": 52,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 130,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 67,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 43.96200180053711
+    },
+    {
+      "sourceId": "bldg_740f4b5a-00b3-43d4-83d6-c45e82f2e494",
+      "auditLabel": "B054",
+      "lod": 2,
+      "variationIndex": 53,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 12,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 13.59000015258789
+    },
+    {
+      "sourceId": "bldg_081a1c94-4b22-4245-b41d-bce24cdd94d1",
+      "auditLabel": "B055",
+      "lod": 2,
+      "variationIndex": 54,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 76,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 40,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 42.099998474121094
+    },
+    {
+      "sourceId": "bldg_d1c14616-11d6-420f-a194-b00d109cd088",
+      "auditLabel": "B056",
+      "lod": 2,
+      "variationIndex": 55,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 12,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 13.260000228881836
+    },
+    {
+      "sourceId": "bldg_e9a16744-1518-44eb-a8ad-55525ed6ac48",
+      "auditLabel": "B058",
+      "lod": 2,
+      "variationIndex": 57,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 12,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 8,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 13.390000343322754
+    },
+    {
+      "sourceId": "bldg_67ee9dba-9301-4e9d-9fd9-25e33057186f",
+      "auditLabel": "B060",
+      "lod": 2,
+      "variationIndex": 59,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 54,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 29,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 17.09000015258789
+    },
+    {
+      "sourceId": "bldg_fca861ee-3cbf-45ce-97c0-36cf40a755b5",
+      "auditLabel": "B062",
+      "lod": 2,
+      "variationIndex": 61,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 24,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 14,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 14.833000183105469
+    },
+    {
+      "sourceId": "bldg_2260a3a1-9ab2-48bf-80c9-09d3a718b74f",
+      "auditLabel": "B064",
+      "lod": 2,
+      "variationIndex": 63,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 42,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 23,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 19.617000579833984
+    },
+    {
+      "sourceId": "bldg_94780c64-d2d7-4e0b-b465-93a3429e6533",
+      "auditLabel": "B065",
+      "lod": 2,
+      "variationIndex": 64,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 52,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 12,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 22.28700065612793
+    },
+    {
+      "sourceId": "bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1",
+      "auditLabel": "B066",
+      "lod": 2,
+      "variationIndex": 65,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 252,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 60,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 45.77000045776367
+    },
+    {
+      "sourceId": "bldg_25f7a5fb-7d9b-4992-8936-a1a8b4a6ad52",
+      "auditLabel": "B067",
+      "lod": 2,
+      "variationIndex": 66,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 74,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 39,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 16.898000717163086
+    },
+    {
+      "sourceId": "bldg_c657204f-1a56-4972-aba9-70ac9edc3226",
+      "auditLabel": "B069",
+      "lod": 1,
+      "variationIndex": 68,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 38,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 10,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 19.190000534057617
+    },
+    {
+      "sourceId": "bldg_2c945096-d6a8-4590-b6f7-d0c31ef03b7a",
+      "auditLabel": "B071",
+      "lod": 2,
+      "variationIndex": 70,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 12,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 8,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 16.47100067138672
+    },
+    {
+      "sourceId": "bldg_f7b27726-11e9-4848-92a2-7879b0483bbc",
+      "auditLabel": "B073",
+      "lod": 1,
+      "variationIndex": 72,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 64,
+      "authoringCutFaces": 2,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 12,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 15.0600004196167
+    },
+    {
+      "sourceId": "bldg_20542333-f1db-4f98-be51-35536efa796d",
+      "auditLabel": "B077",
+      "lod": 2,
+      "variationIndex": 76,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 78,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 16,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 20.020999908447266
+    },
+    {
+      "sourceId": "bldg_5b57a30b-ae12-422b-813f-b71032866bc6",
+      "auditLabel": "B090",
+      "lod": 2,
+      "variationIndex": 89,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 42,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 8,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 16.95800018310547
+    },
+    {
+      "sourceId": "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa",
+      "auditLabel": "B092",
+      "lod": 2,
+      "variationIndex": 91,
+      "translationEastNorthM": [
+        -80.0,
+        0.0
+      ],
+      "triangles": 40,
+      "authoringCutFaces": 0,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 22,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 44.571998596191406
+    },
+    {
+      "sourceId": "bldg_6e50f530-73f8-4296-a8d1-d5e14a02faf8",
+      "auditLabel": "B095",
+      "lod": 2,
+      "variationIndex": 94,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 20,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 4,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 12.390000343322754
+    },
+    {
+      "sourceId": "bldg_d93312f3-779f-460f-ac15-cfb0956955b1",
+      "auditLabel": "B122",
+      "lod": 2,
+      "variationIndex": 121,
+      "translationEastNorthM": [
+        0.0,
+        0.0
+      ],
+      "triangles": 50,
+      "authoringCutFaces": 1,
+      "nonManifoldEdges": 0,
+      "removedLooseCutEdges": 0,
+      "retainedSourceVertices": 10,
+      "retainedVertexMaxErrorM": 0.0,
+      "maximumHeightM": 19.079999923706055
+    }
+  ],
+  "boundaryWeldToleranceM": 1e-05,
+  "validation": "Closed building topology, crop coverage and retained source vertices verified. Not a site-accuracy certification."
+}

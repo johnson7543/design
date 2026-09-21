@@ -1,0 +1,180 @@
+{
+  "schema": "designqr-dotonbori-waterfront-references",
+  "version": 2,
+  "retrieved": "2026-09-10",
+  "reviewed": "2026-09-21",
+  "files": [
+    {
+      "file": "boat-advertisement.pdf",
+      "url": "https://www.ipponmatsu.co.jp/assets/pdf/business-advertisement.pdf",
+      "bytes": 5963651,
+      "sha256": "100203652e01156d80218ea00dadabd33b4b6d54a289af7c085f44f0607dad85"
+    },
+    {
+      "file": "boat-gallery.html",
+      "url": "https://www.ipponmatsu.co.jp/gallery/",
+      "bytes": 80004,
+      "sha256": "0b53a4624e0242ecf99aa0ad63053a47a9e0cc461355e8f1c45fa2a958c6485e"
+    },
+    {
+      "file": "bridge.jpg",
+      "url": "https://www.ctie.co.jp/english/project/uploads/2021/11/ebisu%20bridge.jpg",
+      "bytes": 113673,
+      "sha256": "3ce597e095eb4d6c397fd1fd5ed5a1679a4f17d954b0a06105603a8973021786"
+    },
+    {
+      "file": "river-section.jpg",
+      "url": "https://www.city.osaka.lg.jp/kensetsu/cmsfiles/contents/0000010/10881/14-04.jpg",
+      "bytes": 20969,
+      "sha256": "da2e5da6354e57e58c4b0d8b6841b300e58bc3a940fc33117e66d77abb6c5bd0"
+    },
+    {
+      "file": "glico.jpg",
+      "url": "https://www.glico.com/assets/images/large/%E3%82%B0%E3%83%AA%E3%82%B3%E3%82%B5%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%98%E3%83%83%E3%83%80%E3%83%BC%E7%94%BB%E5%83%8F.jpg",
+      "bytes": 127043,
+      "sha256": "25cb2ca0623735cc961c1650546fbb234bc046b3a3f603abe1ef7a0db849a317"
+    },
+    {
+      "file": "boat-front.jpg",
+      "url": "https://www.ipponmatsu.co.jp/assets/img/ship/ship07_01.jpg",
+      "bytes": 168356,
+      "sha256": "795028a2ea362a965430cde6e92c51de8f1dbd1bd069e1f16cf38848db642d34"
+    },
+    {
+      "file": "boat-seats.jpg",
+      "url": "https://www.ipponmatsu.co.jp/assets/img/ship/ship07_03.jpg",
+      "bytes": 172421,
+      "sha256": "b2be6cad30871a8b9ae8679002f144c1b0ebe70ed5775a78f97dc077c12a6252"
+    },
+    {
+      "file": "bridge-plan.pdf",
+      "url": "https://web.archive.org/web/20230805233636id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/siryou3.pdf",
+      "bytes": 1053517,
+      "sha256": "65466efe5c31d0850214651eabf8192ed46f2cb9091417e9bf3750fbb30fc5b1"
+    },
+    {
+      "file": "riverwalk.png",
+      "url": "https://www.tonbori.jp/osanpo/img/sv06b.png",
+      "bytes": 65541,
+      "sha256": "a09cbe41c019782577bcfb2777555846af24d1916d78a1eb03a48ec61e43ca5e",
+      "use": "Visual reference only; original photograph is not bundled.",
+      "reviewed": "2026-09-21",
+      "retrieved": "2026-09-21"
+    },
+    {
+      "file": "east-approach.webp",
+      "url": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_03.webp",
+      "bytes": 216100,
+      "sha256": "8453f118d880c36dc52fc25cbab653a591116f00f08d3e0a4cc046663d132067",
+      "use": "Visual reference only; original photograph is not bundled.",
+      "reviewed": "2026-09-21"
+    }
+  ],
+  "observations": [
+    {
+      "id": "S13",
+      "object": "DOTON",
+      "evidence": "operator general arrangement and current fleet gallery",
+      "drawingDate": "2020-03-05 advertising document; embedded drawing 2016-02-23",
+      "lengthOverallM": 16.4,
+      "lengthBetweenPerpendicularsM": 15.4,
+      "beamM": 3.6,
+      "mouldedDepthM": 0.9,
+      "draftM": 0.5,
+      "currentGalleryLengthM": 15.4,
+      "currentPassengerCapacity": 60,
+      "drawingPassengerCapacity": 80,
+      "appearance": [
+        "open passenger deck",
+        "rounded transom and tapered bow",
+        "yellow hull and railings",
+        "paired benches and center aisle",
+        "forward helm",
+        "stern equipment boxes"
+      ],
+      "limitations": [
+        "gallery capture dates unknown",
+        "different passenger counts retained, not reconciled as one date",
+        "fittings and seating are simplified photo-directed geometry",
+        "gold substitutes for photographed yellow under the existing repository palette"
+      ]
+    },
+    {
+      "id": "S5/S10/S11",
+      "object": "riverwalk",
+      "evidence": "municipal standard section and designer/operator photographs",
+      "lowerWalkTPM": 1.05,
+      "upperWalkTPM": 1.95,
+      "displayWaterTPM": 0.6,
+      "interpretedLowerWidthM": 2.2,
+      "maximumCombinedWidthM": 8,
+      "method": "Buffer the source water polygon, subtract selected building footprints under their recorded presentation placement, and intersect the bridge-centered 144 m square.",
+      "limitations": [
+        "standard levels do not establish local benchmark epochs or every transition",
+        "2.2 m lower strip, rail section/post spacing and lights are photo-directed approximations"
+      ]
+    },
+    {
+      "id": "S6",
+      "object": "glico-frontage",
+      "hostSourceId": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+      "auditLabel": "B040",
+      "publishedPanelM": [
+        10.38,
+        20.0
+      ],
+      "hostInference": "owner frontal photograph frontage order: narrow snow-brand frontage to the east, three-tier Estem/CHINTAI frontage to the west; 10.38 m panel fits the 11 m north face",
+      "displayEastM": -17.6735967,
+      "displayNorthM": -12.8052594,
+      "interpretedBottomTPM": 5.4,
+      "interpretation": "single-plane visual fit, approximately 3.5 m above upper promenade; 0.20 m face offset; original vector illustration and visible glazing only",
+      "uncertainty": "host association is a manual interpretation, not a registered camera solve; allow roughly 1 m vertically and 0.5 m in face offset; photograph capture date unknown"
+    },
+    {
+      "id": "S9/S10",
+      "object": "bridge fittings",
+      "evidence": "2008 completion plan, southwest landing dimensions and designer photograph",
+      "interpretation": "concentric paving/radial seams; thin metal rails, 0.48 m display fascia, four stair connections; southwest structural 5.1 m run reused as miniature interpretation for other connections",
+      "limitations": [
+        "does not resolve 31 mm profile/section disagreement",
+        "rail dimensions, other stairs, finished heights and understructure are not surveyed",
+        "outer curved bypass profiles and street approach ramps remain incomplete"
+      ]
+    },
+    {
+      "object": "activity",
+      "evidence": "representative generic visitors and operator vessel, not observed individuals",
+      "pedestrians": 64,
+      "boatPassengers": 26,
+      "crew": 1,
+      "boatSpeedMPerSecond": 1.35,
+      "motion": "one-way boat clipped at tile boundary; pedestrians follow seeded capsule routes with varied widths, irregular spacing, individual pace and eased stops; activity freezes during QR transitions, paused frames and reduced motion",
+      "nightDetailRecord": "night-reference.json"
+    },
+    {
+      "id": "S5/S10/S14",
+      "object": "bridge soffit and waterline finishing",
+      "reviewed": "2026-09-21",
+      "evidence": "Designer bridge photograph and Osaka Tourism Bureau east-approach photograph; the operator guide corroborates riverwalk context.",
+      "observed": [
+        "Continuous metal-clad bridge underside with panel seams",
+        "Circular underside light and narrow edge light ribbon",
+        "Metal riverwalk rails and hard paving edge above darker water-contact surfaces"
+      ],
+      "implemented": [
+        "Source-envelope soffit, 0.48 m below the existing deck",
+        "Transverse panel seams and a 2.8 m radius circular cool light",
+        "0.23 m rail base plates at existing interpreted posts, with four flat bolt-head surfaces",
+        "Partitioned bank wall with a dark band from 0.04 m below to 0.10 m above the authored water level"
+      ],
+      "limits": [
+        "Underside depth, ring radius, hardware dimensions and exact fitting layout are miniature photo fits, not surveyed or manufacturer specifications",
+        "Flat bolt heads retain readable hardware marks without unnecessary subpixel geometry",
+        "The contact band is authored wet-surface shading; the water level remains the existing 0.60 m display assumption",
+        "No local datum reconciliation, full curved bypass reconstruction or verified structural undersection is claimed"
+      ],
+      "transform": "All fitting surfaces are retained in the complete ground-to-paper QR transport; no additional texture or material batch."
+    }
+  ],
+  "waterMotionRecord": "water-motion-reference.json"
+}

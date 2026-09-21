@@ -1,0 +1,439 @@
+{
+  "status": "Source building and bridge-deck studies created; runtime study preset integrated; detailed reconstruction incomplete",
+  "retrievedAt": "2026-09-08",
+  "scene": "Osaka / Dōtonbori / Ebisubashi",
+  "artifacts": {
+    "site-audit.json": "Numeric source inventory and local geometry; GML LOD0 footprints, road polygons and map features",
+    "site-plan.svg": "Derived source coverage diagram; approved repository colors",
+    "../../../../../assets/design-qr/dotonbori/source-meshes.json": "Compiled complete source solids; 73 buildings, original roof geometry and IDs",
+    "../../../../../assets/design-qr/dotonbori/bridge-deck-study.json": "Incomplete dimension-based main-deck envelope; published values, interpolation, registration residuals and conflicts"
+  },
+  "sourceFiles": [
+    {
+      "bytes": 67132784,
+      "sha256": "e30bf0c85750186394ed352e6f22610443ad37b1adcbb2bc6fb20910d190ca81",
+      "url": "https://assets.cms.plateau.reearth.io/assets/10/a0aecb-67d1-4463-92d5-d67c99f3b8b6/27100_osaka-shi_city_2025_citygml_1_op/udx/bldg/52350400_bldg_6697_op.gml",
+      "sourceEdition": 2025,
+      "objectCreationDate": "2023-03-22",
+      "surveyDate": null,
+      "inspected": true,
+      "storage": "download on demand; raw GML omitted from repository",
+      "fileName": "52350400_bldg_6697_op.gml"
+    },
+    {
+      "bytes": 1850136,
+      "sha256": "f84599d97f18ec1a4c910c168d7d85e91ba46f71d080c71f9177095c4dcd4aae",
+      "url": "https://assets.cms.plateau.reearth.io/assets/10/a0aecb-67d1-4463-92d5-d67c99f3b8b6/27100_osaka-shi_city_2025_citygml_1_op/udx/tran/52350400_tran_6697_op.gml",
+      "sourceEdition": 2025,
+      "objectCreationDate": "2023-03-22",
+      "surveyDate": null,
+      "inspected": true,
+      "storage": "download on demand; raw GML omitted from repository",
+      "fileName": "52350400_tran_6697_op.gml"
+    },
+    {
+      "fileName": "gsi-vector-16-57435-26032.pbf",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/optimal_bvmap-v1/optimal_bvmap-v1.pmtiles",
+      "bytes": 20851,
+      "sha256": "26aef17d3fd185cd1207adfdb730719417ef59f21d5e6a92d94107db3827ef40",
+      "role": "Mapped water and bank outlines; tile extracted via HTTP Range",
+      "captureDate": null,
+      "visuallyInspected": false,
+      "zxy": [
+        16,
+        57435,
+        26032
+      ],
+      "encoding": "gzip-compressed MVT extracted from PMTiles",
+      "declaredDatasetUpdate": "2026-04-01",
+      "coordinateExtent": 4096,
+      "usedLayers": [
+        "WA",
+        "WL",
+        "RdCompt",
+        "RdEdg"
+      ],
+      "metadataUrl": "https://github.com/gsi-cyberjapan/optimal_bvmap",
+      "geometryDecodedAndReviewed": true
+    },
+    {
+      "fileName": "gsi-ortho-18-229740-104127.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229740/104127.jpg",
+      "bytes": 16320,
+      "sha256": "fc73266fc6511bd4b8aed715693897b7cdf0ee0920e24bad0f57f2cb41c8ed42",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": false
+    },
+    {
+      "fileName": "gsi-ortho-18-229740-104128.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229740/104128.jpg",
+      "bytes": 16058,
+      "sha256": "2006102209d8f16882989c2686051f4973eebce7259e884988e0abb7fc33bbc4",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": true
+    },
+    {
+      "fileName": "gsi-ortho-18-229740-104129.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229740/104129.jpg",
+      "bytes": 17696,
+      "sha256": "d4c0df2f2126bdffe1b4f2aba13f0b715bff51bb2ace7c681b519cac66b556d8",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": false
+    },
+    {
+      "fileName": "gsi-ortho-18-229741-104127.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229741/104127.jpg",
+      "bytes": 18077,
+      "sha256": "2168e3064635f00f43c248c64b3c8674cb8fdfd936b7f21d480ef0e4ab195bd5",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": true
+    },
+    {
+      "fileName": "gsi-ortho-18-229741-104128.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229741/104128.jpg",
+      "bytes": 15983,
+      "sha256": "73051241d0d53be945fbe05b1fcfbf47e4f085c32bfd8c852d67bf5588570000",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": true
+    },
+    {
+      "fileName": "gsi-ortho-18-229741-104129.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229741/104129.jpg",
+      "bytes": 17815,
+      "sha256": "a1c772bc031dd134b598cdf2760b80bad3f66b93845c2dd951e3ff87d872c2a0",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": false
+    },
+    {
+      "fileName": "gsi-ortho-18-229742-104127.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229742/104127.jpg",
+      "bytes": 16274,
+      "sha256": "30f7d32db798af5286dc525fcb94778692e2a76e8a4483d367d6be9e381133a6",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": false
+    },
+    {
+      "fileName": "gsi-ortho-18-229742-104128.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229742/104128.jpg",
+      "bytes": 17056,
+      "sha256": "68b6042bf05a9a005b203e6bd12f9748c942645f4ab0d329cff2a8e4e6ea38af",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": true
+    },
+    {
+      "fileName": "gsi-ortho-18-229742-104129.jpg",
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229742/104129.jpg",
+      "bytes": 17905,
+      "sha256": "60373bb6a95b2c9d5360df2f7982371c001ed9d1d8e2794424250209622f48f9",
+      "role": "Georeferenced aerial reference; not a façade photograph",
+      "captureDate": null,
+      "visuallyInspected": false
+    },
+    {
+      "fileName": "bridge-day.jpg",
+      "url": "https://www.city.osaka.lg.jp/kensetsu/cmsfiles/contents/0000021/21695/ebisu_d.jpg",
+      "bytes": 24499,
+      "sha256": "5d767da8b70098f2618dd90b7b19e4f3e9873ff02f72f302eaa5492bbfb09431",
+      "role": "Municipal bridge reference photo; view direction and capture date not established",
+      "captureDate": null,
+      "visuallyInspected": true
+    },
+    {
+      "fileName": "riverwalk-section.jpg",
+      "url": "https://www.city.osaka.lg.jp/kensetsu/cmsfiles/contents/0000010/10881/14-04.jpg",
+      "bytes": 20969,
+      "sha256": "da2e5da6354e57e58c4b0d8b6841b300e58bc3a940fc33117e66d77abb6c5bd0",
+      "role": "Municipal standard riverwalk cross section; not an as-built section at every station",
+      "captureDate": null,
+      "visuallyInspected": true
+    },
+    {
+      "fileName": "osaka-datum.pdf",
+      "url": "https://www.city.osaka.lg.jp/port/cmsfiles/contents/0000596/596092/A52-kouwankouji-hyoujunzuhyou.pdf",
+      "bytes": 885166,
+      "sha256": "8fa7898187f74f051925368369aae974344025dfe1204e12609b07915a527c82",
+      "role": "O.P./T.P. relation; diagram 5-2-2 on PDF page 3",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository",
+      "visuallyInspectedPages": [
+        3
+      ]
+    },
+    {
+      "fileName": "glico-owner-photo.jpg",
+      "url": "https://www.glico.com/assets/images/large/グリコサインページヘッダー画像.jpg",
+      "bytes": 127043,
+      "sha256": "25cb2ca0623735cc961c1650546fbb234bc046b3a3f603abe1ef7a0db849a317",
+      "role": "Owner frontal sign photograph; camera and capture date not verified",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository"
+    },
+    {
+      "fileName": "cti-bridge-photo.jpg",
+      "url": "https://www.ctie.co.jp/english/project/uploads/2021/11/ebisu%20bridge.jpg",
+      "bytes": 113673,
+      "sha256": "3ce597e095eb4d6c397fd1fd5ed5a1679a4f17d954b0a06105603a8973021786",
+      "role": "Bridge designer photograph; westward context, no camera calibration",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository"
+    },
+    {
+      "fileName": "447_01.jpg",
+      "url": "https://www.konoike.co.jp/et/img/2008/447_01.jpg",
+      "bytes": 137245,
+      "sha256": "c443f529c424d42267b90add5be8a1dfa64502eaefd9ce2403cc310fdd8dc952",
+      "role": "Contractor construction-location diagram",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository"
+    },
+    {
+      "fileName": "447_03.jpg",
+      "url": "https://www.konoike.co.jp/et/img/2008/447_03.jpg",
+      "bytes": 62505,
+      "sha256": "f8af7a6449b2303d6aa6de6584870cadf51e9b06af58460532f741a9d38a6d0d",
+      "role": "Contractor riverwalk photograph",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository"
+    },
+    {
+      "fileName": "447_04.jpg",
+      "url": "https://www.konoike.co.jp/et/img/2008/447_04.jpg",
+      "bytes": 57212,
+      "sha256": "3c3dc23cf941d58f64ae5043435b27b8d23066eece297ce1f1588e0aba2066dc",
+      "role": "Contractor standard riverwalk cross-section, not local levels at every station",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository"
+    },
+    {
+      "fileName": "bridge-award-2007.pdf",
+      "url": "https://www.kandoken.jp/pdf/H19_1.pdf",
+      "bytes": 1223180,
+      "sha256": "96f7c99e93f20a4bdcc487a83f22fddfbdf85166a30746282038011d65581fc2",
+      "role": "Municipal bridge project report; dimensions and completed bridge photographs",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository",
+      "visuallyInspectedPages": [
+        3,
+        4
+      ]
+    },
+    {
+      "fileName": "bridge-southwest-landing.pdf",
+      "url": "https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/tuikasiryou2.pdf",
+      "bytes": 436500,
+      "sha256": "5c70b975cc0d8043a7d9a7a2aaa3ba0e74ea0edce7b445c5688f2f6523dd3133",
+      "role": "Recovered southwest landing drawing; finished and structural levels must remain distinct",
+      "retrievedAt": "2026-09-09",
+      "visuallyInspected": true,
+      "captureDate": null,
+      "storage": "download on demand; third-party document/image omitted from repository",
+      "visuallyInspectedPages": [
+        1
+      ],
+      "retrievalUrl": "https://web.archive.org/web/20230805235458id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/tuikasiryou2.pdf",
+      "archiveTimestamp": "20230805235458",
+      "originalObservedStatus": 404
+    },
+    {
+      "fileName": "competition-siryou3.pdf",
+      "url": "https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/siryou3.pdf",
+      "retrievalUrl": "https://web.archive.org/web/20230805233636id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/siryou3.pdf",
+      "bytes": 1053517,
+      "sha256": "65466efe5c31d0850214651eabf8192ed46f2cb9091417e9bf3750fbb30fc5b1",
+      "pages": 1,
+      "retrievedAt": "2026-09-09",
+      "captureDate": null,
+      "visuallyInspected": true,
+      "visuallyInspectedPages": [
+        1
+      ],
+      "storage": "download on demand; third-party PDF omitted from repository",
+      "role": "Municipal completion drawing, March 2008; main bridge dimensions and elevation table",
+      "drawingDate": "2008-03"
+    },
+    {
+      "fileName": "competition-tuikasiryou1.pdf",
+      "url": "https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/tuikasiryou1.pdf",
+      "retrievalUrl": "https://web.archive.org/web/20230805233859id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/tuikasiryou1.pdf",
+      "bytes": 149790,
+      "sha256": "c42ff16b0ded815ba585030705cf0446ee5da4562c8c8e38e5002416c59f4cf8",
+      "pages": 1,
+      "retrievedAt": "2026-09-09",
+      "captureDate": null,
+      "visuallyInspected": true,
+      "visuallyInspectedPages": [
+        1
+      ],
+      "storage": "download on demand; third-party PDF omitted from repository",
+      "role": "Municipal completed bridge end-post detail"
+    },
+    {
+      "fileName": "competition-siryo02.pdf",
+      "url": "https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/siryo02.pdf",
+      "retrievalUrl": "https://web.archive.org/web/20230805232215id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/siryo02.pdf",
+      "bytes": 1028519,
+      "sha256": "491e768291c6d77d28332697f301973ab476780795c2fe680bf5012c506dbb72",
+      "pages": 1,
+      "retrievedAt": "2026-09-09",
+      "captureDate": null,
+      "visuallyInspected": true,
+      "visuallyInspectedPages": [
+        1
+      ],
+      "storage": "download on demand; third-party PDF omitted from repository",
+      "role": "2022 competition existing-site plan with separately marked permitted construction area"
+    },
+    {
+      "fileName": "competition-genchi.pdf",
+      "url": "https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/genchi.pdf",
+      "retrievalUrl": "https://web.archive.org/web/20230805232928id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/genchi.pdf",
+      "bytes": 598096,
+      "sha256": "b18ae346e7e3cc5348b5b8340582b1e82981896aad6fcab8a41598eb196e3c2e",
+      "pages": 6,
+      "retrievedAt": "2026-09-09",
+      "captureDate": null,
+      "visuallyInspected": true,
+      "visuallyInspectedPages": [
+        1,
+        2,
+        4
+      ],
+      "storage": "download on demand; third-party PDF omitted from repository",
+      "role": "Municipal 2022 competition existing-site photographs and viewing-direction diagram"
+    },
+    {
+      "fileName": "competition-Vol1.pdf",
+      "url": "https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/Vol1.pdf",
+      "retrievalUrl": "https://web.archive.org/web/20230805234248id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/Vol1.pdf",
+      "bytes": 393167,
+      "sha256": "a64bcecc3a7c0d269d5c57a7e1b6c42a736aa97d5dbd0d2d8e4ebf7283b2a103",
+      "pages": 15,
+      "retrievedAt": "2026-09-09",
+      "captureDate": null,
+      "visuallyInspected": false,
+      "visuallyInspectedPages": [],
+      "storage": "download on demand; third-party PDF omitted from repository",
+      "role": "2022-11-04 municipal Q&A; text inspected, distinguishes existing structures and proposal allowances",
+      "textInspectedPages": [
+        4,
+        5,
+        6,
+        11,
+        12
+      ]
+    }
+  ],
+  "sourcePages": [
+    {
+      "id": "bridge",
+      "url": "https://www.city.osaka.lg.jp/kensetsu/page/0000021695.html",
+      "role": "Current bridge dimensions and structural character",
+      "inspected": true
+    },
+    {
+      "id": "riverwalk",
+      "url": "https://www.city.osaka.lg.jp/kensetsu/page/0000010881.html",
+      "role": "Standard bank cross section",
+      "inspected": true
+    },
+    {
+      "id": "glico",
+      "url": "https://www.glico.com/jp/health/contents/glicosign/",
+      "role": "Sign dimensions and generation; image registration still required",
+      "inspected": true
+    },
+    {
+      "id": "glico-2022",
+      "url": "https://www.glico.com/jp/newscenter/pressrelease/39545/",
+      "role": "Dated sign update, not a complete 2026 facade survey",
+      "inspected": true
+    },
+    {
+      "id": "kani-doraku",
+      "url": "https://douraku.co.jp/kansai/honten/",
+      "role": "Owner identity and location; no facade dimensions established",
+      "inspected": true
+    },
+    {
+      "id": "bridge-designer",
+      "url": "https://www.ctie.co.jp/english/project/project648.html",
+      "role": "Original detailed bridge designer; photo supports visible character",
+      "inspected": true,
+      "reviewedAt": "2026-09-09"
+    },
+    {
+      "id": "riverwalk-contractor",
+      "url": "https://www.konoike.co.jp/et/archive/detail/000066.html",
+      "role": "2008-10-01 contractor report; riverwalk west of Ebisubashi",
+      "inspected": true,
+      "reviewedAt": "2026-09-09"
+    },
+    {
+      "id": "bridge-archive-index",
+      "url": "https://web.archive.org/web/20230805102646id_/https://www.city.osaka.lg.jp/kankyo/page/0000580243.html",
+      "role": "Archived municipal reference index; distinguish completion drawings from submitted design proposals",
+      "inspected": true,
+      "reviewedAt": "2026-09-09"
+    },
+    {
+      "id": "gsi-vertical-datum",
+      "url": "https://www.gsi.go.jp/sokuchikijun/datum-main.html",
+      "role": "National height datum and the 2025 change; source epoch must be retained",
+      "inspected": true,
+      "reviewedAt": "2026-09-09"
+    },
+    {
+      "id": "open-heritage-scan",
+      "url": "https://openheritage3d.org/project.php?id=D6688F",
+      "role": "Upcoming scan; download unavailable, CC BY-NC, curator reports alignment/tilt issues; not used as model data",
+      "inspected": true,
+      "reviewedAt": "2026-09-09"
+    }
+  ],
+  "unresolvedSources": [
+    {
+      "role": "Coherent dated facade and bridge detail set with registration",
+      "observedStatus": "Incomplete; municipal, owner and designer references inspected, but not a registered dated survey"
+    },
+    {
+      "url": "https://openheritage3d.org/project.php?id=D6688F",
+      "observedStatus": "Upcoming / Spatial Data Coming Soon; no downloadable scan",
+      "role": "Potential future reference; not used"
+    }
+  ],
+  "attribution": {
+    "plateau": "Derived from Osaka City 3D city model, accessed through MLIT PLATEAU distribution service. This processing is repository-authored.",
+    "plateauPolicy": "https://www.mlit.go.jp/plateau/site-policy/",
+    "gsi": "国土地理院最適化ベクトルタイルを加工して作成; GSI aerial tiles used as linked visual reference.",
+    "gsiPolicy": "https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html"
+  },
+  "catalogSnapshot": {
+    "url": "https://api.plateauview.mlit.go.jp/datacatalog/citygml/27100",
+    "retrievedAt": "2026-09-08",
+    "bytes": 320616,
+    "sha256": "7d41a0314a0be2147388a766a7d605a59750ea8014247392ca3121e7fceb8d7f"
+  },
+  "lastReviewedAt": "2026-09-09"
+}

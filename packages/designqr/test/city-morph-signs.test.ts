@@ -100,3 +100,55 @@ test('sign fragments borrow live per-player maps, use the existing shader, and n
   second.mesh.material.forEach(m => m.dispose());
   [...signs, ...another.signs].forEach(s => { s.mesh.geometry.dispose(); s.mesh.material.map!.dispose(); s.mesh.material.dispose(); });
 });
+
+test('a second City preset folds a bounded atlas region and refreshes its UVs on content edits', () => {
+  const { signs, tiles } = fixture(), source = signs[0], id = source.panel.id;
+  const detail = new CityMorphSigns([id]);
+  const atlas = { ...source, uvRect: [.25, .5, .5, .75] as const };
+  detail.setTiles(tiles, [atlas], 29); detail.update(.5);
+  const geometry = detail.mesh.geometry, uv = geometry.getAttribute('uv');
+  assert.equal(geometry.drawRange.count, 12); assert.equal(geometry.getAttribute('position').count, 12);
+  assert.equal(uv.getX(0), .25); assert.equal(uv.getX(7), .5);
+  assert.equal(uv.getY(0), .5); assert.equal(uv.getY(2), .75);
+  detail.setTiles(tiles, [{ ...atlas, uvRect: [.5, .25, .75, .5] }], 37);
+  assert.equal(uv.getX(0), .5); assert.equal(uv.getX(7), .75);
+  assert.equal(uv.getY(0), .25); assert.equal(uv.getY(2), .5);
+  assert.equal(detail.mesh.material[0].map, source.mesh.material.map);
+  detail.update(1); assert.equal(detail.mesh.visible, false);
+  geometry.dispose(); detail.mesh.material.forEach(m => m.dispose());
+  signs.forEach(s => { s.mesh.geometry.dispose(); s.mesh.material.map!.dispose(); s.mesh.material.dispose(); });
+});
+
+test('folding artwork borrows the live animation shader and its frozen per-player uniforms', () => {
+  const { signs, tiles } = fixture(), detail = new CityMorphSigns(), blend = { value: .5 };
+  signs[0].mesh.material.onBeforeCompile = shader => { shader.uniforms.animatedSignFrame = blend; };
+  signs[0].mesh.material.customProgramCacheKey = () => 'animated-sign-test';
+  detail.setTiles(tiles, signs, 29);
+  const borrowed = detail.mesh.material[0];
+  const shader = { uniforms: {} } as Parameters<MeshBasicMaterial['onBeforeCompile']>[0];
+  borrowed.onBeforeCompile(shader, {} as Parameters<MeshBasicMaterial['onBeforeCompile']>[1]);
+  assert.equal(shader.uniforms.animatedSignFrame, blend);
+  assert.equal(borrowed.customProgramCacheKey(), 'animated-sign-test');
+  assert.equal(borrowed.map, signs[0].mesh.material.map);
+  for (const p of [.42, .7, .42, 1]) { detail.update(p); assert.equal(blend.value, .5); }
+  assert.equal(detail.mesh.material[1].customProgramCacheKey(), signs[1].mesh.material.customProgramCacheKey());
+  detail.mesh.geometry.dispose(); detail.mesh.material.forEach(m => m.dispose());
+  signs.forEach(s => { s.mesh.geometry.dispose(); s.mesh.material.map!.dispose(); s.mesh.material.dispose(); });
+});
+
+test('each folding sign follows its host interval even when a previous panel contributes only one half', () => {
+  const { signs, tiles } = fixture(), detail = new CityMorphSigns();
+  const retained = tiles.filter((_, i) => i !== 1).map(tile => ({ ...tile,
+    motion: { ...tile.motion, timing: { start: tile.source.group === signs[0].panel.id ? 0 : .2, end: .94, lift: .018 } } }));
+  detail.setTiles(retained, signs, 29); detail.update(.32);
+  assert.ok(detail.mesh.material[0].opacity > 0);
+  assert.equal(detail.mesh.material[1].opacity, 0);
+  assert.equal(detail.mesh.material[2].opacity, 0);
+  detail.update(.55);
+  assert.ok(detail.mesh.material.every(material => material.opacity > 0));
+  const positions = Array.from(detail.mesh.geometry.getAttribute('position').array);
+  detail.update(.8); detail.update(.55);
+  assert.deepEqual(Array.from(detail.mesh.geometry.getAttribute('position').array), positions);
+  detail.mesh.geometry.dispose(); detail.mesh.material.forEach(m => m.dispose());
+  signs.forEach(s => { s.mesh.geometry.dispose(); s.mesh.material.map!.dispose(); s.mesh.material.dispose(); });
+});

@@ -38,3 +38,23 @@ test('forwards the configured transition speed to the renderer', () => {
 
   assert.equal(configuredSpeed, 1.75);
 });
+
+test('reflecting stopped Auto Spin preserves an in-flight camera preset or reset', () => {
+  const renderer = {
+    isTurntable: true,
+    movingCamera: false,
+    viewRiver() { this.isTurntable = false; this.movingCamera = true; },
+    resetRotation() { this.isTurntable = false; this.movingCamera = true; },
+    cancelRotationReset() { this.movingCamera = false; },
+  };
+  const manager = new RenderManager({} as HTMLCanvasElement);
+  (manager as unknown as { renderer: typeof renderer }).renderer = renderer;
+  for (const action of [() => manager.viewRiver(), () => manager.resetRotation()]) {
+    manager.toggleTurntable(true); action();
+    // React reflects the action's stopped spin state on the following commit.
+    manager.toggleTurntable(false);
+    assert.equal(renderer.isTurntable, false); assert.equal(renderer.movingCamera, true);
+    manager.toggleTurntable();
+    assert.equal(renderer.isTurntable, true); assert.equal(renderer.movingCamera, false, 'Explicitly resuming spin takes over camera movement.');
+  }
+});

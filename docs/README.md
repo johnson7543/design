@@ -1,37 +1,21 @@
 # Documentation
 
-This directory is the entry point for product, design, and architecture
-documentation. Repository setup and commands remain in the root `README.md`;
-agent instructions remain in the root `AGENTS.md`.
+Choose the area that owns the behavior you are changing.
+Repository setup stays in the root [README](../README.md).
 
-## Shared foundations
+| Area | What belongs here | Main source |
+| --- | --- | --- |
+| [Global standards](global-standards/README.md) | Repository-wide color rules and documentation conventions | Shared design tokens and documentation registry |
+| [Home page UI](home-page/README.md) | Catalog, site shell, loading, and not-found surfaces | `src/platform/`, `src/platform.css` |
+| [DesignQR package](designqr-package/README.md) | Public player, rendering, themes, city assets, integrations, and releases | `packages/designqr/` |
+| [DesignQR editor UI](designqr-editor/README.md) | Controls, theme editing, logo crop, sharing, and responsive editor layout | `src/App.tsx`, `src/components/`, `src/editor/` |
+| [Demo-video workflow](demo-videos/README.md) | Recording and verifying product previews | `scripts/record-demo-video.mjs` |
 
-| Foundation | Documentation |
-| --- | --- |
-| Design system | [Global visual contracts](design-system/README.md) |
-| Design ownership | [Route, source, and documentation registry](design-registry.json) |
+The editor consumes the package. A change to artwork, QR rendering, export, or
+public player behavior belongs in package docs even when it is visible in the
+editor. A change to surrounding controls or editor layout belongs in editor
+docs. The hosted `/qr/embed` route is a package integration surface.
 
-## Products
-
-| Product | Documentation |
-| --- | --- |
-| Design platform | [Catalog and shared route surfaces](design-platform/README.md) |
-| Design QR | [Overview and document index](design-qr/README.md) |
-
-## Workflows
-
-| Workflow | Documentation |
-| --- | --- |
-| Product demo videos | [Initialize, record, verify, and apply](demo-videos/README.md) |
-
-## Organization rules
-
-- Keep product-specific documents under `docs/<product>/` and shared visual
-  foundations under `docs/design-system/`.
-- Use lowercase kebab-case filenames.
-- Give each maintained document a status and identify its source of truth.
-- Add new documents to the relevant product index.
-- Register new designs, routes, source ownership, and required documents in
-  `design-registry.json`.
-- Update local links whenever a document moves; `npm run docs:check` validates
-  paths and prevents machine-specific `file://` links.
+Use the [design registry](design-registry.json) to resolve exact route and source
+ownership. Read [documentation conventions](global-standards/documentation.md)
+when adding or moving documents.

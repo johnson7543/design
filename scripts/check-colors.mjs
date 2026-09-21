@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { Color } from 'three';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const registryPath = join(projectRoot, 'docs', 'design-system', 'colors.md');
+const registryPath = join(projectRoot, 'docs', 'global-standards', 'colors.md');
 const ignoredDirectories = new Set(['.git', '.wrangler', 'dist', 'node_modules']);
 const sourceExtensions = new Set([
   '.c',

@@ -1,0 +1,131 @@
+{
+  "schema": "designqr-dotonbori-ebisu-reference",
+  "version": 5,
+  "reviewed": "2026-09-20",
+  "operator": {
+    "page": "https://www.donki.com/kanransha/",
+    "map": "https://www.donki.com/store/map.php?shop_id=110",
+    "name": "道頓堀大観覧車えびすタワー",
+    "highestAboveGroundM": 77.4,
+    "boardingAboveGroundM": 10.5,
+    "cabins": 32,
+    "rideSeconds": 900,
+    "storePinLongitudeLatitude": [
+      135.5026796,
+      34.6693043
+    ]
+  },
+  "manufacturer": {
+    "page": "https://www.intamin.com/project/yebisu-tower-osaka/",
+    "company": "Intamin"
+  },
+  "inspectedImages": [
+    {
+      "url": "https://www.intamin.com/wp-content/uploads/2019/11/cimg0109.jpg",
+      "bytes": 2176320,
+      "sha256": "464348263072d6abb9adb96a2bcc33c5f2f6e9874562ca9f4c74126b7410330f",
+      "dimensionsPx": [
+        1728,
+        2304
+      ],
+      "observations": "Fixed yellow stadium-shaped lattice, outward red cabins, lower Ebisu/Donpen relief and support masts.",
+      "captureDate": null,
+      "redistributed": false
+    },
+    {
+      "url": "https://www.intamin.com/wp-content/uploads/2019/11/cimg0091-1920x1440.jpg",
+      "bytes": 322849,
+      "sha256": "72f63777689d23e171b5c0857023127c82526b95839088d0e055d1f66401c371",
+      "dimensionsPx": [
+        1920,
+        1440
+      ],
+      "observations": "Circular cabin shell, glazing, horizontal seat/floor and boarding pivot.",
+      "captureDate": null,
+      "redistributed": false
+    },
+    {
+      "url": "https://www.intamin.com/wp-content/uploads/2019/11/cimg0118-1440x1920.jpg",
+      "bytes": 397927,
+      "sha256": "f42f0ca80563056e8218e273ac33fea5efe6a9d2fea229a571ec671a81372ee6",
+      "dimensionsPx": [
+        1440,
+        1920
+      ],
+      "observations": "Deep four-rail open truss, diagonal members, interior cross-braces and oval stiffeners; store behind the lower frame; shallow deity/penguin/fish relief, with a rounded fish head and downward tail.",
+      "captureDate": null,
+      "redistributed": false
+    },
+    {
+      "url": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_02.webp",
+      "bytes": 241346,
+      "sha256": "382d0435b585bf3805cde7e3cd86e8f3646aa912e538564c3b3c9dcca3a0afed",
+      "dimensionsPx": [
+        1400,
+        934
+      ],
+      "observations": "Wheel on the south river elevation of the north-bank store, east of Ebisubashi; illuminated frame/cabins and ground-floor fascia.",
+      "captureDate": null,
+      "redistributed": false
+    }
+  ],
+  "registration": {
+    "sourceId": "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa",
+    "auditLabel": "B092",
+    "audit": "east-site-audit.json",
+    "sourceLOD": 2,
+    "sourceRoofMaximumM": 44.57,
+    "sourceLOD1GroundMinimumM": 1.785,
+    "sourceLOD2GroundMinimumM": 0,
+    "sourceWallHintEastNorthM": [
+      135.52,
+      15.91
+    ],
+    "normal": "Actual south-facing source wall, resolved by the common frontage fitter",
+    "evidence": "The official store pin falls inside the PLATEAU LOD0 footprint; inspected operator/manufacturer/tourism photos establish the south mounting face. The pin is not a wheel-center survey.",
+    "presentationTranslationEastNorthM": [
+      -80,
+      0
+    ],
+    "presentationWallHintEastNorthM": [
+      55.52,
+      15.91
+    ],
+    "placementEvidence": "Source matching remains geographic. The user-requested compact composition translates the complete host, wheel, storefront and reflected light 80 m west without changing source shape, height or facing direction."
+  },
+  "interpretation": {
+    "coordinateUnits": "metres in the original EPSG:6674 local frame",
+    "groundDatum": "1.785 m from the source LOD1 minimum; local reconciliation with the LOD2 zero base and bank remains unverified",
+    "cabinsRadiusM": 1.4,
+    "cabinCenterTrackRadiusM": 14.4,
+    "lowerArcCenterM": 28.085,
+    "upperArcCenterM": 63.385,
+    "trussRadiiM": [
+      10.4,
+      12.8
+    ],
+    "trussDepthM": 2.3,
+    "limits": "Track radius, truss section/depth, mounting projection, cabin shell and original relief are photo-derived miniature proportions. No engineering width or exact campaign date is claimed. Boarding pivot/doors are not animated. The relief uses original solid geometry and bundled outlines, not redistributed photographs.",
+    "reliefDetail": "The inspected manufacturer-front photograph directs inset ears, raised moustache lobes, garment folds, fingers, Donpen flippers, separate bill surfaces and toes. Original closed shallow geometry uses existing muted palette blends; current dimensions and source mounting stay fixed."
+  },
+  "composition": {
+    "tileSizeM": 144,
+    "tileCenterEastNorthM": [
+      4.196907421216137,
+      2.1639323405262125
+    ],
+    "rotationRadians": 0.7853981633974483,
+    "retainedBuildings": 58,
+    "omittedEdgeFragments": 8,
+    "fixedHosts": 8,
+    "opening": "Northeast, 65 degrees north of east, at 30 degrees elevation, facing the central Glico running man",
+    "context": "Static 48-to-12 m top envelope toward the southeast, independent of the opening camera; horizontal shapes under recorded placement and all eight landmark heights remain fixed.",
+    "displacedContextBuildings": 6
+  },
+  "motion": {
+    "path": "Uniform arc-length travel around a fixed stadium track; upright cabin orientation",
+    "periodSeconds": 900,
+    "clock": "Shared scene activity clock; pause and reduced motion freeze it",
+    "qr": "Complete rails and 32 cabin surfaces gather into the 24 dark outer cells of the top-right QR finder. Interior relief fills its nine dark center cells; lower storefront surfaces follow their host. All source surfaces retain positive-area ownership and live poses. Wheel patches share architecture's contraction, travel and expansion path throughout the turn. Wheel, storefront and city share one clock: geometry settles at 72–90% and source paint blends to QR inks at 54–90%."
+  }
+}

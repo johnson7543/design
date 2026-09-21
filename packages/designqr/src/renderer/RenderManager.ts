@@ -83,8 +83,9 @@ export class RenderManager {
   public toggleTurntable(enabled?: boolean) {
     if (!this.renderer) return;
 
-    this.renderer.cancelRotationReset();
-    this.renderer.isTurntable = enabled ?? !this.renderer.isTurntable;
+    const next = enabled ?? !this.renderer.isTurntable;
+    if (next) this.renderer.cancelRotationReset();
+    this.renderer.isTurntable = next;
   }
 
   public setTurntableDirection(direction: AutoRotateDirection) {
@@ -97,6 +98,10 @@ export class RenderManager {
 
   public resetRotation() {
     this.renderer?.resetRotation();
+  }
+
+  public viewRiver() {
+    this.renderer?.viewRiver();
   }
 
   public pause() {

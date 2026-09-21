@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import type { ResolvedTreeTheme } from '../../config/types.ts';
 import { BLOCK_SIZE } from '../../designs/tree/constants.ts';
 import { SHIBUYA_PALETTE as P } from '../../designs/city/palette.ts';
-import { cityQRModuleColor } from '../../designs/city/qr-colors.ts';
+import { createCityQRTargets } from '../../designs/city/qr-colors.ts';
 import { cityNoise, createCityBuildings, SHIBUYA_STREET_TREES, type CityBuilding } from '../../designs/city/layout.ts';
 import { createHachikoSquareGeometry } from '../../designs/city/hachiko-square.ts';
 import { createShibuyaConstructionGeometry } from '../../designs/city/construction-geometry.ts';
@@ -134,15 +134,9 @@ export class ShibuyaScene {
     this.morphDirty = true;
     this.morphBase = undefined;
     if (this.morphGround.length !== this.grid * this.grid) this.morphGround = [];
-    for (let row = 0; row < this.grid; row++) {
-      for (let col = 0; col < this.grid; col++) {
-        const x = (col + .5) / this.grid - .5;
-        const z = (row + .5) / this.grid - .5;
-        const light = !modules[row][col];
-        const ink = new THREE.Color(light ? theme.groundColor : cityQRModuleColor(row, col, this.grid, theme));
-        this.morphTargets.push({ x, z, ink, light });
-        if (!light) this.modules.push({ x, z, ink });
-      }
+    for (const target of createCityQRTargets(modules, theme)) {
+      this.morphTargets.push(target);
+      if (!target.light) this.modules.push(target);
     }
   }
 

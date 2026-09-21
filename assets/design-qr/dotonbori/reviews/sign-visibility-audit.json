@@ -1,0 +1,424 @@
+{
+  "schema": "designqr-dotonbori-sign-visibility-review",
+  "reviewed": "2026-09-21",
+  "value": "https://example.com/dotonbori",
+  "environment": "Headless Chrome with ANGLE SwiftShader; 1440x1100 viewport, 480px public player. Geometry ray samples measure occlusion; they are not a physical-device performance benchmark.",
+  "opening": {
+    "elevationDegrees": 30,
+    "northOfEastDegrees": 65
+  },
+  "context": {
+    "label": "B038",
+    "sourceId": "bldg_fd5276cc-91fe-4ca0-a80f-afdbbbcf3b9e",
+    "bodyTopLimitM": 12,
+    "reviewBodyTopBeforeM": 29.7654,
+    "reviewBodyTopAfterM": 11.8454,
+    "interpretation": "Static miniature height choice for a narrow LOD1 context solid; original footprint, ground datum, closed topology and ground floor retained."
+  },
+  "sideSigns": [
+    {
+      "front": "B037-east",
+      "building": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "art": 16,
+      "y": 29.9,
+      "width": 9.1,
+      "height": 9.8,
+      "vertex": 80,
+      "clear": 144,
+      "samples": 144,
+      "blocked": {}
+    },
+    {
+      "front": "B037-east",
+      "building": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "art": 17,
+      "y": 17.7,
+      "width": 9.1,
+      "height": 11.2,
+      "vertex": 84,
+      "clear": 144,
+      "samples": 144,
+      "blocked": {}
+    }
+  ],
+  "logo": {
+    "placement": "Top-aligned within the north Asahi panel, using its original fitted width and height. Normal depth occlusion remains.",
+    "baselineCenteredSamples": {
+      "square": {
+        "clear": 107,
+        "samples": 144
+      },
+      "wide": {
+        "clear": 114,
+        "samples": 144
+      }
+    },
+    "raisedSamples": [
+      {
+        "aspect": 1,
+        "visible": {
+          "clear": 129,
+          "samples": 144,
+          "blocked": {
+            "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": 15
+          }
+        },
+        "backing": [
+          31,
+          58,
+          82,
+          255
+        ]
+      },
+      {
+        "aspect": 4,
+        "visible": {
+          "clear": 139,
+          "samples": 144,
+          "blocked": {
+            "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a": 1,
+            "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": 4
+          }
+        },
+        "backing": [
+          31,
+          58,
+          82,
+          255
+        ]
+      },
+      {
+        "aspect": 0.25,
+        "visible": {
+          "clear": 102,
+          "samples": 144,
+          "blocked": {
+            "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": 42
+          }
+        },
+        "backing": [
+          31,
+          58,
+          82,
+          255
+        ]
+      },
+      {
+        "aspect": 1,
+        "ink": "dark",
+        "visible": {
+          "clear": 129,
+          "samples": 144,
+          "blocked": {
+            "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": 15
+          }
+        },
+        "backing": [
+          232,
+          221,
+          207,
+          255
+        ]
+      },
+      {
+        "aspect": 1,
+        "ink": "light",
+        "visible": {
+          "clear": 129,
+          "samples": 144,
+          "blocked": {
+            "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": 15
+          }
+        },
+        "backing": [
+          31,
+          58,
+          82,
+          255
+        ]
+      }
+    ],
+    "backing": "Osaka ivory for dark uploads; Osaka navy for light uploads. Alpha-weighted 32x32 image brightness sample; uploaded pixels unchanged.",
+    "artworkChecks": "Final pass also used dark and light QR lettering on transparent canvases."
+  },
+  "verification": {
+    "closedSourceBodies": 58,
+    "sourceAndBlenderHashesValid": true,
+    "pausedEditProgress": [
+      0,
+      0.42,
+      1
+    ],
+    "identicalForwardReverseProgress": [
+      0,
+      0.2,
+      0.5,
+      0.78,
+      1
+    ],
+    "orbitYawRadians": [
+      0,
+      1.5707963267948966,
+      3.141592653589793,
+      4.71238898038469
+    ],
+    "reducedMotionEndpoints": true,
+    "decodedExport": "https://example.com/dotonbori",
+    "logoRemoval": true
+  },
+  "surfaces": {
+    "sourceTriangles": 392413,
+    "degenerateTriangles": 6,
+    "patches": 271634,
+    "bytes": 110442744,
+    "batches": 16,
+    "buildMs": 1036.6000000000931,
+    "wheelCells": [
+      80,
+      51,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      57,
+      86,
+      115,
+      144,
+      173,
+      202,
+      201,
+      200,
+      199,
+      198,
+      197,
+      196,
+      167,
+      138,
+      109,
+      82,
+      83,
+      84,
+      112,
+      113,
+      142,
+      141,
+      140,
+      111
+    ],
+    "cellCount": 841,
+    "coverageError": 7.061018436615996e-14,
+    "buildingCount": 58,
+    "meshes": {
+      "dotonbori-reference-datum": 2,
+      "ebisubashi-deck-dimension-study": 860,
+      "dotonbori-road-plan": 117,
+      "dotonbori-water-plan": 18,
+      "dotonbori-lower-riverwalk": 32,
+      "dotonbori-upper-riverwalk": 51,
+      "dotonbori-waterfront-fittings": 95596,
+      "dotonbori-glico-frame": 60,
+      "dotonbori-glico-sign": 2,
+      "dotonbori-bridge-name--1": 2,
+      "dotonbori-bridge-name-1": 2,
+      "dotonbori-ebisu-structure": 55916,
+      "dotonbori-ebisu-cabins": 32640,
+      "dotonbori-water-reflections": 1242,
+      "dotonbori-spreading-wake": 144,
+      "dotonbori-visitor-reactions": 264,
+      "dotonbori-doton-tour-boat": 2901,
+      "dotonbori-boat-pennant": 40,
+      "dotonbori-boat-reaction": 132,
+      "dotonbori-pedestrians": 6144,
+      "bldg_05ec86aa-79f1-4aaa-8e93-0bf011542f99": 34,
+      "bldg_97ff7748-df43-4444-9eb0-23cc6f494ee3": 156,
+      "bldg_fc4e8d81-ae3d-4f37-9d4f-37c39142094b": 40,
+      "bldg_2de00e94-da2b-43f6-851e-31ccd3170afa": 28,
+      "bldg_7ad08c54-9183-462f-bf96-9eb346a14310": 76,
+      "bldg_05785215-b10c-434c-99b8-a700f76f8adc": 88,
+      "bldg_f7b7d534-49ca-4a79-b03a-08128ff697c0": 94,
+      "bldg_711d3b15-de26-4d47-a8a3-5d0e1f7e5d8d": 56,
+      "bldg_fa021df6-6040-4cd5-8773-63d12e3ccf27": 80,
+      "bldg_484c9eab-7b24-4cdb-b22a-6cca97c92210": 20,
+      "bldg_d589d364-22d5-4c9c-85c3-4416c222ec92": 222,
+      "bldg_91ce1b36-b134-4def-bdf5-ed78a1e948cb": 56,
+      "bldg_69381567-48c9-40b7-a6d3-478623f7e2f6": 132,
+      "bldg_eff919e5-aa90-4f6c-aa5f-09d49d9aafcc": 20,
+      "bldg_412fb575-c91d-47c2-8887-bbce1a985622": 120,
+      "bldg_ee83e0d9-4ba0-4a72-bec8-c77447ef2a8e": 148,
+      "bldg_cdc316af-5973-4869-8a8d-5c4bc84bf49f": 40,
+      "bldg_992fac86-aa37-4398-a10e-6850c9cac9f9": 48,
+      "bldg_36dfa3b9-6bbd-4d27-9567-629b27f1fbf4": 20,
+      "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4": 32,
+      "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73": 76,
+      "bldg_52193e01-cf9a-489d-9baf-06917e3b056c": 28,
+      "bldg_e95a0f5f-11e1-46f8-b5da-37619d297fc4": 120,
+      "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d": 40,
+      "bldg_fd5276cc-91fe-4ca0-a80f-afdbbbcf3b9e": 12,
+      "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742": 110,
+      "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614": 20,
+      "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85": 24,
+      "bldg_e5544ca4-cb61-4b2e-a70d-8aee283a67f5": 36,
+      "bldg_b64bf000-9dcd-42bc-af79-2acb3651aaeb": 32,
+      "bldg_80a96e74-6934-4bca-b090-fc736ff4fc87": 104,
+      "bldg_1910ceab-f4fe-4995-ba10-79dcf616cf77": 60,
+      "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a": 96,
+      "bldg_7548efc6-1187-4138-ab0f-5e94709ed687": 76,
+      "bldg_f3e79f73-b62f-48c0-a3f3-dd4849d1a867": 52,
+      "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429": 92,
+      "bldg_8cee6021-11a5-4653-8418-f12e6173b4cc": 86,
+      "bldg_8bcee197-1f52-417e-a67f-28480a319821": 12,
+      "bldg_1f987142-0572-4544-9529-9a21c0c24447": 46,
+      "bldg_fee60d6a-ed22-4cb1-863e-d4aa94a1d2e1": 130,
+      "bldg_740f4b5a-00b3-43d4-83d6-c45e82f2e494": 20,
+      "bldg_081a1c94-4b22-4245-b41d-bce24cdd94d1": 76,
+      "bldg_d1c14616-11d6-420f-a194-b00d109cd088": 20,
+      "bldg_e9a16744-1518-44eb-a8ad-55525ed6ac48": 12,
+      "bldg_67ee9dba-9301-4e9d-9fd9-25e33057186f": 54,
+      "bldg_fca861ee-3cbf-45ce-97c0-36cf40a755b5": 24,
+      "bldg_2260a3a1-9ab2-48bf-80c9-09d3a718b74f": 42,
+      "bldg_94780c64-d2d7-4e0b-b465-93a3429e6533": 52,
+      "bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1": 252,
+      "bldg_25f7a5fb-7d9b-4992-8936-a1a8b4a6ad52": 74,
+      "bldg_c657204f-1a56-4972-aba9-70ac9edc3226": 38,
+      "bldg_2c945096-d6a8-4590-b6f7-d0c31ef03b7a": 12,
+      "bldg_f7b27726-11e9-4848-92a2-7879b0483bbc": 64,
+      "bldg_20542333-f1db-4f98-be51-35536efa796d": 78,
+      "bldg_5b57a30b-ae12-422b-813f-b71032866bc6": 42,
+      "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": 40,
+      "bldg_6e50f530-73f8-4296-a8d1-d5e14a02faf8": 20,
+      "bldg_d93312f3-779f-460f-ac15-cfb0956955b1": 50,
+      "dotonbori-qr-building-details": 79489,
+      "dotonbori-qr-generated-signs": 90,
+      "dotonbori-photo-facade-details": 102822,
+      "dotonbori-storefront-forecourts": 25,
+      "dotonbori-night-signs": 44,
+      "dotonbori-storefront-artwork": 454,
+      "dotonbori-storefront-noren": 420,
+      "dotonbori-shop-activity": 1668,
+      "dotonbori-kani-exterior-crab": 7504
+    },
+    "versions": [
+      {
+        "position": 0,
+        "surfaceCenter": 0,
+        "surfaceFlow": 0,
+        "surfaceEnd": 0,
+        "uv": 0,
+        "color": 0
+      },
+      {
+        "position": 0,
+        "surfaceCenter": 0,
+        "surfaceFlow": 0,
+        "surfaceEnd": 0,
+        "color": 0
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "uv": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "uv": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7,
+        "glicoReflectedColor": 7,
+        "ripplePhase": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7,
+        "uv": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "uv": 7,
+        "dotonboriCampaign": 7
+      },
+      {
+        "position": 0,
+        "surfaceCenter": 0,
+        "surfaceFlow": 0,
+        "surfaceEnd": 0,
+        "color": 0
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "uv": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "uv": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7
+      },
+      {
+        "position": 7,
+        "surfaceCenter": 7,
+        "surfaceFlow": 7,
+        "surfaceEnd": 0,
+        "color": 7
+      }
+    ]
+  },
+  "runtimeSnapshotSha256": "d9ebadc251a19dc3114b84feaeb86f58733bb2607f25250f810c1b5aab258f12"
+}

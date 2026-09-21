@@ -13,6 +13,8 @@ dist-ssr
 *.local
 .wrangler/
 
+plan
+
 # Local visual experiments and diagnostic output
 /scratch/
 /preview_*.png

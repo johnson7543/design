@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { build, preview } from 'vite';
 import puppeteer from 'puppeteer-core';
 import { shibuyaAssetPlugin } from './shibuya-asset-plugin.mjs';
+import { dotonboriAssetPlugin } from './dotonbori-asset-plugin.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const directory = await mkdtemp(join(tmpdir(), 'designqr-morph-detail-'));
@@ -18,7 +19,7 @@ await writeFile(join(directory, 'main.js'), `import ${JSON.stringify(join(root, 
 let server, browser;
 const report = { baseline, profiling, cases: [] };
 try {
-  if (fixtureDirectory === directory) await build({ configFile: false, root: directory, plugins: [shibuyaAssetPlugin()], logLevel: 'warn', build: { outDir: 'dist' } });
+  if (fixtureDirectory === directory) await build({ configFile: false, root: directory, plugins: [shibuyaAssetPlugin(), dotonboriAssetPlugin()], logLevel: 'warn', build: { outDir: 'dist' } });
   server = await preview({ configFile: false, root: fixtureDirectory, logLevel: 'warn', preview: { host: '127.0.0.1', port, strictPort: true } });
   browser = await puppeteer.launch({ executablePath: process.env.CHROME_BIN ?? '/usr/bin/google-chrome', headless: true,
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });

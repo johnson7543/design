@@ -1,6 +1,15 @@
 import type { ResolvedTreeTheme } from '../../config/types.ts';
 import { isFinderPattern } from '../tree/qr.ts';
-import { cityNoise } from './layout.ts';
+import { cityNoise } from './building-variation.ts';
+import { Color } from 'three';
+import type { CityMorphTarget } from './morph-sources.ts';
+
+/** Canonical City module centers and inks, shared by every geographic preset. */
+export function createCityQRTargets(modules: readonly (readonly boolean[])[], theme: ResolvedTreeTheme): CityMorphTarget[] {
+  const grid = modules.length;
+  return modules.flatMap((row, r) => row.map((dark, col) => ({ x: (col + .5) / grid - .5, z: (r + .5) / grid - .5,
+    light: !dark, ink: new Color(dark ? cityQRModuleColor(r, col, grid, theme) : theme.groundColor) })));
+}
 
 /** Facade-sized color groups and a diagonal morning-light band, fixed to cells.
  * Each cell remains one flat ink; logo, motion and Border never change its color. */

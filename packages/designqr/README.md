@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/designqr?logo=npm)](https://www.npmjs.com/package/designqr)
 [![npm downloads](https://img.shields.io/npm/dm/designqr?logo=npm)](https://www.npmjs.com/package/designqr)
 
-React component that turns interactive 3D Tree or Shibuya City artwork into a
+React component that turns interactive 3D Tree or Japanese City artwork into a
 scannable 2D QR code.
 
 [Quick start](#quick-start) · [Props](#props) · [Themes](#themes) ·
@@ -57,7 +57,22 @@ Change `value` to update the QR code and artwork.
 ## Themes
 
 Tree presets are `spring`, `summer`, `autumn`, and `winter`. City defaults to
-`shibuya`. Set `theme="summer"`, for example, to select the Summer Tree preset.
+`shibuya`; choose `theme="dotonbori"` for the Dōtonbori night miniature or
+`theme="tokyo-tower"` for an illuminated Tokyo Tower whose complete structure
+collapses into the QR. Every modeled tower surface retains a cell destination.
+Dōtonbori centers its diagonal canal and 58 selected buildings around 戎橋,
+with detailed storefronts, signs and the compact Donki landmark composition.
+These are source-directed miniatures; the source notice documents interpreted
+proportions and evidence limits. Set `theme="summer"`, for example, to select
+the Summer Tree preset.
+
+City implementation and model chunks load only when their preset is selected;
+Tree does not fetch City models. Your bundler includes the chunks automatically,
+so deploy its complete output. While a City implementation is loading, or if
+its download fails, the current QR remains available in 2D and PNG export.
+Newly downloaded scenes attach at a running, settled 3D/2D endpoint; paused
+players retain their frame until resumed. `onReady` means the renderer is ready,
+not that optional City assets have finished downloading.
 
 ## Props
 
@@ -158,8 +173,12 @@ Pass a URL string as `logo.src`:
 | Image limits | 2 MiB and 2,048 px per edge |
 
 Logo paths resolve against the page displaying `DesignQR`. Set `logo={false}`
-to remove the logo. On Tree, the logo appears in the canopy; on City, it appears
-on the QFRONT billboard. In QR view, it appears at the center of the QR code.
+to remove the logo. On Tree, the logo appears in the canopy; on Shibuya, it appears
+on the QFRONT billboard. Tokyo Tower uses a small front Foot Town panel.
+Dōtonbori uses the north-facing Asahi sign panel and
+restores its original artwork when the logo is removed. The building and logo
+remain present throughout rotation, with normal depth occlusion. In QR view, the logo appears at the center of
+the QR code.
 
 ## Viewing zoom
 
@@ -232,7 +251,9 @@ export function ControlledExample() {
 Update controlled state in `onViewChange` to accept tap, keyboard, and ref-based
 view requests. Use `defaultView` only for uncontrolled state.
 `interaction.transitionSpeed` controls the turn speed: `0.5` is
-slower and `2` is faster than the default `1`.
+slower and `2` is faster than the default `1`. At `1`, Dōtonbori takes
+approximately 0.99 seconds in either direction; Tree, Shibuya and Tokyo Tower
+take approximately 0.74 seconds.
 
 ### Styling
 
@@ -370,7 +391,7 @@ fails, no canvas is rendered and `onReady` is not called.
 Custom themes are supported for Tree. City does not yet support custom themes.
 
 `TREE_THEME_PRESETS` contains the four seasonal Tree themes.
-`DESIGN_QR_THEME_PRESETS` contains those themes plus `shibuya`.
+`DESIGN_QR_THEME_PRESETS` contains those themes plus `shibuya`, `dotonbori`, and `tokyo-tower`.
 
 Use `createTreeTheme(preset, overrides)` to customize a preset while keeping
 related colors coordinated. `tree.shape` controls the silhouette independently
@@ -496,7 +517,32 @@ clipping, simplification, extrusion, and visual styling. Crossing markings are
 interpreted from [GSI aerial imagery](https://maps.gsi.go.jp/development/ichiran.html).
 The artwork is a stylized representation, not a navigation or engineering map.
 
-Station lettering includes Noto CJK glyph outlines (Adobe, SIL OFL 1.1;
+Station and Dōtonbori sign lettering include Noto CJK glyph outlines (Adobe, SIL OFL 1.1;
 [license notice](third-party-licenses/noto-cjk.txt)) and the JR East vector mark
 sourced through [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:JR_East_logo.svg).
 These asset notices are separate from the package's code license.
+
+Dōtonbori includes modified geometry from Osaka City's
+**27100_osaka-shi_city_2025_citygml_1_op** ([MLIT PLATEAU catalog](https://api.plateauview.mlit.go.jp/datacatalog/citygml/27100)),
+GSI water-area plan geometry, and an incomplete dimensional study from Osaka
+City's Ebisubashi completion drawings. Source assets retain their metric
+heights, with projection, clipping, triangulation and palette mapping. The
+night presentation keeps all 58 selected buildings and their attached details visible
+at every rotation and throughout the QR transformation. Foreground buildings
+occlude the center normally. Its northeast opening uses a 30° elevation and a bearing 65° north of east,
+with a static low-rise foreground, visible landmark signs and a diagonal mapped canal.
+The compact 144 m composition centers 戎橋 and translates the complete Donki
+assembly 80 m west, retaining all eight landmark shapes and orientations.
+Original source coordinates remain separate from this illustrative spacing.
+As in Shibuya, QR content generates context heights, glazing,
+window bays, roof equipment and original campaigns while footprints and retained
+landmark dimensions remain fixed. Reference-directed detail adds the stepped
+riverwalk, bridge fittings, central sign fronts,
+32 upright moving wheel cabins, 64 pedestrians and a DOTON sightseeing boat based on its
+operator's drawing and photographs. Standard water/bank levels, photo-fitted
+details, generated architecture and representative activity do not establish a
+surveyed reconstruction. Reference sign artwork, Japanese lettering, cabinet
+frames and commercial bases are fitted to their source hosts. Activity freezes
+during QR turns, pause and reduced motion. A user logo replaces the north Asahi
+panel's artwork, stays attached during rotation and moves to the QR center during the turn.
+See the [Dōtonbori source notice](third-party-licenses/dotonbori-sources.txt).

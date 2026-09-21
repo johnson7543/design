@@ -34,6 +34,8 @@ export interface PresentationSurfaceState {
   titleColor: string;
   prefersReducedMotion: boolean;
   qrArtworkScale?: number;
+  /** Source-only night illumination, faded out before the QR inks settle. */
+  nightGlow?: 'landmark' | 'waterfront';
 }
 
 interface RgbColor {
@@ -506,6 +508,24 @@ export class PresentationSurface {
     // The preview camera already applied the complete presentation transform.
     // Composite its newly rasterized pixels 1:1, never scale its bitmap again.
     if (preview) context.restore();
+    if (this.state.nightGlow && !this.state.transparentBackground && this.viewProgress < .65) {
+      const fade = Math.max(0, Math.min(1, (this.viewProgress - .08) / .57));
+      const strength = 1 - fade * fade * (3 - 2 * fade);
+      const waterfront = this.state.nightGlow === 'waterfront';
+      const radius = Math.max(1.2, Math.min(width, height) * (waterfront ? .0028 : .004)) * (preview ? Math.min(this.previewZoom.scale, 3) : 1);
+      const bright = waterfront ? 'brightness(1.05) contrast(3.2)' : 'brightness(1.1) contrast(2)';
+      context.save();
+      context.globalCompositeOperation = 'screen';
+      // Lift only bright source pixels; the deep ground and sky must not glow.
+      // Composite behind the sharp source to preserve paint and logo pixels.
+      context.globalAlpha = strength * (waterfront ? .20 : .38);
+      context.filter = `${bright} blur(${radius * 3.5}px)`;
+      context.drawImage(this.sourceCanvas, 0, 0, width, height);
+      context.globalAlpha = strength * (waterfront ? .38 : .58);
+      context.filter = `${bright} blur(${radius}px)`;
+      context.drawImage(this.sourceCanvas, 0, 0, width, height);
+      context.restore();
+    }
     context.filter = this.blurIntensity > 0.01
       ? `blur(${this.blurIntensity * 2.2 * (preview ? this.previewZoom.scale : 1)}px)`
       : 'none';

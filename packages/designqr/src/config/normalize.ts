@@ -1,3 +1,4 @@
+import { isCityPreset } from '../designs/city/presets.ts';
 import {
   DESIGN_QR_BORDER_PADDING_DEFAULT,
   DESIGN_QR_BORDER_PADDING_MAX,
@@ -591,6 +592,8 @@ export function normalizeDesignQRTheme(input: unknown): DesignQRConfigV1['theme'
     'autumn',
     'winter',
     'shibuya',
+    'dotonbori',
+    'tokyo-tower',
   ];
 
   if (typeof input === 'string') {
@@ -700,10 +703,10 @@ function normalizeConfig(input: unknown, requireSchemaVersion: boolean): DesignQ
   const theme = normalizeDesignQRTheme(
     input.theme ?? (adapter.type === 'city' ? 'shibuya' : undefined)
   );
-  if (adapter.type === 'city' && (theme.type !== 'preset' || theme.preset !== 'shibuya')) {
+  if (adapter.type === 'city' && (theme.type !== 'preset' || !isCityPreset(theme.preset))) {
     throw new DesignQRConfigError(
       'INVALID_CONFIG',
-      'City currently supports only the Shibuya preset; custom themes are available for Tree.'
+      'City supports the Shibuya, Dōtonbori and Tokyo Tower presets; custom themes are available for Tree.'
     );
   }
   const details = isRecord(input.details) ? input.details : {};

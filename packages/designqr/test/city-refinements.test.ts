@@ -99,21 +99,43 @@ test('one logo moves from a depth-tested billboard to the QR center and restores
   assert.equal(renderer.scene.children.length, 0);
 });
 
-test('all designs share Tree timing at every speed, in both directions and after a mid-turn change', () => {
-  for (const city of [true, false]) {
-    for (const speed of [.25, .5, 1, 1.5, 2]) for (const target of [0, 1]) {
+test('Dōtonbori rebases 1× to the former 0.75× pace in both directions and at every speed', () => {
+  for (const preset of [null, undefined, 'shibuya', 'dotonbori', 'tokyo-tower']) {
+    const duration = VIEW_TRANSITION_DURATION_SECONDS / (preset === 'dotonbori' ? .75 : 1);
+    for (const speed of [.25, .5, .75, 1, 1.25, 1.5, 1.75, 2]) for (const target of [0, 1]) {
       const renderer = Object.create(ThreeFallbackRenderer.prototype);
-      Object.assign(renderer, { treeData: city ? { city: {} } : {}, _targetProgress: 1 - target,
+      Object.assign(renderer, { treeData: preset === null ? {} : { city: { preset } }, _targetProgress: 1 - target,
         currentProgress: 1 - target, transitionSpeed: speed });
       renderer.targetProgress = target;
-      assert.equal(renderer.transitionDuration, VIEW_TRANSITION_DURATION_SECONDS / speed);
+      assert.ok(Math.abs(renderer.transitionDuration - duration / speed) < 1e-12);
       renderer.transitionStartTime = performance.now() - renderer.transitionDuration * 500;
       renderer.setTransitionSpeed(speed === 2 ? 1 : 2);
-      assert.equal(renderer.transitionDuration, VIEW_TRANSITION_DURATION_SECONDS / (speed === 2 ? 1 : 2));
+      assert.ok(Math.abs(renderer.transitionDuration - duration / (speed === 2 ? 1 : 2)) < 1e-12);
       const elapsedRatio = (performance.now() - renderer.transitionStartTime) / (renderer.transitionDuration * 1000);
       assert.ok(Math.abs(elapsedRatio - .5) < .02, 'Changing speed jumps within the active turn.');
     }
   }
+});
+
+test('changing city presets preserves the active phase and restores each design’s 1× baseline', () => {
+  const renderer = Object.create(ThreeFallbackRenderer.prototype);
+  Object.assign(renderer, { treeData: {}, _targetProgress: 0, currentProgress: 0, transitionSpeed: 1,
+    rebuildMeshes() {}, renderOnce() {} });
+  renderer.targetProgress = 1;
+  for (const preset of ['dotonbori', 'shibuya', 'dotonbori', 'tokyo-tower', 'dotonbori', null]) {
+    renderer.transitionStartTime = performance.now() - renderer.transitionDuration * 500;
+    renderer.setTreeData(preset === null ? {} : { city: { preset } });
+    assert.equal(renderer.transitionSpeed, 1, 'The configured speed and 1× label stay at 1.');
+    assert.equal(renderer.transitionDuration, VIEW_TRANSITION_DURATION_SECONDS / (preset === 'dotonbori' ? .75 : 1));
+    const elapsedRatio = (performance.now() - renderer.transitionStartTime) / (renderer.transitionDuration * 1000);
+    assert.ok(Math.abs(elapsedRatio - .5) < .02, 'Changing presets jumps within the active turn.');
+  }
+  renderer.setProgressImmediate(1);
+  renderer.setTreeData({ city: { preset: 'dotonbori' } });
+  assert.equal(renderer.currentProgress, 1);
+  assert.equal(renderer.isTransitioning, false, 'A preset update preserves an immediate/reduced-motion endpoint.');
+  renderer.targetProgress = 0;
+  assert.equal(renderer.transitionDuration, VIEW_TRANSITION_DURATION_SECONDS / .75);
 });
 
 test('City shares 1× framing with only a bounded narrow-host clipping guard', () => {

@@ -1,0 +1,198 @@
+{
+  "schema": "designqr-dotonbori-qr-composition",
+  "version": 21,
+  "updated": "2026-09-20",
+  "intent": "Keep all eight complete landmark hosts in a compact, bridge-centered composition with a static low-rise foreground.",
+  "coordinateBasis": "Runtime unit tile: 144 metres, centered exactly on the Ebisubashi registration E4.196907421216137/N2.1639323405262125; 45-degree rotation. Donki has a separately recorded 80 m west presentation translation.",
+  "fixedReferenceHosts": [
+    {
+      "auditLabel": "B031",
+      "sourceId": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4"
+    },
+    {
+      "auditLabel": "B034",
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73"
+    },
+    {
+      "auditLabel": "B037",
+      "sourceId": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d"
+    },
+    {
+      "auditLabel": "B039",
+      "sourceId": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742"
+    },
+    {
+      "auditLabel": "B040",
+      "sourceId": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614"
+    },
+    {
+      "auditLabel": "B041",
+      "sourceId": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85"
+    },
+    {
+      "auditLabel": "B046",
+      "sourceId": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a"
+    },
+    {
+      "auditLabel": "B092",
+      "sourceId": "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa"
+    }
+  ],
+  "qrGeneration": {
+    "sharedWithShibuya": [
+      "Full-matrix content hash",
+      "Local dark-cell density",
+      "Quantized context heights",
+      "Facade style, window-bay width, sill and floor spacing",
+      "Seeded glazing and lighting",
+      "Seeded roof equipment",
+      "Original sign layouts and lettering",
+      "Canonical QR cells and inks, shared camera path, selected preset duration, Border, logo travel and endpoint handoff"
+    ],
+    "contextBuildingCount": 50,
+    "heightScaleRange": [
+      0.73,
+      1.2
+    ],
+    "heightStepMetres": 0.72,
+    "minimumContextHeightMetres": 8,
+    "maximumBodyTopTileUnits": 0.3333333333333333,
+    "roofSupport": "Complete projected equipment footprint must lie on one actual flat source roof; no corner-only support test.",
+    "facadeContainment": "Near-coplanar source triangles share one rhythm (maximum 14.4 cm detail-plane fitting tolerance). Reference walls have exclusive facade ownership, including corner margins; upper QR windows avoid ground-floor glazing. All patches clip to source triangles; tile-cut caps stay plain. B049 ground-floor-only registration leaves its upper QR facade active.",
+    "campaigns": "14 original Osaka-palette designs, cached per player in one 2048x1024 atlas. B031 screen frames stay fixed; 2:1 campaigns are letterboxed into them.",
+    "limits": "Context heights, windows, equipment and campaign choices are artistic QR output, not measurements or a real-business inventory.",
+    "centralGroundFloor": "Eleven bridge-area directed fronts retain 42 bays; Donki adds six bays. Context adds 239 sections and 561 bays. Saved value totals 251 sections, 609 bays, 24 functional entrances, 90 counters and 75 menus across 56 exposed hosts. B005/B054 are enclosed. Door support is checked across full width and projection; B046 street datum remains unresolved. S15/S16/S19/S22 interpretation limits apply.",
+    "referenceSignDetail": "Twenty-one fitted regular sign quads plus separately owned Glico and Kani fascia. Every restored riverbank panel retains its complete textured surface in the QR transport. A retained 2048x1536 atlas has 20 original drawings, a private logo cell and per-cell clipping. Forty-nine bundled label outlines include clock numerals. B037-east upper signs preserve its existing 1F; B039 Hana Langue is an advert, not a tenant. Source bodies and Asahi/logo slot dimensions remain unchanged.",
+    "groundFloorCoverageRecord": "ground-floor-coverage.json",
+    "frontageComposition": "Uneven bay widths and complementary service/display/seating/glazing roles replace cloned complete shops. Known corner hosts share finishes; context display arrangements respond to QR content. Layout keys identify illustrative facade treatments, not real tenants. Menus and awnings are localized to the service area. Four coordinated artwork variants occupy 48 cells in one retained 2048x1536 atlas.",
+    "animatedSign": "All textured sign surfaces retain their original UVs and private atlases. Glico carries its frozen track/rainbow uniform on a full folding panel, with a 0.12-tile lift and the same global 54–90% paint blend as every other surface. See glico-animation-reference.json.",
+    "waterMotion": "Complete reflection/wake surfaces retain current positions, vertex alpha and frozen shader uniforms through turns, reversals and content edits. Ground surfaces supply all QR paper cells. See water-motion-reference.json.",
+    "foregroundHeightEnvelope": {
+      "coordinateBasis": "Projection of source-tile building centers along the fixed southeast composition axis; independent of opening-angle changes and live rotation.",
+      "depthRangeTileUnits": [
+        -0.18,
+        0.37
+      ],
+      "maximumTopTileUnits": [
+        0.3333333333333333,
+        0.08333333333333333
+      ],
+      "interpolation": "smoothstep",
+      "variation": "Limit source height by the envelope, apply shared QR variation and quantization, clamp to the envelope, retain the existing 8 m minimum.",
+      "reviewValueLoweredBuildings": [
+        "B050",
+        "B047",
+        "B048",
+        "B077"
+      ],
+      "evidence": "Authored miniature composition, not measured real-world heights."
+    },
+    "ebisuTower": "B092 retains its source body under the recorded translation; the fixed oval track has 32 upright cabins, a 900-second circuit, solid relief, store fascia and six-bay ground floor. Complete rails/cabins retain current poses and supply the top-right finder outer ring; interior relief supplies its center. The lower storefront follows its host. See ebisu-reference.json.",
+    "synchronizedTransition": {
+      "evidence": "Authored presentation motion; no new real-site geometry or lighting claims.",
+      "interval": "One global clock: architecture, Donki's wheel and ground contract at 0–0.40, travel at 0.40–0.74, and settle at 0.72–0.90. Wheel patches use the ordinary architecture path throughout the turn. Glico folds at 0–0.74, then shares the same settle. All paint blends at 0.54–0.90.",
+      "ownership": "Complete bodies, details, Glico, Donki and QR paper start and finish together. Area transport tiles every canonical cell exactly once.",
+      "liftTileUnits": 0.018,
+      "ground": "Bridge, ground, waterfront fittings, reflections and wake have zero lift and supply paper cells.",
+      "light": "A warmWindow pulse emphasizes the canal on existing surfaces; no separate particles or effect timer.",
+      "continuity": "Capture moving vertices once per turn; subsequent playback/reversal changes only a progress uniform. Content edits rebuild correspondence at retained activity time and progress. All surfaces reach canonical cell positions/inks by 0.90."
+    },
+    "completeSurfaces": {
+      "correspondence": "Integer area intervals partition every drawn triangle; matching affine planar pairs become panels. UVs, paint, vertex alpha, material maps and live uniforms are preserved. Static zero-area triangles are audited separately.",
+      "finder": "The upper wheel supplies only 33 top-right finder dark cells: 24 outer cells for rails/cabins and nine center cells for relief. Landmark targets avoid the largest supported central logo footprint.",
+      "storage": "Material batches borrow existing artwork textures. Each patch retains four exact indexed source corners and one shared Float32 motion record in a numeric data texture. Vertex, index and motion storage, including texture padding, is checked below 56 MiB for dense content. Original 3D source meshes remain instanced; transition geometry is built on asset/content changes."
+    }
+  },
+  "preserved": [
+    "Original 73-building source master, study GLB and bridge GLB",
+    "Every retained horizontal source shape under its recorded placement, and stable source audit labels",
+    "River and road alignment; road/bank surfaces exclude the translated Donki footprint",
+    "Bridge dimensions and registration",
+    "All eight photographic-host dimensions",
+    "Actor identities, poses and activity clock during content edits",
+    "Per-player atlas/material ownership",
+    "All canonical QR cells, including those beneath buildings"
+  ],
+  "review": {
+    "value": "https://example.com/dotonbori",
+    "grid": 29,
+    "pose": "Time-zero runtime geometry with complete source bodies and attached detail. Runtime animation is reviewed in browser captures.",
+    "runtimeGeometrySource": "packages/designqr/src/renderer/webgl/DotonboriScene.ts",
+    "manifest": "assets/design-qr/dotonbori/waterfront-review-manifest.json"
+  },
+  "references": [
+    "night-reference.json",
+    "waterfront-reference.json",
+    "site-audit.json",
+    "ground-floor-coverage.json",
+    "glico-animation-reference.json",
+    "water-motion-reference.json",
+    "east-site-audit.json",
+    "ebisu-reference.json"
+  ],
+  "evidenceBoundary": "Reference files retain their original facts and uncertainty; generative detail does not expand photographic coverage.",
+  "presentation": {
+    "rule": "All 58 selected buildings and their attached details form the complete scene at every 3D viewing angle. Foreground geometry uses ordinary depth occlusion.",
+    "defaultCameraYawRadians": 1.6580627893946132,
+    "orbit": "Drag, Auto Spin in both directions, and Reset only change the view. Building visibility, complete detail indices and sign lighting remain unchanged.",
+    "scanTurn": "All 58 selected buildings and their details participate throughout both QR directions, reversals and mid-turn content edits, including assets first attached in QR. Every canonical QR cell remains.",
+    "ownership": "Bodies, facades, windows, roof equipment, signs, campaigns, storefronts, shop actors, forecourts, light spill and reflection strokes retain their source host and remain present.",
+    "storage": "Reuse source geometry, complete draw indices, materials and textures during rotation.",
+    "defaultView": "Northeast eye, 65 degrees north of east and 30 degrees above ground, showing the complete central Glico running man from a low angle. Reset restores this view; Auto Spin retains elevation.",
+    "logo": "The B046 north Asahi panel and uploaded logo remain present at every rotation and use the shared sign-to-QR travel in both directions. Uploaded panels exclude old Asahi artwork fragments.",
+    "buildings": 58,
+    "defaultCameraElevationRadians": 0.5235987755982988,
+    "foreground": "Southeastern context retains its fixed height envelope independently of the opening view. Live rotation never changes height or inventory. All eight reference hosts retain their dimensions. Normal 1F proportions are preserved; upper floors, signs and roof equipment are regenerated against the shorter source topology."
+  },
+  "edgeSelection": {
+    "rule": "At least 1 square metre intersects the 144 m square; retain at least 40 square metres OR half the original footprint. Variation indices use stable audit labels before selection.",
+    "candidateBuildings": 72,
+    "retainedBuildings": 58,
+    "omittedLabels": [
+      "B002",
+      "B013",
+      "B057",
+      "B059",
+      "B086",
+      "B091",
+      "B105",
+      "B115"
+    ],
+    "omittedFootprintAreaM2": 82.255,
+    "layout": "assets/design-qr/dotonbori/focus-layout.json",
+    "behavior": "Omitted at focused-asset generation, including attached details; unchanged by view or QR content. Complete small buildings and substantial clipped blocks remain. The complete square ground and QR target grid are retained.",
+    "displacedContextLabels": [
+      "B026",
+      "B027",
+      "B029",
+      "B030",
+      "B032",
+      "B033"
+    ]
+  },
+  "landmarkPlacement": {
+    "offsetsEastNorthM": {
+      "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": [
+        -80,
+        0
+      ]
+    },
+    "clearanceMetres": 1,
+    "displacedContextLabels": [
+      "B026",
+      "B027",
+      "B029",
+      "B030",
+      "B032",
+      "B033"
+    ],
+    "evidence": "User-authorized compression of spacing; preserve all eight complete source shapes, heights and facing directions. Original source coordinates remain in the research inventory. River, bridge and road alignment are unchanged."
+  },
+  "roofFinish": {
+    "buildings": 58,
+    "geometry": "Narrow panel joints and edge flashing follow existing upward-facing flat and sloping source triangles, including Donki rear roofs. No source vertices or heights change.",
+    "ownership": "Exclude the B034 east reference setback already owned by its glazing and ribs. Keep building ownership for complete QR surface transport.",
+    "generation": "Building-aligned courses vary deterministically with QR seed; skip coplanar triangulation diagonals and clip offsets to the tile.",
+    "evidence": "Authored structural interpretation using existing roof, joints and metal palette roles; not a surveyed roof specification or equipment inventory."
+  }
+}

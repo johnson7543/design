@@ -59,13 +59,14 @@ try {
       'The installed component must load core styles without a CSS import.');
     assert.equal(await page.$eval('.designqr-webgl-canvas', canvas => getComputedStyle(canvas).opacity), '0');
   }
-  assert.equal(requests.some(url => /shibuya-asset-data|GLTFLoader/.test(url)), false, 'Tree downloaded City model payloads.');
+  assert.equal(requests.some(url => /(?:Shibuya|Dotonbori|TokyoTower)Scene-|(?:shibuya|dotonbori)-asset-data|GLTFLoader/.test(url)), false, 'Tree downloaded an unused City implementation/model.');
   if (consumer) await page.evaluate(() => window.fixture.update({ design: 'city', }));
   else {
     await page.click('.design-type-tabs button:nth-child(2)');
   }
   await page.waitForFunction(() => document.querySelector('.designqr-webgl-canvas')?.dataset.cityAssets === 'ready', { timeout: 20000 });
   assert.equal(requests.filter(url => /shibuya-asset-data/.test(url)).length, 1, 'Asset data was not lazy-loaded once.');
+  assert.equal(requests.some(url => /(?:Dotonbori|TokyoTower)Scene-|dotonbori-asset-data/.test(url)), false, 'Shibuya loaded another city.');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   if (captures) {
     await mkdir(captures, { recursive: true });
@@ -181,6 +182,48 @@ try {
     }
     console.log('Installed consumer: exact forward/reverse morph poses 0, .1, .25, .5, .75, .9, 1; logo and dense QR decode; orbit views passed.');
 
+    // Qualify Tokyo Tower through the same installed tarball and non-root host.
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    const towerValue = 'https://example.com/tokyo-tower';
+    await page.evaluate(({ value, logo }) => window.fixture.update({ design: 'city', theme: 'tokyo-tower',
+      value, logo, second: true, secondTheme: 'tokyo-tower', secondLogo: logo,
+      transparentBackground: true, details: { border: true } }), { value: towerValue, logo: logos[0] });
+    await page.waitForFunction(() => document.querySelector('main')?.dataset.theme === 'tokyo-tower' && document.querySelectorAll('.designqr-webgl-canvas[data-city-assets="ready"]').length === 2);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await page.evaluate(() => { window.fixture.first.current.pause(); window.fixture.second.current.pause(); });
+    const secondTower = await frame(page, '.second .designqr-presentation-canvas');
+    for (const logo of [logos[1], false]) {
+      await page.evaluate(logo => window.fixture.update({ logo }), logo);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      assert.equal(await frame(page, '.second .designqr-presentation-canvas'), secondTower,
+        'Tokyo Tower logo edits changed another instance.');
+    }
+    for (const view of ['qr', 'design', 'qr']) {
+      await page.evaluate(view => window.fixture.first.current.setView(view), view);
+      await new Promise(resolve => setTimeout(resolve, 250));
+      if (view === 'qr') await decode(page, towerValue);
+      if (captures) await page.screenshot({ path: join(captures, `tokyo-tower-${view}.png`) });
+    }
+    const towerExport = await page.evaluate(async () => {
+      const blob = await window.fixture.first.current.exportImage();
+      const bitmap = await createImageBitmap(blob), canvas = document.createElement('canvas');
+      canvas.width = bitmap.width; canvas.height = bitmap.height;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(bitmap, 0, 0); bitmap.close();
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      return window.jsQR(pixels.data, pixels.width, pixels.height)?.data;
+    });
+    assert.equal(towerExport, towerValue, 'Installed Tokyo Tower PNG must decode.');
+    await page.evaluate(() => window.fixture.update({ show: false }));
+    await page.waitForFunction(() => !document.querySelector('.first'));
+    assert.equal(await frame(page, '.second .designqr-presentation-canvas'), secondTower,
+      'Disposing Tokyo Tower changed another instance.');
+    await page.evaluate(() => window.fixture.second.current.setView('qr'));
+    await decode(page, 'https://example.com/second', '.second .designqr-presentation-canvas');
+    await page.evaluate(() => window.fixture.update({ second: false }));
+    await page.waitForFunction(() => !document.querySelector('.designqr-root'));
+    assert.equal(await page.evaluate(() => window.fixtureError), undefined, 'Tokyo Tower reported a player error.');
+    console.log('Installed Tokyo Tower: two instances, logo replacement/removal, both views, PNG decode and disposal passed.');
+
     for (const mode of ['delayed', 'failed', 'disposed']) {
       const target = await browser.newPage(); let release;
       await target.setCacheEnabled(false);
@@ -254,8 +297,8 @@ try {
   }
   assert.deepEqual(errors, [], 'Shibuya City has browser/GLSL errors.');
   if (captures) await writeFile(join(captures, `${consumer ? 'consumer' : 'editor'}-asset-validation.json`), JSON.stringify({
-    installedConsumer: Boolean(consumer), base, treeLazyLoading: 'passed', assetsReady: 'passed', qrDecode: 'passed', errors,
+    installedConsumer: Boolean(consumer), base, unusedCityLazyLoading: 'passed', assetsReady: 'passed', qrDecode: 'passed', errors,
     assetRequests: requests.filter(url => /shibuya-asset-data|GLTFLoader/.test(url)),
   }, null, 2));
-  console.log(`${consumer ? 'Installed non-root consumer' : 'Editor'}: Tree excludes City chunks; City assets load; QR decodes; no browser/GLSL errors.`);
+  console.log(`${consumer ? 'Installed non-root consumer' : 'Editor'}: Tree defers all City implementations/models; selected City assets load; QR decodes; no browser/GLSL errors.`);
 } finally { await browser?.close(); preview.kill(); }

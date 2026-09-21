@@ -1,0 +1,59 @@
+{
+  "schema": "designqr-dotonbori-water-motion-reference",
+  "version": 2,
+  "reviewed": "2026-09-15",
+  "status": "Implemented moving reflection bands and spreading stern ripples. Source geometry is retained; motion is an illustrative physical interpretation.",
+  "sources": {
+    "ledgerId": "S18",
+    "operatorPage": "https://www.ipponmatsu.co.jp/cruise/tombori.html",
+    "vesselGeometry": "S13 and waterfront-reference.json retain the operator drawing, dimensions and original fitting references.",
+    "photographs": [
+      {
+        "url": "https://www.ipponmatsu.co.jp/assets/img/common/tombori_img01.jpg",
+        "pixels": [
+          1000,
+          760
+        ],
+        "bytes": 162700,
+        "sha256": "33e4e6bb1596f57baca98c759ea186fb04bd36046299935f8566802aa5cf305b",
+        "observed": "Approaching open boat below Ebisubashi, fine water ripples and outward trailing wave ridges. Text covers part of the foreground water."
+      },
+      {
+        "url": "https://www.ipponmatsu.co.jp/assets/img/common/tombori_img04.jpg",
+        "pixels": [
+          1000,
+          662
+        ],
+        "bytes": 136640,
+        "sha256": "0688dc3153ef8c9cc6ec4d854bae63e1b29e08f9f0ccfcd2287f699d1c00aa9b",
+        "observed": "DOTON's transom, disturbed water immediately behind it and low ripples alongside the vessel. The canal also shows broken sign reflections."
+      }
+    ],
+    "inspection": "Downloaded and visually inspected on 2026-09-15. Capture dates, water conditions and boat speed are unverified. No motion footage inspected. Photographs are retained outside the repository and are not runtime textures."
+  },
+  "interpretation": {
+    "reflectionMotion": "Existing fine strokes drift and change width/depth independently. A small local disturbance follows nearby wake crests. Glico retains its synchronized color blend.",
+    "wake": "Curved, broken transverse ridges are emitted at historical stern positions, expand outward, drift slowly and fade. Existing crests stay in the water instead of moving rigidly with the boat. The former rigid wake beams are removed.",
+    "emissionIntervalSeconds": 0.72,
+    "retainedEmissions": 12,
+    "lifetimeSeconds": 8.64,
+    "maximumWakeSegments": 72,
+    "spreadMetresPerSecond": 0.54,
+    "eastDriftMetresPerSecond": 0.045,
+    "waveWidthMetres": "0.075 + ageSeconds * 0.012",
+    "limits": "Emission timing, spread, drift, amplitude and the existing 1.35 m/s boat travel are authored miniature choices. They do not represent measured local currents, operating speed, a hydrodynamic simulation or a dated reconstruction. Water height and the source canal outline are unchanged."
+  },
+  "runtime": {
+    "sourceFiles": [
+      "packages/designqr/src/designs/city/dotonbori-river.ts",
+      "packages/designqr/src/designs/city/dotonbori-wake.ts",
+      "packages/designqr/src/designs/city/dotonbori-water-area.ts"
+    ],
+    "boundary": "Distance to every source water boundary, hole and rotated tile edge bounds the complete reflection motion envelope. Wake segments fade before their enclosing circles reach a boundary. Hidden slots contribute neither pixels nor QR fragments.",
+    "clock": "Analytic state from the existing per-player activity clock. Pause, reduced motion, QR view and both transition directions freeze positions, spread and brightness. Content edits preserve phase and GPU buffer ownership.",
+    "morph": "Complete reflection/wake triangles copy their actual frozen vertices, colors and alpha, with the same shader uniforms. They supply QR paper through area transport. No detail sampling cap applies. The exact endpoint hides source and transport groups.",
+    "rendering": "One retained dynamic position buffer for the existing reflection mesh; one additional wake draw with 72 fixed quad slots and retained position/RGBA buffers. No added texture, per-frame geometry allocation or canvas repaint. Updates at the same clock value do not upload buffers.",
+    "palette": "Existing water/foam blends, sign-reflection roles and Glico color phase. Wake strength is vertex alpha; QR snapshots composite it against the water role. No new base colors.",
+    "staticReview": "The editable Blender review captures the current runtime geometry at time zero. Browser captures document the animation; source building and bridge GLBs retain their metric geometry."
+  }
+}

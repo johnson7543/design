@@ -1,0 +1,168 @@
+{
+  "schema": "designqr-dotonbori-facade-reference",
+  "version": 3,
+  "reviewed": "2026-09-20",
+  "status": "Implemented perimeter/reference-wall finishes, B046 street facade, B034 closed ribs/setback and seven restored riverbank sign panels. Complete unphotographed rear elevations remain unresolved.",
+  "photographPolicy": "Downloaded outside the repository and visually inspected. Photographs are references, not bundled textures. Capture dates remain unknown.",
+  "geometry": {
+    "catalogUrl": "https://api.plateauview.mlit.go.jp/datacatalog/citygml/27100",
+    "catalogBytes": 320616,
+    "catalogSha256": "7d41a0314a0be2147388a766a7d605a59750ea8014247392ca3121e7fceb8d7f",
+    "edition": "27100_osaka-shi_city_2025_citygml_1_op",
+    "mesh": "52350400",
+    "features": 3385,
+    "lod2Features": 1332,
+    "lod3Features": 0,
+    "lod4Features": 0,
+    "citygmlUrl": "https://assets.cms.plateau.reearth.io/assets/10/a0aecb-67d1-4463-92d5-d67c99f3b8b6/27100_osaka-shi_city_2025_citygml_1_op/udx/bldg/52350400_bldg_6697_op.gml",
+    "citygmlBytes": 67132784,
+    "citygmlSha256": "e30bf0c85750186394ed352e6f22610443ad37b1adcbb2bc6fb20910d190ca81",
+    "appearanceInspection": {
+      "method": "Inspect the complete downloaded XML for element names, allowing any namespace prefix.",
+      "imageURI": 0,
+      "ParameterizedTexture": 0,
+      "textureCoordinates": 0,
+      "limit": "This confirms the inspected CityGML has no facade textures; alternative distributions were not exhaustively checked."
+    }
+  },
+  "references": [
+    {
+      "id": "F1",
+      "publisher": "Kani Doraku, main-store owner",
+      "pageUrl": "https://douraku.co.jp/area/shop/photo/?shop_id=1",
+      "imageUrl": "https://douraku.co.jp/lacne/photo/upload/OYRbCZyjstBd8H4l.jpg",
+      "bytes": 653687,
+      "sha256": "7420f57d9c8a0627f5c068cd2331af2bb06d8f0fb430640eeda90ff7cd4b660a",
+      "dimensions": [
+        1000,
+        700
+      ],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "Street entrance below a tiled eave; vertical wall panels and crab assembly; adjacent dark-framed inset window bands and corner returns.",
+      "target": "B046-south, registered to the actual oblique source street wall.",
+      "registration": {
+        "hintCenterEastNorthM": [
+          22.3264,
+          -28.3823
+        ],
+        "outwardNormalEastNorth": [
+          -0.19226348,
+          -0.98134334
+        ],
+        "sourceFloorTPM": 1.26,
+        "frontWidthM": 14.9,
+        "interpretedLowerElevationHeightM": 12.6,
+        "entranceEaveHeightM": 3.65,
+        "maximumReliefM": 0.81,
+        "method": "Fit photo-directed proportions within the actual source wall; not calibrated photogrammetry.",
+        "features": [
+          "entrance reveal",
+          "tiled eave with closed ends",
+          "pale vertical wall panels",
+          "inset window bands",
+          "dark corner framing",
+          "warm soffit and lamps",
+          "outlined かに道楽 本店 fascia"
+        ],
+        "access": "Retain source floor; street walking datum unresolved, so no functional entrance, invented steps or pedestrian route.",
+        "exteriorCrab": "Implemented within the S23 reservation; see kani-sign-reference.json. Maximum crab/uplight projection 1.6 m; entrance relief remains 0.81 m.",
+        "upperWall": "Structural finish; photograph does not establish a full-height elevation."
+      },
+      "limit": "No complete elevations, measured relief or current campaign date."
+    },
+    {
+      "id": "F2",
+      "publisher": "Osaka Convention & Tourism Bureau",
+      "pageUrl": "https://discover.osaka-info.jp/jp/articles/osaka-night-view",
+      "publicationDate": "2026-01-07",
+      "imageUrl": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_03.webp",
+      "bytes": 216100,
+      "sha256": "8453f118d880c36dc52fc25cbab653a591116f00f08d3e0a4cc046663d132067",
+      "dimensions": [
+        1400,
+        933
+      ],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "B034 has continuous bent ribs over recessed glazing, a top setback and different signs on adjacent exposed faces. B037 east has Pip above FANCL; B034 south has a Salonpas portrait panel and lower H&M fashion panels.",
+      "implementation": "Closed rib relief on the source-fitted east/south fronts; aligned upper/lower strips and glass/ribs following original sloped east triangles between the 30.83 m lower envelope and 37.11 m upper wall. No source vertex is moved. Fit these missing sign quads to the actual source planes; preserve the existing B037 east ground floor.",
+      "limit": "Does not show the north/west rear walls. Publication date is not the photograph date."
+    },
+    {
+      "id": "F3",
+      "publisher": "Osaka Convention & Tourism Bureau",
+      "pageUrl": "https://discover.osaka-info.jp/jp/articles/osaka-night-view",
+      "publicationDate": "2026-01-07",
+      "imageUrl": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_01.webp",
+      "bytes": 283500,
+      "sha256": "a90f54f615e07c6625f0d60d9174ed3921474323b2e0b5c8b43ad159849634ee",
+      "dimensions": [
+        1400,
+        934
+      ],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "Distinct advertising stacks, exposed lower windows, narrow facade strips and localized night lighting on the south bank. A yellow 大阪 花ラング advertisement occupies the gap below the SAMTY service band; the Snow Brand slogan sits below the dairy panel.",
+      "limit": "Not a rear-elevation survey or a verified current sign inventory."
+    },
+    {
+      "id": "F4",
+      "publisher": "Tonbori Riverwalk operator",
+      "pageUrl": "https://www.tonbori.jp/osanpo/",
+      "imageUrl": "https://www.tonbori.jp/osanpo/img/sv06b.png",
+      "bytes": 65541,
+      "sha256": "a09cbe41c019782577bcfb2777555846af24d1916d78a1eb03a48ec61e43ca5e",
+      "dimensions": [
+        184,
+        181
+      ],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "Ribbed building corner and river-facing architectural silhouette.",
+      "limit": "Small image supports orientation and silhouette only."
+    },
+    {
+      "id": "F5",
+      "publisher": "Tonbori Riverwalk operator",
+      "pageUrl": "https://www.tonbori.jp/osanpo/",
+      "imageUrl": "https://www.tonbori.jp/osanpo/img/sv04b.png",
+      "bytes": 152194,
+      "sha256": "993d945ddbbe646c464527f0f5c8f7d71abc8c83f157b3fc4518a84b4c3e9146",
+      "dimensions": [
+        275,
+        270
+      ],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "Service ducts, pipes, small vents, projecting signs and terrace furniture beside restaurant openings.",
+      "limit": "Tenant is not registered to a source host. Features cannot establish equipment on an arbitrary building."
+    },
+    {
+      "id": "F6",
+      "publisher": "Shinsaibashi-suji Shopping Street Promotion Association",
+      "pageUrl": "https://www.shinsaibashi.or.jp/stores/show/2nr3erh5u/H%26M%20EBISUBASHI",
+      "pageBytes": 62303,
+      "pageSha256": "39cafc6500790ef9b26e1d542b31c3af1c2ce49da4370e721a5525ba60cc80f4",
+      "observed": "H&M EBISUBASHI listed at Shinsaibashi-suji 2-4-9, Ebisubashi Building, area 8 west.",
+      "limit": "Current HTML uses a generic store-image placeholder; identity/address evidence only."
+    },
+    {
+      "id": "F7",
+      "publisher": "Pip Co., Ltd.",
+      "pageUrl": "https://www.pipjapan.co.jp/products/recommend/tokeidai/",
+      "imageUrl": "https://www.pipjapan.co.jp/products/recommend/tokeidai/img/history_ph03.jpg",
+      "bytes": 64486,
+      "sha256": "b7fe2b60ea6e5af933940fd7e314098d060387da033821853dbb3c91428560d6",
+      "dimensions": [
+        444,
+        296
+      ],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "Pip clock on the north face above Snow Brand, with a distinct east-face advertisement; clock numerals, vine ornament and Pip footer.",
+      "implementation": "Original fixed clock drawing on B037 north; S14 supplies the separate east Pip logo state.",
+      "limit": "Composite photographic state; not a current campaign, measured tower elevation or live-time clock."
+    }
+  ]
+}

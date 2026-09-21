@@ -169,7 +169,7 @@
       ],
       "morphProxy": "footprint",
       "ground": 0,
-      "sourceSha256": "f046ef653f0980892a2596c6778d564f8240f85e47a410b4f3a7a1c4989239a2",
+      "sourceSha256": "36b76bf1309a341df7f77a1a6a26e7433605fb4a08fd261f36d557dcc6b7a382",
       "logoAnchor": "qfront-logo-anchor",
       "logoPosition": [
         -0.26508282444052883,
@@ -194,7 +194,7 @@
       ],
       "morphProxy": "footprint",
       "ground": 0,
-      "sourceSha256": "f046ef653f0980892a2596c6778d564f8240f85e47a410b4f3a7a1c4989239a2",
+      "sourceSha256": "36b76bf1309a341df7f77a1a6a26e7433605fb4a08fd261f36d557dcc6b7a382",
       "nodes": [
         "building-magnet",
         "building-magnet-body"
@@ -251,5 +251,5 @@
       "swatch": "#809dca"
     }
   },
-  "provenance": "Original facades on modified PLATEAU Shibuya 2025 footprints; no reference media, external textures, or uploaded logos. See docs/design-qr/shibuya-architecture.md."
+  "provenance": "Original facades on modified PLATEAU Shibuya 2025 footprints; no reference media, external textures, or uploaded logos. See docs/designqr-package/cities/shibuya/architecture.md."
 }

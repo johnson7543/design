@@ -1,0 +1,1696 @@
+{
+  "schema": "designqr-dotonbori-focus-layout",
+  "version": 5,
+  "sourceMeshSha256": "ede42a5691140bd7b44df32ae62be6c10030a9f4ab94ec725e0a257c92e0cb79",
+  "sourceAuditSha256": "8e63218630c2942e8f447d3029be86c2df2c7cde0e61e90701c599fa97a18161",
+  "bridgeStudySha256": "c4d4242e3154c32dc27752b11045badb0842604e54657062509ebad8c892b0e7",
+  "tileSizeM": 144,
+  "centerEastNorthM": [
+    4.196907421216137,
+    2.1639323405262125
+  ],
+  "rotationYRadians": 0.7853981633974483,
+  "outlineEastNorthM": [
+    [
+      -97.62646906964672,
+      2.1639323405262125
+    ],
+    [
+      4.196907421216137,
+      103.98730883138907
+    ],
+    [
+      106.020283912079,
+      2.1639323405262125
+    ],
+    [
+      4.196907421216137,
+      -99.65944415033664
+    ],
+    [
+      -97.62646906964672,
+      2.1639323405262125
+    ]
+  ],
+  "landmarkOffsetsEastNorthM": {
+    "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa": [
+      -80,
+      0
+    ]
+  },
+  "composition": "Bridge-centered 144 m miniature. Donki translates 80 m west as one complete source building; six displaced context parcels are omitted. Landmark dimensions and central street/canal geometry remain unchanged. Spacing is illustrative, not geographic.",
+  "selectionRule": "After the recorded landmark translation and context clearance, retain at least 40 square metres OR half the original footprint. Complete small buildings remain; variation indices use stable source audit labels.",
+  "edgeSelection": {
+    "minimumRetainedAreaM2": 40,
+    "minimumRetainedFraction": 0.5
+  },
+  "objects": [
+    {
+      "sourceId": "bldg_05ec86aa-79f1-4aaa-8e93-0bf011542f99",
+      "auditLabel": "B001",
+      "variationIndex": 0,
+      "retainedFootprintAreaM2": 316.6902459665353,
+      "retainedFootprintFraction": 0.20212260815699823,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_97ff7748-df43-4444-9eb0-23cc6f494ee3",
+      "auditLabel": "B004",
+      "variationIndex": 3,
+      "retainedFootprintAreaM2": 122.49928942678926,
+      "retainedFootprintFraction": 0.9306930654325238,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_fc4e8d81-ae3d-4f37-9d4f-37c39142094b",
+      "auditLabel": "B005",
+      "variationIndex": 4,
+      "retainedFootprintAreaM2": 101.69275229869271,
+      "retainedFootprintFraction": 0.7582064558376156,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_2de00e94-da2b-43f6-851e-31ccd3170afa",
+      "auditLabel": "B006",
+      "variationIndex": 5,
+      "retainedFootprintAreaM2": 5.101880402130689,
+      "retainedFootprintFraction": 0.5922614694453259,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_7ad08c54-9183-462f-bf96-9eb346a14310",
+      "auditLabel": "B007",
+      "variationIndex": 6,
+      "retainedFootprintAreaM2": 151.15564151405513,
+      "retainedFootprintFraction": 0.9173481447689174,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_05785215-b10c-434c-99b8-a700f76f8adc",
+      "auditLabel": "B008",
+      "variationIndex": 7,
+      "retainedFootprintAreaM2": 67.650366466512,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_f7b7d534-49ca-4a79-b03a-08128ff697c0",
+      "auditLabel": "B009",
+      "variationIndex": 8,
+      "retainedFootprintAreaM2": 228.58961903785737,
+      "retainedFootprintFraction": 0.18313267991494628,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_711d3b15-de26-4d47-a8a3-5d0e1f7e5d8d",
+      "auditLabel": "B012",
+      "variationIndex": 11,
+      "retainedFootprintAreaM2": 102.67616103050688,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_fa021df6-6040-4cd5-8773-63d12e3ccf27",
+      "auditLabel": "B014",
+      "variationIndex": 13,
+      "retainedFootprintAreaM2": 157.69095102057517,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_484c9eab-7b24-4cdb-b22a-6cca97c92210",
+      "auditLabel": "B015",
+      "variationIndex": 14,
+      "retainedFootprintAreaM2": 99.52643780014328,
+      "retainedFootprintFraction": 0.37887770755637373,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_d589d364-22d5-4c9c-85c3-4416c222ec92",
+      "auditLabel": "B016",
+      "variationIndex": 15,
+      "retainedFootprintAreaM2": 132.51988579199516,
+      "retainedFootprintFraction": 0.5551443797370282,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_91ce1b36-b134-4def-bdf5-ed78a1e948cb",
+      "auditLabel": "B017",
+      "variationIndex": 16,
+      "retainedFootprintAreaM2": 72.76259892850003,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_69381567-48c9-40b7-a6d3-478623f7e2f6",
+      "auditLabel": "B018",
+      "variationIndex": 17,
+      "retainedFootprintAreaM2": 204.43184973448587,
+      "retainedFootprintFraction": 0.9812463223373312,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_eff919e5-aa90-4f6c-aa5f-09d49d9aafcc",
+      "auditLabel": "B019",
+      "variationIndex": 18,
+      "retainedFootprintAreaM2": 64.23624999817103,
+      "retainedFootprintFraction": 1.0000000000000002,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_412fb575-c91d-47c2-8887-bbce1a985622",
+      "auditLabel": "B022",
+      "variationIndex": 21,
+      "retainedFootprintAreaM2": 42.883027706074344,
+      "retainedFootprintFraction": 0.3573116251971361,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_ee83e0d9-4ba0-4a72-bec8-c77447ef2a8e",
+      "auditLabel": "B023",
+      "variationIndex": 22,
+      "retainedFootprintAreaM2": 517.6092479911708,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_cdc316af-5973-4869-8a8d-5c4bc84bf49f",
+      "auditLabel": "B024",
+      "variationIndex": 23,
+      "retainedFootprintAreaM2": 54.70699251934069,
+      "retainedFootprintFraction": 0.9999999999999999,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_992fac86-aa37-4398-a10e-6850c9cac9f9",
+      "auditLabel": "B025",
+      "variationIndex": 24,
+      "retainedFootprintAreaM2": 151.55071451772437,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_36dfa3b9-6bbd-4d27-9567-629b27f1fbf4",
+      "auditLabel": "B028",
+      "variationIndex": 27,
+      "retainedFootprintAreaM2": 55.53351015749246,
+      "retainedFootprintFraction": 0.36130706994195705,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4",
+      "auditLabel": "B031",
+      "variationIndex": 30,
+      "retainedFootprintAreaM2": 405.6404490174811,
+      "retainedFootprintFraction": 1.0000000000000002,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "auditLabel": "B034",
+      "variationIndex": 33,
+      "retainedFootprintAreaM2": 440.236693478301,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_52193e01-cf9a-489d-9baf-06917e3b056c",
+      "auditLabel": "B035",
+      "variationIndex": 34,
+      "retainedFootprintAreaM2": 140.18044511844812,
+      "retainedFootprintFraction": 0.9999999999999998,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_e95a0f5f-11e1-46f8-b5da-37619d297fc4",
+      "auditLabel": "B036",
+      "variationIndex": 35,
+      "retainedFootprintAreaM2": 265.54205300041616,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "auditLabel": "B037",
+      "variationIndex": 36,
+      "retainedFootprintAreaM2": 78.1444487862416,
+      "retainedFootprintFraction": 1.0000000000000002,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_fd5276cc-91fe-4ca0-a80f-afdbbbcf3b9e",
+      "auditLabel": "B038",
+      "variationIndex": 37,
+      "retainedFootprintAreaM2": 7.46441150816357,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742",
+      "auditLabel": "B039",
+      "variationIndex": 38,
+      "retainedFootprintAreaM2": 186.3124999730544,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+      "auditLabel": "B040",
+      "variationIndex": 39,
+      "retainedFootprintAreaM2": 166.74257826470324,
+      "retainedFootprintFraction": 0.9999999999999998,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85",
+      "auditLabel": "B041",
+      "variationIndex": 40,
+      "retainedFootprintAreaM2": 170.8124999722113,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_e5544ca4-cb61-4b2e-a70d-8aee283a67f5",
+      "auditLabel": "B042",
+      "variationIndex": 41,
+      "retainedFootprintAreaM2": 84.55343502505391,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_b64bf000-9dcd-42bc-af79-2acb3651aaeb",
+      "auditLabel": "B043",
+      "variationIndex": 42,
+      "retainedFootprintAreaM2": 74.33607049261913,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_80a96e74-6934-4bca-b090-fc736ff4fc87",
+      "auditLabel": "B044",
+      "variationIndex": 43,
+      "retainedFootprintAreaM2": 132.81249999817283,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_1910ceab-f4fe-4995-ba10-79dcf616cf77",
+      "auditLabel": "B045",
+      "variationIndex": 44,
+      "retainedFootprintAreaM2": 68.78789549031664,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+      "auditLabel": "B046",
+      "variationIndex": 45,
+      "retainedFootprintAreaM2": 179.50181596251738,
+      "retainedFootprintFraction": 0.9999999999999997,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_7548efc6-1187-4138-ab0f-5e94709ed687",
+      "auditLabel": "B047",
+      "variationIndex": 46,
+      "retainedFootprintAreaM2": 59.325597533406494,
+      "retainedFootprintFraction": 0.9918595200578374,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_f3e79f73-b62f-48c0-a3f3-dd4849d1a867",
+      "auditLabel": "B048",
+      "variationIndex": 47,
+      "retainedFootprintAreaM2": 61.874999994193786,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429",
+      "auditLabel": "B049",
+      "variationIndex": 48,
+      "retainedFootprintAreaM2": 423.14628926155973,
+      "retainedFootprintFraction": 1.0000000000000002,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_8cee6021-11a5-4653-8418-f12e6173b4cc",
+      "auditLabel": "B050",
+      "variationIndex": 49,
+      "retainedFootprintAreaM2": 82.3872968001584,
+      "retainedFootprintFraction": 0.6552672886258133,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_8bcee197-1f52-417e-a67f-28480a319821",
+      "auditLabel": "B051",
+      "variationIndex": 50,
+      "retainedFootprintAreaM2": 21.37499998396197,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_1f987142-0572-4544-9529-9a21c0c24447",
+      "auditLabel": "B052",
+      "variationIndex": 51,
+      "retainedFootprintAreaM2": 15.843749990308424,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_fee60d6a-ed22-4cb1-863e-d4aa94a1d2e1",
+      "auditLabel": "B053",
+      "variationIndex": 52,
+      "retainedFootprintAreaM2": 222.821622071219,
+      "retainedFootprintFraction": 0.9999999999999994,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_740f4b5a-00b3-43d4-83d6-c45e82f2e494",
+      "auditLabel": "B054",
+      "variationIndex": 53,
+      "retainedFootprintAreaM2": 8.749910549512448,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_081a1c94-4b22-4245-b41d-bce24cdd94d1",
+      "auditLabel": "B055",
+      "variationIndex": 54,
+      "retainedFootprintAreaM2": 499.4802515019378,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_d1c14616-11d6-420f-a194-b00d109cd088",
+      "auditLabel": "B056",
+      "variationIndex": 55,
+      "retainedFootprintAreaM2": 21.342038952944797,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_e9a16744-1518-44eb-a8ad-55525ed6ac48",
+      "auditLabel": "B058",
+      "variationIndex": 57,
+      "retainedFootprintAreaM2": 31.08131195871434,
+      "retainedFootprintFraction": 1.0000000000000002,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_67ee9dba-9301-4e9d-9fd9-25e33057186f",
+      "auditLabel": "B060",
+      "variationIndex": 59,
+      "retainedFootprintAreaM2": 30.87132579981226,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_fca861ee-3cbf-45ce-97c0-36cf40a755b5",
+      "auditLabel": "B062",
+      "variationIndex": 61,
+      "retainedFootprintAreaM2": 30.193118537584567,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_2260a3a1-9ab2-48bf-80c9-09d3a718b74f",
+      "auditLabel": "B064",
+      "variationIndex": 63,
+      "retainedFootprintAreaM2": 85.97058550862799,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_94780c64-d2d7-4e0b-b465-93a3429e6533",
+      "auditLabel": "B065",
+      "variationIndex": 64,
+      "retainedFootprintAreaM2": 468.4421536047873,
+      "retainedFootprintFraction": 0.35095128289363675,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_20a34d49-7e67-48bc-a3f4-12e5d8d8c5e1",
+      "auditLabel": "B066",
+      "variationIndex": 65,
+      "retainedFootprintAreaM2": 617.6593588278408,
+      "retainedFootprintFraction": 0.39870780145119344,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_25f7a5fb-7d9b-4992-8936-a1a8b4a6ad52",
+      "auditLabel": "B067",
+      "variationIndex": 66,
+      "retainedFootprintAreaM2": 105.69099300131191,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_c657204f-1a56-4972-aba9-70ac9edc3226",
+      "auditLabel": "B069",
+      "variationIndex": 68,
+      "retainedFootprintAreaM2": 293.2461985704359,
+      "retainedFootprintFraction": 0.861809800564798,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_2c945096-d6a8-4590-b6f7-d0c31ef03b7a",
+      "auditLabel": "B071",
+      "variationIndex": 70,
+      "retainedFootprintAreaM2": 40.5890704885158,
+      "retainedFootprintFraction": 0.9999999999999998,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_f7b27726-11e9-4848-92a2-7879b0483bbc",
+      "auditLabel": "B073",
+      "variationIndex": 72,
+      "retainedFootprintAreaM2": 293.482482228192,
+      "retainedFootprintFraction": 0.2850786564882728,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_20542333-f1db-4f98-be51-35536efa796d",
+      "auditLabel": "B077",
+      "variationIndex": 76,
+      "retainedFootprintAreaM2": 67.50760829522483,
+      "retainedFootprintFraction": 0.2802018563881246,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_5b57a30b-ae12-422b-813f-b71032866bc6",
+      "auditLabel": "B090",
+      "variationIndex": 89,
+      "retainedFootprintAreaM2": 57.1836722113966,
+      "retainedFootprintFraction": 0.38703156757814433,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_62a12ed7-ad07-4a43-8a33-c8720026bbaa",
+      "auditLabel": "B092",
+      "variationIndex": 91,
+      "retainedFootprintAreaM2": 648.3853549472898,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        -80,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_6e50f530-73f8-4296-a8d1-d5e14a02faf8",
+      "auditLabel": "B095",
+      "variationIndex": 94,
+      "retainedFootprintAreaM2": 76.5554855613112,
+      "retainedFootprintFraction": 0.5712104845376583,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_d93312f3-779f-460f-ac15-cfb0956955b1",
+      "auditLabel": "B122",
+      "variationIndex": 121,
+      "retainedFootprintAreaM2": 107.32080842635258,
+      "retainedFootprintFraction": 0.5235520159580684,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    }
+  ],
+  "omittedEdgeFragments": [
+    {
+      "sourceId": "bldg_8cfb1e65-5be3-47bb-8e54-600452e7395d",
+      "auditLabel": "B002",
+      "variationIndex": 1,
+      "retainedFootprintAreaM2": 2.021817052391804,
+      "retainedFootprintFraction": 0.014969671064232993,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_85c14406-5eae-4678-a80b-fa9cc1f14dcc",
+      "auditLabel": "B013",
+      "variationIndex": 12,
+      "retainedFootprintAreaM2": 5.595053147482737,
+      "retainedFootprintFraction": 0.008278741058038141,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_c2481bab-de3d-4885-ac93-4a4468dac9fa",
+      "auditLabel": "B057",
+      "variationIndex": 56,
+      "retainedFootprintAreaM2": 4.517552365290799,
+      "retainedFootprintFraction": 0.023855061997204476,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_83ec56aa-2338-4b9e-b1e3-c0dd4a1d1ca3",
+      "auditLabel": "B059",
+      "variationIndex": 58,
+      "retainedFootprintAreaM2": 10.74534496851791,
+      "retainedFootprintFraction": 0.026523669044484815,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_4d3ca1d5-457c-4dc9-bac4-2c462f9d6954",
+      "auditLabel": "B086",
+      "variationIndex": 85,
+      "retainedFootprintAreaM2": 27.251244923308498,
+      "retainedFootprintFraction": 0.1753897854835636,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_6025780d-c088-4222-a00f-546b392ad97b",
+      "auditLabel": "B091",
+      "variationIndex": 90,
+      "retainedFootprintAreaM2": 9.770091199646936,
+      "retainedFootprintFraction": 0.06228965888562812,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_9bba870f-9b28-4c9b-8e3c-9377c03cc7a4",
+      "auditLabel": "B105",
+      "variationIndex": 104,
+      "retainedFootprintAreaM2": 2.179512402111088,
+      "retainedFootprintFraction": 0.01475866988097971,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_c0304451-3e37-4be2-b8c2-54f6163e4235",
+      "auditLabel": "B115",
+      "variationIndex": 114,
+      "retainedFootprintAreaM2": 20.174139893982822,
+      "retainedFootprintFraction": 0.2977950336655228,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    }
+  ],
+  "displacedContext": [
+    {
+      "sourceId": "bldg_af2493d8-cf34-4855-a45b-e070f8c4ba6b",
+      "auditLabel": "B026",
+      "variationIndex": 25,
+      "retainedFootprintAreaM2": 50.71648298934538,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_8a1583f8-f560-4137-9938-b49420c3515f",
+      "auditLabel": "B027",
+      "variationIndex": 26,
+      "retainedFootprintAreaM2": 168.41024970354306,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_09cdf410-c611-4b54-9454-593bd587d1bd",
+      "auditLabel": "B029",
+      "variationIndex": 28,
+      "retainedFootprintAreaM2": 111.46908253541606,
+      "retainedFootprintFraction": 0.6922340646713745,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_0642fc6c-6d3b-4bb8-b8a1-1b18eb05cdaf",
+      "auditLabel": "B030",
+      "variationIndex": 29,
+      "retainedFootprintAreaM2": 146.95380212150494,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_90585470-1c85-41a2-b1d1-08c7e7456fc0",
+      "auditLabel": "B032",
+      "variationIndex": 31,
+      "retainedFootprintAreaM2": 163.7061014931193,
+      "retainedFootprintFraction": 1.0,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    },
+    {
+      "sourceId": "bldg_1fa7973c-e3bf-41a8-ae40-fc1460305e35",
+      "auditLabel": "B033",
+      "variationIndex": 32,
+      "retainedFootprintAreaM2": 99.57672022034619,
+      "retainedFootprintFraction": 0.9894110082972201,
+      "translationEastNorthM": [
+        0,
+        0
+      ]
+    }
+  ],
+  "plan": {
+    "roads": [
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.97540332092467,
+              -94.21425938422908
+            ],
+            [
+              8.460528101185767,
+              -95.395823470367
+            ],
+            [
+              4.196907421216137,
+              -99.65944415033664
+            ],
+            [
+              0.07292066004609093,
+              -95.5354573891666
+            ],
+            [
+              1.1251033212683978,
+              -94.51415938316495
+            ],
+            [
+              6.97540332092467,
+              -94.21425938422908
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -62.25059663691959,
+              -33.21194009220092
+            ],
+            [
+              -64.18935875109909,
+              -31.273177978021412
+            ],
+            [
+              -62.223896677627636,
+              -31.264159381738864
+            ],
+            [
+              -62.25059663691959,
+              -33.21194009220092
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.675603320130904,
+              -43.16475938385702
+            ],
+            [
+              0.6756033220372046,
+              -43.264659385342384
+            ],
+            [
+              -0.8288966763793724,
+              -41.64435938416864
+            ],
+            [
+              -1.2742966746955062,
+              -41.16465938455076
+            ],
+            [
+              -6.224196679097076,
+              -30.21475938387448
+            ],
+            [
+              14.825703320289904,
+              -27.064959384209942
+            ],
+            [
+              8.72560332165449,
+              -41.21465938354959
+            ],
+            [
+              8.447503321673139,
+              -41.4792593823513
+            ],
+            [
+              7.551403321529506,
+              -42.33155938395066
+            ],
+            [
+              6.675603320130904,
+              -43.16475938385702
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -61.813931190955806,
+              37.97647021921713
+            ],
+            [
+              -61.8231966767562,
+              37.23524061561329
+            ],
+            [
+              -61.87339667921333,
+              19.685340615658788
+            ],
+            [
+              -80.125730245111,
+              19.664671165061932
+            ],
+            [
+              -61.813931190955806,
+              37.97647021921713
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -5.373496677697403,
+              37.83474061684683
+            ],
+            [
+              -0.023496678259107284,
+              46.084640616580145
+            ],
+            [
+              1.0029033205573796,
+              46.94454061600845
+            ],
+            [
+              1.8265033227362437,
+              47.63454061548691
+            ],
+            [
+              8.176503322632925,
+              47.68454061591183
+            ],
+            [
+              8.946403320493118,
+              46.701740616437746
+            ],
+            [
+              17.188303323084256,
+              38.396540614950936
+            ],
+            [
+              14.363303321195417,
+              35.93454061547527
+            ],
+            [
+              -5.373496677697403,
+              37.83474061684683
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.0274033220703132,
+              98.48364061603206
+            ],
+            [
+              1.1545755487529108,
+              100.94497695892585
+            ],
+            [
+              4.196907421216137,
+              103.98730883138907
+            ],
+            [
+              9.105505985587428,
+              99.07871026701778
+            ],
+            [
+              9.055703322483168,
+              96.32244061608799
+            ],
+            [
+              2.87700332293025,
+              96.4342406160431
+            ],
+            [
+              1.0274033220703132,
+              98.48364061603206
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -61.899496679223375,
+              14.47164061514195
+            ],
+            [
+              -61.90049667820858,
+              14.271740616328316
+            ],
+            [
+              -61.91579667804763,
+              11.232640616653953
+            ],
+            [
+              -61.91679667855351,
+              11.031640615023207
+            ],
+            [
+              -62.02209667825082,
+              -10.00825938480557
+            ],
+            [
+              -62.023196677961096,
+              -10.208359383017523
+            ],
+            [
+              -62.02369667511812,
+              -10.31435938278446
+            ],
+            [
+              -62.053596679070324,
+              -12.742359382973518
+            ],
+            [
+              -62.05599667785282,
+              -12.943159384449245
+            ],
+            [
+              -62.12379667780624,
+              -18.46425938452012
+            ],
+            [
+              -62.219796677651175,
+              -30.736959382600617
+            ],
+            [
+              -62.223896677627636,
+              -31.264159381738864
+            ],
+            [
+              -64.18935875109909,
+              -31.273177978021412
+            ],
+            [
+              -97.62646906964672,
+              2.1639323405262125
+            ],
+            [
+              -80.125730245111,
+              19.664671165061932
+            ],
+            [
+              -61.87339667921333,
+              19.685340615658788
+            ],
+            [
+              -61.899496679223375,
+              14.47164061514195
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              6.675603320130904,
+              -43.16475938385702
+            ],
+            [
+              6.97540332092467,
+              -94.21425938422908
+            ],
+            [
+              1.1251033212683978,
+              -94.51415938316495
+            ],
+            [
+              0.6756033220372046,
+              -43.264659385342384
+            ],
+            [
+              6.675603320130904,
+              -43.16475938385702
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -52.92409667881293,
+              -41.91415938350838
+            ],
+            [
+              -52.923596676875604,
+              -42.01435938375653
+            ],
+            [
+              -53.43732414317754,
+              -42.02521258594296
+            ],
+            [
+              -62.25059663691959,
+              -33.21194009220092
+            ],
+            [
+              -62.223896677627636,
+              -31.264159381738864
+            ],
+            [
+              -52.92359667801793,
+              -31.06435938301729
+            ],
+            [
+              -25.474596677689988,
+              -30.664259383804165
+            ],
+            [
+              -8.574596677455702,
+              -30.26435938331997
+            ],
+            [
+              -6.224196679097076,
+              -30.21475938387448
+            ],
+            [
+              -1.2742966746955062,
+              -41.16465938455076
+            ],
+            [
+              -8.67439667951112,
+              -41.314359383512056
+            ],
+            [
+              -25.27419667554932,
+              -41.514359382359544
+            ],
+            [
+              -52.92409667881293,
+              -41.91415938350838
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.590303321834654,
+              -41.29845938456128
+            ],
+            [
+              8.72560332165449,
+              -41.21465938354959
+            ],
+            [
+              14.825703320289904,
+              -27.064959384209942
+            ],
+            [
+              24.006703322454996,
+              -29.256559382542036
+            ],
+            [
+              30.325503320906137,
+              -30.76505938306218
+            ],
+            [
+              72.81294957806801,
+              -31.043401993484768
+            ],
+            [
+              62.18770149039562,
+              -41.66865008115716
+            ],
+            [
+              23.98850332146685,
+              -41.344259383680765
+            ],
+            [
+              18.590303321834654,
+              -41.29845938456128
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              10.326103322659037,
+              14.684740614669863
+            ],
+            [
+              10.23800332450628,
+              11.759840617189184
+            ],
+            [
+              12.05100332324946,
+              10.559840615518624
+            ],
+            [
+              13.438003320712596,
+              9.071740615472663
+            ],
+            [
+              14.701003322959878,
+              7.371740617352771
+            ],
+            [
+              15.351003324809426,
+              5.471740616107127
+            ],
+            [
+              15.78790332195058,
+              2.859840615419671
+            ],
+            [
+              15.712903322884813,
+              0.38484061605413444
+            ],
+            [
+              15.350903320744692,
+              -1.7151593854650855
+            ],
+            [
+              14.675903320669022,
+              -4.078059383988148
+            ],
+            [
+              13.637903322705824,
+              -7.965059384558117
+            ],
+            [
+              13.525903323381499,
+              -8.428059384721564
+            ],
+            [
+              10.237903322442435,
+              -8.465059384558117
+            ],
+            [
+              10.162903321885096,
+              -11.177959384600399
+            ],
+            [
+              9.87570332231553,
+              -24.10295938330819
+            ],
+            [
+              11.987703322287416,
+              -24.152859384397743
+            ],
+            [
+              12.050703322092886,
+              -21.714859382715076
+            ],
+            [
+              14.875703324054484,
+              -21.73995938405278
+            ],
+            [
+              14.825703320289904,
+              -27.064959384209942
+            ],
+            [
+              -6.224196679097076,
+              -30.21475938387448
+            ],
+            [
+              -5.662196677287284,
+              -18.03975938440999
+            ],
+            [
+              -1.8371966779159266,
+              -17.97785938339075
+            ],
+            [
+              -1.7740966793717234,
+              -13.352959382842528
+            ],
+            [
+              -4.249096678693604,
+              -13.239859383465955
+            ],
+            [
+              -4.26199667709443,
+              -8.414859383978182
+            ],
+            [
+              -1.7869966779835522,
+              -8.402959383383859
+            ],
+            [
+              -3.5489966771929176,
+              -6.91485938403639
+            ],
+            [
+              -4.748996678761614,
+              -5.61485938433907
+            ],
+            [
+              -5.948996678584081,
+              -3.614859383669682
+            ],
+            [
+              -6.873896677556331,
+              -1.552959384105634
+            ],
+            [
+              -7.261996677945717,
+              -0.13985938360565342
+            ],
+            [
+              -7.46189667879662,
+              1.4850406163022853
+            ],
+            [
+              -7.436896678067569,
+              3.009940616058884
+            ],
+            [
+              -7.036896677906043,
+              5.197040615021251
+            ],
+            [
+              -6.311896675979369,
+              7.49694061675109
+            ],
+            [
+              -5.673796678776853,
+              9.084940616914537
+            ],
+            [
+              -5.161796676577069,
+              10.446940615569474
+            ],
+            [
+              -5.71189667841827,
+              10.471940616116626
+            ],
+            [
+              -5.61179667802935,
+              11.784940614306834
+            ],
+            [
+              -1.4617966789519414,
+              11.846940616815118
+            ],
+            [
+              -1.3367966773366788,
+              14.784940614947118
+            ],
+            [
+              -1.0617966785139288,
+              24.54684061530861
+            ],
+            [
+              -2.9486966776530608,
+              24.521840616158443
+            ],
+            [
+              -2.923696679150453,
+              26.709840616444126
+            ],
+            [
+              -5.498696678398119,
+              26.684740615804913
+            ],
+            [
+              -5.373596678677131,
+              34.9847406167537
+            ],
+            [
+              -5.373496677697403,
+              37.83474061684683
+            ],
+            [
+              14.363303321195417,
+              35.93454061547527
+            ],
+            [
+              13.876203321808134,
+              21.43464061515988
+            ],
+            [
+              10.476203322672518,
+              21.359640617010882
+            ],
+            [
+              10.326103322659037,
+              14.684740614669863
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -61.8231966767562,
+              37.23524061561329
+            ],
+            [
+              -61.813931190955806,
+              37.97647021921713
+            ],
+            [
+              -54.55526079479722,
+              45.23514061537571
+            ],
+            [
+              -52.923196679665125,
+              45.23514061537571
+            ],
+            [
+              -42.02279667689436,
+              45.41014061580063
+            ],
+            [
+              -1.0417966782624717,
+              46.0682406159176
+            ],
+            [
+              -0.023496678259107284,
+              46.084640616580145
+            ],
+            [
+              -5.373496677697403,
+              37.83474061684683
+            ],
+            [
+              -41.912296677881386,
+              37.41244061605539
+            ],
+            [
+              -52.92329667817103,
+              37.28514061597525
+            ],
+            [
+              -61.8231966767562,
+              37.23524061561329
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              17.188303323084256,
+              38.396540614950936
+            ],
+            [
+              8.946403320493118,
+              46.701740616437746
+            ],
+            [
+              60.66794890835277,
+              47.51626734425244
+            ],
+            [
+              69.21677269590039,
+              38.967443556704815
+            ],
+            [
+              61.600703322132176,
+              38.88114061561646
+            ],
+            [
+              17.188303323084256,
+              38.396540614950936
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.87700332293025,
+              96.4342406160431
+            ],
+            [
+              9.055703322483168,
+              96.32244061608799
+            ],
+            [
+              8.176503322632925,
+              47.68454061591183
+            ],
+            [
+              1.8265033227362437,
+              47.63454061548691
+            ],
+            [
+              2.87700332293025,
+              96.4342406160431
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.1545755487529108,
+              100.94497695892585
+            ],
+            [
+              1.0274033220703132,
+              98.48364061603206
+            ],
+            [
+              -1.3045563507290219,
+              98.48584505944392
+            ],
+            [
+              1.1545755487529108,
+              100.94497695892585
+            ]
+          ]
+        ]
+      }
+    ],
+    "water": [
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              100.21431162276099,
+              7.969904629844213
+            ],
+            [
+              106.020283912079,
+              2.1639323405262125
+            ],
+            [
+              99.22222847885288,
+              -4.634123092699896
+            ],
+            [
+              76.17071625711105,
+              -4.569272711378289
+            ],
+            [
+              73.57938082823966,
+              -6.636454816762125
+            ],
+            [
+              53.545490971526306,
+              -6.537390350422356
+            ],
+            [
+              50.60781918477733,
+              -4.075810099137016
+            ],
+            [
+              21.479401956174115,
+              -3.80933514868957
+            ],
+            [
+              -6.792299712804379,
+              -4.281126230867812
+            ],
+            [
+              -62.1121027011759,
+              -6.331689112237655
+            ],
+            [
+              -88.46306954638104,
+              -6.999467182739472
+            ],
+            [
+              -97.62646906964672,
+              2.1639323405262125
+            ],
+            [
+              -94.02235329696117,
+              5.768048113211755
+            ],
+            [
+              -62.04476280664676,
+              7.249100935383467
+            ],
+            [
+              -6.975702865318453,
+              8.32208263737266
+            ],
+            [
+              21.417050654476043,
+              8.42621558168321
+            ],
+            [
+              50.911729910869326,
+              7.668519020284293
+            ],
+            [
+              53.13555557442305,
+              9.982213933923049
+            ],
+            [
+              73.16940958646592,
+              9.883148206426995
+            ],
+            [
+              76.60052571110282,
+              7.7861965307965875
+            ],
+            [
+              100.21431162276099,
+              7.969904629844213
+            ]
+          ]
+        ]
+      }
+    ]
+  },
+  "interpretation": "Authored compact landmark spacing. Source files retain geographic coordinates. Recorded translations preserve building shape/height and fa\u00e7ade direction; bridge registration, rotation and scale remain uniform."
+}

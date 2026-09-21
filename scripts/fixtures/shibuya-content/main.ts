@@ -25,7 +25,10 @@ interface Probe {
   scene: THREE.Scene; camera: THREE.Camera; renderer: THREE.WebGLRenderer;
   cityScene: ShibuyaScene | null; currentProgress: number; isRunning: boolean;
 }
-const probe = () => renderer() as unknown as Probe;
+const probe = () => {
+  const raw = renderer() as unknown as Probe;
+  return { ...raw, cityScene: (raw.cityScene as unknown as { scene?: typeof raw.cityScene })?.scene ?? raw.cityScene };
+};
 const identities = new WeakMap<object, number>(); let nextIdentity = 0;
 const identity = (value?: object) => {
   if (!value) return 0;

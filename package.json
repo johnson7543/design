@@ -35,8 +35,10 @@
     "smoke:designqr-zoom": "node scripts/smoke-designqr-zoom.mjs",
     "smoke:designqr-consumer": "node scripts/smoke-designqr-consumer.mjs",
     "smoke:designqr-embed": "node scripts/smoke-designqr-embed.mjs",
-    "check": "npm run lint && npm run test:designqr && npm run test:editor && npm run typecheck:designqr && npm run docs:check && npm run design-docs:check && npm run color:check && npm run style:check && npm run build && npm run check:designqr-react-snippets && npm run check:designqr-styles && npm run build:designqr-consumer && npm run build:designqr-iframe-consumer && npm run smoke:designqr-consumer && npm run smoke:designqr-embed && npm run smoke:designqr-city && npm run smoke:shibuya-streets && npm run smoke:shibuya-station && npm run smoke:shibuya-signs && npm run smoke:shibuya-content && npm run smoke:shibuya-morph && npm run smoke:shibuya-morph-detail && npm run smoke:editor-zoom && npm run smoke:designqr-zoom && npm run smoke:production",
+    "check": "npm run lint && npm run test:designqr && npm run test:editor && npm run typecheck:designqr && npm run docs:check && npm run design-docs:check && npm run color:check && npm run style:check && npm run build && npm run check:designqr-city-startup && npm run check:designqr-react-snippets && npm run check:designqr-styles && npm run build:designqr-consumer && npm run build:designqr-iframe-consumer && npm run smoke:designqr-consumer && npm run smoke:designqr-embed && npm run smoke:designqr-city && npm run smoke:tokyo-tower && npm run smoke:shibuya-streets && npm run smoke:shibuya-station && npm run smoke:shibuya-signs && npm run smoke:shibuya-content && npm run smoke:shibuya-morph && npm run smoke:shibuya-morph-detail && npm run smoke:editor-zoom && npm run smoke:designqr-zoom && npm run smoke:production && npm run smoke:dotonbori && npm run smoke:dotonbori-scene && npm run check:designqr-city-package",
     "deploy": "npm run check && wrangler deploy",
+    "smoke:dotonbori": "node scripts/smoke-dotonbori.mjs",
+    "smoke:dotonbori-scene": "node scripts/smoke-dotonbori-scene.mjs",
     "smoke:designqr-city": "node scripts/smoke-designqr-city.mjs",
     "smoke:designqr-city-assets": "node scripts/smoke-designqr-city-assets.mjs",
     "smoke:shibuya-streets": "node scripts/smoke-shibuya-streets.mjs",
@@ -45,7 +47,9 @@
     "smoke:shibuya-content": "node scripts/smoke-shibuya-content.mjs",
     "smoke:shibuya-morph": "node scripts/smoke-shibuya-morph.mjs",
     "smoke:shibuya-morph-detail": "node scripts/smoke-shibuya-morph-detail.mjs",
-    "check:designqr-city-package": "node scripts/check-designqr-city-package.mjs"
+    "check:designqr-city-package": "node scripts/check-designqr-city-package.mjs",
+    "smoke:tokyo-tower": "node scripts/smoke-tokyo-tower.mjs",
+    "check:designqr-city-startup": "node scripts/check-city-startup.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

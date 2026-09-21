@@ -19,14 +19,17 @@ import {
   type TreeData,
 } from 'designqr/editor';
 import type { CustomTheme } from './editor/types';
-import { CITY_THEME_PRESET_OPTIONS, THEME_PRESET_OPTIONS } from './editor/theme-presets';
+import { THEME_PRESET_OPTIONS } from './editor/theme-presets';
 import { EDITOR_PREVIEW_ZOOM_MAX } from './editor/preview-zoom';
 import {
   DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
   DesignQRConfigError,
+  CITY_PRESETS,
+  isCityPreset,
   normalizeDesignQRConfig,
   type AutoRotateDirection,
   type DesignQRConfigV1,
+  type DesignQRCityPreset,
 } from 'designqr/config';
 import { downloadImageBlob } from './utils/export';
 import {
@@ -138,6 +141,7 @@ export const App: React.FC = () => {
   });
 
   const [designType, setDesignType] = useState<'tree' | 'city'>(initialConfig.design ?? 'tree');
+  const [cityPreset, setCityPreset] = useState<DesignQRCityPreset>(initialConfig.cityPreset ?? 'shibuya');
   const [url, setUrl] = useState<string>(initialConfig.url);
   const [debouncedUrl, setDebouncedUrl] = useState<string>(initialConfig.url);
   const [activeThemeId, setActiveThemeId] = useState<string>(
@@ -264,9 +268,9 @@ export const App: React.FC = () => {
 
   const currentSeasonPreset = THEME_PRESET_OPTIONS[seasonId]
     ?? THEME_PRESET_OPTIONS[0];
-  const currentPresetTheme = DESIGN_QR_THEME_PRESETS[designType === 'city' ? 'shibuya' : currentSeasonPreset.name];
+  const currentPresetTheme = DESIGN_QR_THEME_PRESETS[designType === 'city' ? cityPreset : currentSeasonPreset.name];
   const rendererTheme = useMemo(() => {
-    if (designType === 'city') return resolveTreeTheme({ type: 'preset', preset: 'shibuya' });
+    if (designType === 'city') return resolveTreeTheme({ type: 'preset', preset: cityPreset });
     if (activeCustomTheme) {
       return resolveTreeTheme({ type: 'custom', value: activeCustomTheme });
     }
@@ -274,16 +278,19 @@ export const App: React.FC = () => {
       type: 'preset',
       preset: currentSeasonPreset.name,
     });
-  }, [activeCustomTheme, currentSeasonPreset.name, designType]);
+  }, [activeCustomTheme, currentSeasonPreset.name, designType, cityPreset]);
 
   // Dynamic Background Gradient
   const backgroundStyle = useMemo(() => {
-    if (designType === 'city') return `radial-gradient(circle at 50% 30%, ${rendererTheme.skyTop} 0%, ${rendererTheme.skyBottom} 100%)`;
+    if (designType === 'city') {
+      const atmosphere = CITY_PRESETS[cityPreset].night && viewMode === 'scan' ? DESIGN_QR_THEME_PRESETS.shibuya : rendererTheme;
+      return `radial-gradient(circle at 50% 30%, ${atmosphere.skyTop} 0%, ${atmosphere.skyBottom} 100%)`;
+    }
     if (activeCustomTheme) {
       return `radial-gradient(circle at 50% 30%, ${activeCustomTheme.skyTop} 0%, ${activeCustomTheme.skyBottom} 100%)`;
     }
     return `radial-gradient(circle at 50% 30%, ${currentPresetTheme.skyTop} 0%, ${currentPresetTheme.skyBottom} 100%)`;
-  }, [activeCustomTheme, currentPresetTheme, designType, rendererTheme]);
+  }, [activeCustomTheme, currentPresetTheme, designType, rendererTheme, cityPreset, viewMode]);
 
   // Sync background directly to body for instant smooth updates
   useEffect(() => {
@@ -321,19 +328,20 @@ export const App: React.FC = () => {
   const treeData = useMemo<TreeData | null>(() => {
     if (!qrPreparation.ok) return null;
     if (designType === 'city') {
-      return build3DCity(qrPreparation.matrix.modules);
+      return build3DCity(qrPreparation.matrix.modules, cityPreset);
     }
     return build3DTree(
       qrPreparation.matrix.modules,
       activeCustomTheme?.treeShape ?? initialConfig.treeShape ?? 'dome'
     );
-  }, [qrPreparation, activeCustomTheme?.treeShape, designType, initialConfig.treeShape]);
+  }, [qrPreparation, activeCustomTheme?.treeShape, designType, cityPreset, initialConfig.treeShape]);
 
   // 2. Custom Theme Management Handlers
   const handleSelectTheme = (themeId: string) => {
-    // City's sole preset is already selected. Reselecting it must not overwrite
-    // the remembered seasonal/custom Tree theme or reset shared editor settings.
-    if (designType === 'city') return;
+    if (designType === 'city') {
+      if (isCityPreset(themeId)) setCityPreset(themeId);
+      return;
+    }
     setActiveThemeId(themeId);
   };
 
@@ -516,6 +524,7 @@ export const App: React.FC = () => {
     url: url || DEFAULT_URL,
     season: seasonId,
     design: designType,
+    cityPreset,
     viewMode,
     title: qrTitle,
     titleScale: qrTitleScale,
@@ -547,6 +556,7 @@ export const App: React.FC = () => {
     qrTitleScale,
     seasonId,
     designType,
+    cityPreset,
     initialConfig.treeShape,
     showQrContent,
     qrContentScale,
@@ -645,7 +655,7 @@ export const App: React.FC = () => {
     if (shareDisabled) return;
     const blob = await treeCanvasRef.current?.exportImage();
     if (!blob) return;
-    downloadImageBlob(blob, `designqr-${designType === 'city' ? 'shibuya' : currentSeasonPreset.name}.png`);
+    downloadImageBlob(blob, `designqr-${designType === 'city' ? cityPreset : currentSeasonPreset.name}.png`);
   };
 
   // Keep the editor URL synchronized with the same canonical configuration.
@@ -674,6 +684,7 @@ export const App: React.FC = () => {
   return (
     <div
       className={`app-root season-${currentSeasonPreset.name} view-${viewMode}`}
+      data-stage-tone={designType === 'city' && CITY_PRESETS[cityPreset].night && viewMode === '3d' ? 'night' : undefined}
       style={{ background: backgroundStyle }}
     >
       <Header
@@ -741,7 +752,7 @@ export const App: React.FC = () => {
         onDesignTypeChange={handleDesignTypeChange}
         url={url}
         onUrlChange={handleUrlChange}
-        activeThemeId={designType === 'city' ? CITY_THEME_PRESET_OPTIONS[0].id : activeThemeId}
+        activeThemeId={designType === 'city' ? cityPreset : activeThemeId}
         onSelectTheme={handleSelectTheme}
         customThemes={customThemes}
         onOpenCreateTheme={handleOpenCreateTheme}
@@ -762,6 +773,11 @@ export const App: React.FC = () => {
           onClose: () => setOpenStageEditor((editor) => editor === 'zoom' ? null : editor),
           onStep: (direction) => treeCanvasRef.current?.setZoom(previewZoomScale + direction * PREVIEW_ZOOM_STEP),
           onReset: () => treeCanvasRef.current?.resetZoom(),
+          onRiverView: designType === 'city' && cityPreset === 'dotonbori' && viewMode === '3d' ? () => {
+            setIsTurntable(false);
+            treeCanvasRef.current?.resetZoom();
+            renderManagerRef.current?.viewRiver();
+          } : undefined,
         }}
         viewMode={viewMode}
         onToggleScanMode={handleToggleScanMode}

@@ -3,12 +3,13 @@ import { fileURLToPath } from 'node:url';
 
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { dotonboriAssetPlugin } from '../../scripts/dotonbori-asset-plugin.mjs';
 import { shibuyaAssetPlugin } from '../../scripts/shibuya-asset-plugin.mjs';
 
 const packageRoot = fileURLToPath(new URL('.', import.meta.url));
 
 export default defineConfig({
-  plugins: [react(), shibuyaAssetPlugin()],
+  plugins: [react(), shibuyaAssetPlugin(), dotonboriAssetPlugin()],
   build: {
     sourcemap: true,
     lib: {

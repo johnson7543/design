@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { CITY_CAMERA_YAW_OFFSET, fitCityCameraDistance } from '../../designs/city/layout.ts';
-import { cityEase, cityMorphState } from '../../designs/city/morph.ts';
-import { ShibuyaScene } from './ShibuyaScene.ts';
+import { CITY_CAMERA_YAW_OFFSET, fitCityCameraDistance } from '../../designs/city/camera.ts';
+import { CITY_PRESETS } from '../../designs/city/presets.ts';
+import { DOTONBORI_CAMERA_ELEVATION, DOTONBORI_RIVER_CAMERA_ELEVATION } from '../../designs/city/dotonbori-layout.ts';
+import { LazyCityScene } from './LazyCityScene.ts';
+import { cityEase, cityMorphState } from '../../designs/city/morph-state.ts';
 import {
   DesignQRConfigError,
   type DesignQRLogoOptions,
@@ -698,7 +700,7 @@ export class ThreeFallbackRenderer {
 
   // Tree and Meshes
   private treeData: TreeData | null = null;
-  private cityScene: ShibuyaScene | null = null;
+  private cityScene: LazyCityScene | null = null;
   public reducedMotion = false;
   private groundTilesMesh: THREE.InstancedMesh | null = null;
   private groundFallenLeavesMesh: THREE.InstancedMesh | null = null;
@@ -759,6 +761,8 @@ export class ThreeFallbackRenderer {
   private rotationResetStartTime: number = 0;
   private rotationResetStartYaw: number = DEFAULT_TREE_YAW;
   private rotationResetStartPitch: number = DEFAULT_TREE_PITCH;
+  private rotationTargetYaw: number = DEFAULT_TREE_YAW;
+  private rotationTargetPitch: number = DEFAULT_TREE_PITCH;
 
   public get targetProgress(): number {
     return this._targetProgress;
@@ -768,7 +772,7 @@ export class ThreeFallbackRenderer {
     if (Math.abs(this._targetProgress - val) > 0.001) {
       this.transitionStartVal = this.currentProgress;
       this._targetProgress = val;
-      this.transitionDuration = VIEW_TRANSITION_DURATION_SECONDS / this.transitionSpeed;
+      this.updateTransitionDuration();
       this.transitionStartTime = performance.now();
       this.isTransitioning = true;
     }
@@ -782,6 +786,15 @@ export class ThreeFallbackRenderer {
     );
     if (Math.abs(nextSpeed - this.transitionSpeed) < 0.001) return;
 
+    this.transitionSpeed = nextSpeed;
+    this.updateTransitionDuration();
+  }
+
+  private updateTransitionDuration() {
+    const baseSpeed = this.treeData?.city?.preset === 'dotonbori' ? .75 : 1;
+    const nextDuration = VIEW_TRANSITION_DURATION_SECONDS / (this.transitionSpeed * baseSpeed);
+    if (nextDuration === this.transitionDuration) return;
+
     const now = performance.now();
     const previousDuration = this.transitionDuration;
     const elapsedRatio = this.isTransitioning && previousDuration > 0
@@ -792,10 +805,9 @@ export class ThreeFallbackRenderer {
         )
       : 0;
 
-    this.transitionSpeed = nextSpeed;
-    this.transitionDuration = VIEW_TRANSITION_DURATION_SECONDS / nextSpeed;
+    this.transitionDuration = nextDuration;
 
-    // Preserve the current point in an active morph while changing its remaining pace.
+    // Speed or preset changes preserve the current point in an active morph.
     if (this.isTransitioning) {
       this.transitionStartTime = now - elapsedRatio * this.transitionDuration * 1000;
     }
@@ -811,7 +823,23 @@ export class ThreeFallbackRenderer {
   }
 
   public resetRotation() {
+    this.rotateTo(DEFAULT_TREE_YAW, DEFAULT_TREE_PITCH);
+  }
+
+  /** Editor viewing preset; transient, with the same northeast bearing. */
+  public viewRiver() {
+    if (this.treeData?.city?.preset !== 'dotonbori' || this.targetProgress !== 0) return;
+    this.rotateTo(DEFAULT_TREE_YAW, DEFAULT_TREE_PITCH + DOTONBORI_CAMERA_ELEVATION - DOTONBORI_RIVER_CAMERA_ELEVATION);
+  }
+
+  private rotateTo(yaw: number, pitch: number) {
     this.isTurntable = false;
+    this.rotationTargetYaw = yaw;
+    this.rotationTargetPitch = pitch;
+    if (this.reducedMotion || !this.isRunning) {
+      this.yaw = yaw; this.pitch = pitch; this.isResettingRotation = false;
+      this.renderOnce(); return;
+    }
     this.rotationResetStartTime = performance.now();
     this.rotationResetStartYaw = this.yaw;
     this.rotationResetStartPitch = this.pitch;
@@ -921,6 +949,20 @@ export class ThreeFallbackRenderer {
       }
 
       texture.colorSpace = THREE.SRGBColorSpace;
+      // Sample once on load; only Dōtonbori uses this to choose the sign's
+      // backing. Uploaded pixels and the shared QR logo remain untouched.
+      const sample = document.createElement('canvas'); sample.width = sample.height = 32;
+      const context = sample.getContext('2d', { willReadFrequently: true });
+      if (context) {
+        context.drawImage(texture.image as HTMLImageElement, 0, 0, 32, 32);
+        const pixels = context.getImageData(0, 0, 32, 32).data;
+        let brightness = 0, weight = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+          brightness += (.2126 * pixels[i] + .7152 * pixels[i + 1] + .0722 * pixels[i + 2]) * pixels[i + 3];
+          weight += pixels[i + 3];
+        }
+        texture.userData.lightSignBacking = weight > 0 && brightness / weight < 128;
+      }
       texture.needsUpdate = true;
       this.logoLoadController = null;
       this.createLogoVisual(texture, width / height);
@@ -1028,20 +1070,35 @@ export class ThreeFallbackRenderer {
 
     const qrWidth = this.treeData.gridSize * BLOCK_SIZE;
     const image = this.logoGroup.children[0] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+    image.material.opacity = 1;
     if (this.cityScene) {
-      this.cityScene.setLogoPresent(true);
+      this.cityScene.setLogoPresent(true, image.material.map?.userData.lightSignBacking === true);
       const anchor = this.cityScene.getLogoAnchor();
       const travel = cityEase(progress, .04, .94);
       const vertical = cityMorphState(progress).vertical;
-      const billboardSize = Math.min(anchor.width / image.scale.x, anchor.height / image.scale.y) * qrWidth;
+      const billboardScale = Math.min(anchor.width / image.scale.x, anchor.height / image.scale.y);
+      const billboardSize = billboardScale * qrWidth;
+      const anchorY = anchor.y + ('alignTop' in anchor && anchor.alignTop
+        ? (anchor.height - billboardScale * image.scale.y) / 2 : 0);
       const scanSize = qrWidth * THREE.MathUtils.clamp(this.logoConfig.size, DESIGN_QR_LOGO_SIZE_MIN, DESIGN_QR_LOGO_SIZE_MAX);
+      if ('visible' in anchor && !anchor.visible) {
+        // An invisible host contributes no floating logo or sign fragments.
+        // The canonical scan logo appears only at the QR center near settlement.
+        image.material.opacity = cityEase(progress, .78, .98);
+        this.logoGroup.visible = image.material.opacity > 0;
+        this.logoGroup.position.set(0, BLOCK_SIZE * .72, 0);
+        this.logoGroup.quaternion.copy(this.camera.quaternion);
+        this.logoGroup.scale.setScalar(scanSize);
+        image.material.depthTest = false;
+        return;
+      }
       this.logoGroup.position.set(
         anchor.x * qrWidth * (1 - travel),
-        THREE.MathUtils.lerp(anchor.y * qrWidth * (1 - vertical), BLOCK_SIZE * .72, travel)
+        THREE.MathUtils.lerp(anchorY * qrWidth * (1 - vertical), BLOCK_SIZE * .72, travel)
           + qrWidth * .04 * Math.sin(Math.PI * travel),
         anchor.z * qrWidth * (1 - travel));
       this.logoGroup.rotation.set(0, anchor.angle ?? 0, 0);
-      this.logoGroup.quaternion.slerp(this.camera.quaternion, travel);
+      this.logoGroup.quaternion.slerp(this.camera.quaternion, 'faceCamera' in anchor && anchor.faceCamera ? 1 : travel);
       this.logoGroup.scale.setScalar(THREE.MathUtils.lerp(billboardSize, scanSize, travel));
       this.logoGroup.visible = true;
       image.material.depthTest = progress <= .04;
@@ -1159,11 +1216,13 @@ export class ThreeFallbackRenderer {
   public setTreeData(data: TreeData) {
     const previousCity = this.treeData?.city;
     this.treeData = data;
+    this.updateTransitionDuration();
     if (!this.hasSpawned) {
       this.spawnStartTime = performance.now();
       this.hasSpawned = true;
     }
-    if (this.cityScene && data.city && previousCity) {
+    if (this.cityScene && data.city && previousCity
+      && (data.city.preset ?? 'shibuya') === (previousCity.preset ?? 'shibuya')) {
       this.cityScene.updateContent(data.city.modules, this.activeTheme);
     } else {
       this.rebuildMeshes();
@@ -1226,7 +1285,7 @@ export class ThreeFallbackRenderer {
     if (!this.treeData) return;
     if (this.cityScene || this.treeData.city) this.clearDesignMeshes();
     if (this.treeData.city) {
-      this.cityScene = new ShibuyaScene(this.treeData.city.modules, this.activeTheme);
+      this.cityScene = new LazyCityScene(this.treeData.city.preset ?? 'shibuya', this.treeData.city.modules, this.activeTheme);
       this.scene.add(this.cityScene.root);
       return;
     }
@@ -2215,18 +2274,18 @@ export class ThreeFallbackRenderer {
       );
       const resetEase = 1 - Math.pow(1 - resetProgress, 4);
       const shortestYawDelta = Math.atan2(
-        Math.sin(DEFAULT_TREE_YAW - this.rotationResetStartYaw),
-        Math.cos(DEFAULT_TREE_YAW - this.rotationResetStartYaw)
+        Math.sin(this.rotationTargetYaw - this.rotationResetStartYaw),
+        Math.cos(this.rotationTargetYaw - this.rotationResetStartYaw)
       );
       this.yaw = this.rotationResetStartYaw + shortestYawDelta * resetEase;
       this.pitch = THREE.MathUtils.lerp(
         this.rotationResetStartPitch,
-        DEFAULT_TREE_PITCH,
+        this.rotationTargetPitch,
         resetEase
       );
       if (resetProgress >= 1) {
-        this.yaw = DEFAULT_TREE_YAW;
-        this.pitch = DEFAULT_TREE_PITCH;
+        this.yaw = this.rotationTargetYaw;
+        this.pitch = this.rotationTargetPitch;
         this.isResettingRotation = false;
       }
     } else if (this.isTurntable && this.targetProgress === 0) {
@@ -2238,12 +2297,14 @@ export class ThreeFallbackRenderer {
       this.yaw = ((this.yaw % (Math.PI * 2)) + (Math.PI * 2)) % (Math.PI * 2);
     }
 
+    const cityPreset = this.treeData?.city ? CITY_PRESETS[this.treeData.city.preset ?? 'shibuya'] : undefined;
+    const cityYawOffset = cityPreset?.yaw ?? CITY_CAMERA_YAW_OFFSET;
     const designYaw = this.cityScene
-      ? ((this.yaw + CITY_CAMERA_YAW_OFFSET) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2)
+      ? ((this.yaw + cityYawOffset) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2)
       : this.yaw;
     const nearestYaw = designYaw > Math.PI ? Math.PI * 2 : 0;
     const targetYaw = THREE.MathUtils.lerp(designYaw, nearestYaw, progress);
-    const designPitch = this.cityScene ? Math.max(-1.45, this.pitch - .16) : this.pitch;
+    const designPitch = this.cityScene ? Math.max(-1.45, this.pitch + (cityPreset?.pitchOffset ?? -.16)) : this.pitch;
     const targetPitch = THREE.MathUtils.lerp(designPitch, -Math.PI / 2 + 0.0001, progress);
     const baseScanDist = this.viewportProjection.scanDistance;
     // One 3D baseline for every design; the City's fit is only a clipping guard,
@@ -2257,7 +2318,8 @@ export class ThreeFallbackRenderer {
     const targetDist =
       THREE.MathUtils.lerp(
         this.cityScene ? Math.max(baseDesignDist, fitCityCameraDistance(
-          this.viewportProjection.aspect, this.viewportProjection.verticalFov, designYaw, designPitch
+          this.viewportProjection.aspect, this.viewportProjection.verticalFov, designYaw, designPitch,
+          this.cityScene?.preset === 'tokyo-tower' ? { height: 1.06, focus: .27, profile: [[-.015, .505], [.055, .36], [.22, .15], [.49, .075], [.80, .037], [1.06, .006]] } : undefined
         )) : baseDesignDist,
         baseScanDist, progress
       ) * contentScale;
@@ -2268,7 +2330,7 @@ export class ThreeFallbackRenderer {
 
     // Keep the tree's vertical composition normalized with the camera distance.
     // Without this, larger QR versions make the scaled tree drift upward.
-    const lookTargetY = THREE.MathUtils.lerp((this.cityScene ? .10 : .2) * contentScale, 0.0, progress);
+    const lookTargetY = THREE.MathUtils.lerp((this.cityScene?.preset === 'tokyo-tower' ? .27 : this.cityScene ? .10 : .2) * contentScale, 0.0, progress);
     // Dynamic camera up-vector for square QR alignment
     if (this.cityScene || progress > 0.01) {
       this.camera.up.set(0, Math.max(0.001, 1.0 - progress), -progress).normalize();
@@ -2277,12 +2339,14 @@ export class ThreeFallbackRenderer {
     }
     this.camera.position.set(cx, this.cityScene ? cy + lookTargetY : cy, cz);
     this.camera.lookAt(0, lookTargetY, 0);
-    this.updateLogoTransform(progress);
     if (this.cityScene) {
+      this.cityScene.setLogoPresent(!!this.logoGroup && this.logoConfig !== false);
       this.cityScene.update(progress, this.isRunning ? deltaSeconds : 0, this.reducedMotion, this.isRunning);
+      this.updateLogoTransform(progress);
       this.onProgressUpdate?.(progress, Math.sin(progress * Math.PI));
       return;
     }
+    this.updateLogoTransform(progress);
 
     // Dynamic real-time ground color blending
     if (Math.abs(progress - this.lastGroundProgress) > 0.001) {

@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'DesignQR City Japanese';
+  src: url('./editor/fonts/city-names-ja.woff') format('woff');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+30BF, U+30EF, U+30FC, U+4EAC, U+5800, U+6771, U+6E0B, U+8C37, U+9053, U+9813;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -898,6 +907,11 @@ html, body {
   white-space: nowrap;
 }
 
+.preview-river-view {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
 .preview-zoom-help,
 .preview-zoom-note {
   margin: var(--space-2) 0 0;
@@ -949,6 +963,31 @@ html, body {
   background: rgba(192, 122, 58, 0.1);
   color: var(--qr-accent-strong);
   box-shadow: 0 4px 14px rgba(192, 122, 58, 0.1);
+}
+
+/* Night artwork needs light ink only on controls exposed to the stage.
+   Panels keep their existing light surfaces and normal dark interface ink. */
+.app-root[data-stage-tone='night'] .app-header {
+  --site-header-line: var(--qr-night-stage-border);
+}
+
+.app-root[data-stage-tone='night'] :is(.header-brand .site-header-brand, .tech-badge, .floating-edit-toggle) {
+  color: var(--qr-on-night-stage);
+}
+
+.app-root[data-stage-tone='night'] :is(.tech-badge, .floating-edit-toggle) {
+  border-color: var(--qr-night-stage-border);
+}
+
+.app-root[data-stage-tone='night'] .floating-edit-toggle:hover,
+.app-root[data-stage-tone='night'] .floating-edit-toggle.open {
+  color: var(--qr-ink);
+  background: var(--qr-surface-warm-hover);
+  border-color: var(--qr-border-accent);
+}
+
+.app-root[data-stage-tone='night'] .floating-edit-toggle:focus-visible {
+  outline-color: var(--qr-on-night-stage);
 }
 
 .floating-edit-chevron {
@@ -1324,7 +1363,8 @@ html, body {
 
 .season-tabs.city-theme-tabs {
   justify-content: flex-start;
-  /* A single compact preset needs no scrolling; preserve its full focus ring. */
+  /* Compact City presets may wrap on the narrowest host; preserve focus rings. */
+  flex-wrap: wrap;
   overflow: visible;
 }
 
@@ -1338,6 +1378,7 @@ html, body {
 
 .city-theme-tabs .season-chip {
   flex: 0 0 auto;
+  font-family: var(--qr-city-font-family);
 }
 
 .custom-themes-row {

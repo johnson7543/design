@@ -1,12 +1,14 @@
 import {
   DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
   decodeDesignQRConfig,
+  isCityPreset,
   encodeDesignQRConfig,
   normalizeDesignQRConfig,
   type DesignQRConfigV1,
   type DesignQRInteractionOptions,
   type DesignQRLogoOptions,
   type DesignQRThemePreset,
+  type DesignQRCityPreset,
   type TreeDesignOptions,
   type TreeTheme,
 } from 'designqr/config';
@@ -22,6 +24,7 @@ const PRESET_BY_SEASON = [
 export interface ShareConfig {
   url: string;
   design?: 'tree' | 'city';
+  cityPreset?: DesignQRCityPreset;
   season: number;
   viewMode?: '3d' | 'scan';
   title?: string;
@@ -55,7 +58,7 @@ export function createDesignQRConfig(config: ShareConfig): DesignQRConfigV1 {
     design: config.design === 'city'
       ? { type: 'city' }
       : { type: 'tree', options: { shape: config.treeShape } },
-    theme: config.design === 'city' ? 'shibuya' : config.customTheme
+    theme: config.design === 'city' ? config.cityPreset ?? 'shibuya' : config.customTheme
       ? { type: 'custom', value: config.customTheme }
       : presetForSeason(config.season),
     view: config.viewMode === 'scan' ? 'qr' : 'design',
@@ -97,6 +100,8 @@ export function decodeShareConfig(encoded: string): ShareConfig | null {
   return {
     url: config.value,
     design: config.design.type,
+    ...(config.design.type === 'city' ? { cityPreset: config.theme.type === 'preset'
+      && isCityPreset(config.theme.preset) ? config.theme.preset : 'shibuya' as const } : {}),
     season,
     viewMode: config.view.initial === 'qr' ? 'scan' : '3d',
     title: config.details.title,

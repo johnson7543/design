@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "claim": "asset data integrity; not a completed scene or a survey-accuracy assessment",
+  "glbSha256": "c984c6700846569a42c091913aee3351a3f76e14bfbdb2a3d6c198f01c646adc",
+  "blendSha256": "8fdefe867f92962158749ef2422f7f5399a7cbd9f6e595d616fc7d2d1e294245",
+  "sourceBuildingCount": 73,
+  "lodCounts": {
+    "1": 7,
+    "2": 66
+  },
+  "triangles": 4796,
+  "authoringCutTriangles": 396,
+  "materialCount": 4,
+  "gltfBoundsM": [
+    [
+      -62.74677276611328,
+      0.0,
+      -80.0
+    ],
+    [
+      80.0,
+      58.327999114990234,
+      80.0
+    ]
+  ],
+  "checks": [
+    "file and input hashes",
+    "all source IDs and LODs",
+    "finite metric coordinates and retained height range",
+    "160m crop and boundary sections",
+    "triangle indices and nondegenerate geometry",
+    "palette and linear color conversion",
+    "no external asset dependencies or guide geometry"
+  ],
+  "bridgeStudy": {
+    "status": "pass",
+    "claim": "dimensional-study export integrity only",
+    "triangles": 860,
+    "glbSha256": "b9a69574e81bf72b2a02778f77f6b230dfea1bff8fb3c26484b31861f411a2a2"
+  }
+}

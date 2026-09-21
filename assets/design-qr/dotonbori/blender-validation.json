@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "claim": "source preservation and authoring integrity, not site accuracy",
+  "sourceVertexMaxAbsoluteErrorM": 1.3062109360362228e-05,
+  "sourceVertexCoordinateCount": 7965,
+  "sourceNonManifoldObjects": [],
+  "studyNonManifoldObjects": [],
+  "savedBlendScenes": [
+    "DesignQR Dotonbori Source Study"
+  ],
+  "cameraFraming": {
+    "review-axonometric": {
+      "maximumNormalizedFrameCoordinate": 0.9090910155360032,
+      "passed": true
+    },
+    "review-top": {
+      "maximumNormalizedFrameCoordinate": 0.9090909090909091,
+      "passed": true
+    },
+    "review-north": {
+      "maximumNormalizedFrameCoordinate": 0.9090909248541182,
+      "passed": true
+    },
+    "review-south": {
+      "maximumNormalizedFrameCoordinate": 0.9090909090909091,
+      "passed": true
+    },
+    "review-east": {
+      "maximumNormalizedFrameCoordinate": 0.9090909248541182,
+      "passed": true
+    },
+    "review-west": {
+      "maximumNormalizedFrameCoordinate": 0.9090909248541182,
+      "passed": true
+    }
+  },
+  "bridgeStudy": "Open dimensional surface by design; excluded from closed-building topology assertion"
+}

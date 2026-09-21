@@ -1,6 +1,8 @@
 export type DesignQRDesignName = 'tree' | 'city';
 export type DesignQRView = 'design' | 'qr';
-export type DesignQRThemePreset = 'spring' | 'summer' | 'autumn' | 'winter' | 'shibuya';
+export type DesignQRTreePreset = 'spring' | 'summer' | 'autumn' | 'winter';
+export type DesignQRCityPreset = 'shibuya' | 'dotonbori' | 'tokyo-tower';
+export type DesignQRThemePreset = DesignQRTreePreset | DesignQRCityPreset;
 export type AutoRotateDirection = 'clockwise' | 'counterclockwise';
 export type TreeFoliageShape = 'blossom' | 'leaf' | 'pixel';
 export type TreeGroundFeature = 'grass' | 'pixel' | 'none';
@@ -178,7 +180,7 @@ export interface DesignQRInteractionOptions {
   autoRotate?: boolean;
   /** Direction used only by automatic rotation. */
   autoRotateDirection?: AutoRotateDirection;
-  /** Multiplier applied to the animated 3D/2D view transition. */
+  /** Multiplier of the selected design's default 3D/2D transition pace. */
   transitionSpeed?: number;
   /** Adds presentation blur during the 3D/2D turn. */
   motionBlur?: boolean;

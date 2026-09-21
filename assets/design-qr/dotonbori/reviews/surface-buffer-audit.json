@@ -1,0 +1,421 @@
+{
+  "schema": "designqr-dotonbori-surface-buffer-review",
+  "reviewed": "2026-09-21",
+  "content": {
+    "value": "https://example.com/dotonbori",
+    "grid": 29,
+    "errorCorrection": "M",
+    "logo": false
+  },
+  "method": "Unique retained ArrayBuffer bytes for source vertices, draw indices and numeric motion-texture data, including row padding. Shared interleaved views count once. Excludes artwork textures, source-object graphs, temporary construction allocations, browser overhead and GPU copies.",
+  "environment": "Local headless Chromium with ANGLE SwiftShader; correctness and allocated buffer audit, not a phone frame-rate or peak-memory benchmark.",
+  "before": {
+    "transformBytes": 110445240,
+    "allSceneGeometryBytes": 136147792,
+    "sourceTriangles": 392413,
+    "patches": 271640
+  },
+  "after": {
+    "transformBytes": 49604640,
+    "allSceneGeometryBytes": 75307192,
+    "sourceTriangles": 392413,
+    "patches": 271640,
+    "buildings": 59,
+    "batches": 16,
+    "artworkTextures": 5,
+    "motionDataTextures": 16,
+    "vertexBytes": 30167760,
+    "indexBytes": 6340896,
+    "motionDataBytes": 13095984
+  },
+  "savedBytes": 60840600,
+  "reductionPercent": 55.086665572911976,
+  "regressionBudgetBytes": 58720256,
+  "storage": "Four exact Float32 source corners with draw indices, plus one Float32 motion record per patch in a nearest-sampled numeric data texture. No source position/color/UV quantization or dropped surface. Ordinary indexed drawing preserves the source rendering path.",
+  "unchangedCities": {
+    "shibuya": {
+      "beforeTransformBytes": 227560,
+      "afterTransformBytes": 227560
+    },
+    "tokyo-tower": {
+      "beforeTransformBytes": 15300624,
+      "afterTransformBytes": 15300624
+    }
+  },
+  "comparison": {
+    "animationTimeSeconds": 9,
+    "viewport": [
+      900,
+      900
+    ],
+    "sourceCornerHashesMatch": true,
+    "hashMethod": "FNV-1a over Float32 bytes, per source attribute and material batch",
+    "forwardReversePixelsIdentical": true,
+    "frames": [
+      {
+        "progress": 0.0,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "4900a10b95845b202ea58f5c9bf6ed94fdca8f22e9d18e61cb72d48af565dd79",
+        "afterPngSha256": "4900a10b95845b202ea58f5c9bf6ed94fdca8f22e9d18e61cb72d48af565dd79"
+      },
+      {
+        "progress": 0.05,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "d1979efdca15da405c5f7d72c3232e204a7705113fef262439008ea6d8483185",
+        "afterPngSha256": "d1979efdca15da405c5f7d72c3232e204a7705113fef262439008ea6d8483185"
+      },
+      {
+        "progress": 0.18,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "a8d6fe57b90b9963bbdd76c3cda8d721969921c09bd3f2d34563bfd20a04e633",
+        "afterPngSha256": "a8d6fe57b90b9963bbdd76c3cda8d721969921c09bd3f2d34563bfd20a04e633"
+      },
+      {
+        "progress": 0.42,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "d07945faf5e105277c202a10a3bf477400f3e3a4b3debe1ec08a5a1f5b347cd6",
+        "afterPngSha256": "d07945faf5e105277c202a10a3bf477400f3e3a4b3debe1ec08a5a1f5b347cd6"
+      },
+      {
+        "progress": 0.6,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "a3b465dcdfd546994a39acf0f51b5df5f44af72f14a961c9d6ca41fc1e6bb147",
+        "afterPngSha256": "a3b465dcdfd546994a39acf0f51b5df5f44af72f14a961c9d6ca41fc1e6bb147"
+      },
+      {
+        "progress": 0.78,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "69b528d10c4178a38d3d873be5eb28c5664356440415301718e3c0ba8e448555",
+        "afterPngSha256": "69b528d10c4178a38d3d873be5eb28c5664356440415301718e3c0ba8e448555"
+      },
+      {
+        "progress": 0.88,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "8f150234119943a151e98ba5f84b63f0906eb6b425083fc30bc9beadba9848ec",
+        "afterPngSha256": "8f150234119943a151e98ba5f84b63f0906eb6b425083fc30bc9beadba9848ec"
+      },
+      {
+        "progress": 0.9,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "2c7b9955536a3bdb2707768e6c038f555c48b42ac2a723665d13cdddc4fe0689",
+        "afterPngSha256": "2c7b9955536a3bdb2707768e6c038f555c48b42ac2a723665d13cdddc4fe0689"
+      },
+      {
+        "progress": 1.0,
+        "changedPixels": 0,
+        "maximumChannelDelta": 0,
+        "meanChannelDelta": 0.0,
+        "beforePngSha256": "ce1997181cd550b7e5b772f6a38056c16307da9a33ddefd44623ca6a4c83192a",
+        "afterPngSha256": "ce1997181cd550b7e5b772f6a38056c16307da9a33ddefd44623ca6a4c83192a"
+      }
+    ],
+    "browserErrors": []
+  },
+  "sources": {
+    "packages/designqr/src/designs/city/dotonbori-surface-morph.ts": "32c523f19e5e5ddfe7f616b11fc9f46c02cbff081f476d5a06f10e80f59d6d52",
+    "packages/designqr/src/designs/city/dotonbori-surface-geometry.ts": "be8d2dded6fe9fe892382c0867db7c25318c605062585c2b6427b9b1e67d745f"
+  },
+  "beforeMorphSourceSha256": "83a45a743838a14ca35e04a5e214ebcef4f959d49d5536ce134bd8f3f0cd4ca7",
+  "publicPlayer": {
+    "playbackEnvironment": "960x900, device pixel ratio 1, default 1x pace, ANGLE SwiftShader; a single correctness comparison, not a physical-device performance benchmark.",
+    "beforePlayback": [
+      {
+        "view": "qr",
+        "frames": [
+          {
+            "progress": 0.34180006876685426,
+            "visibleBuildings": 58,
+            "elapsedMs": 415.30000000074506
+          },
+          {
+            "progress": 1,
+            "visibleBuildings": 58,
+            "elapsedMs": 1046.800000000745
+          },
+          {
+            "progress": 1,
+            "visibleBuildings": 58,
+            "elapsedMs": 1713.699999999255
+          }
+        ]
+      },
+      {
+        "view": "design",
+        "frames": [
+          {
+            "progress": 0.9962600929552694,
+            "visibleBuildings": 58,
+            "elapsedMs": 6.5
+          },
+          {
+            "progress": 0.9323284424327515,
+            "visibleBuildings": 58,
+            "elapsedMs": 85.89999999850988
+          },
+          {
+            "progress": 0.9189319694037155,
+            "visibleBuildings": 58,
+            "elapsedMs": 100
+          },
+          {
+            "progress": 0.36128183806651204,
+            "visibleBuildings": 58,
+            "elapsedMs": 537.6999999992549
+          },
+          {
+            "progress": 0,
+            "visibleBuildings": 58,
+            "elapsedMs": 1229.0999999977648
+          }
+        ]
+      }
+    ],
+    "afterPlayback": [
+      {
+        "view": "qr",
+        "frames": [
+          {
+            "progress": 0.3278859231499617,
+            "visibleBuildings": 58,
+            "elapsedMs": 375.6000000014901
+          },
+          {
+            "progress": 0.9994000297336689,
+            "visibleBuildings": 58,
+            "elapsedMs": 974.1000000014901
+          },
+          {
+            "progress": 1,
+            "visibleBuildings": 58,
+            "elapsedMs": 1738.8999999985099
+          },
+          {
+            "progress": 1,
+            "visibleBuildings": 58,
+            "elapsedMs": 1740
+          }
+        ]
+      },
+      {
+        "view": "design",
+        "frames": [
+          {
+            "progress": 0.45146093824253397,
+            "visibleBuildings": 58,
+            "elapsedMs": 470.8999999985099
+          },
+          {
+            "progress": 0.42597338386105377,
+            "visibleBuildings": 58,
+            "elapsedMs": 489.5
+          },
+          {
+            "progress": 0.402586321599814,
+            "visibleBuildings": 58,
+            "elapsedMs": 506.5999999977648
+          },
+          {
+            "progress": 0.09664065354678175,
+            "visibleBuildings": 58,
+            "elapsedMs": 774.5999999977648
+          },
+          {
+            "progress": 0,
+            "visibleBuildings": 58,
+            "elapsedMs": 1035.8999999985099
+          }
+        ]
+      }
+    ],
+    "responsiveViews": [
+      {
+        "width": 1440,
+        "height": 900,
+        "progress": 0,
+        "pixels": 55729
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "progress": 0.42,
+        "pixels": 134148
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "progress": 1,
+        "pixels": 238141
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "progress": 0,
+        "pixels": 221731
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "progress": 0.42,
+        "pixels": 76401
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "progress": 1,
+        "pixels": 132496
+      },
+      {
+        "width": 320,
+        "height": 568,
+        "progress": 0,
+        "pixels": 80119
+      },
+      {
+        "width": 320,
+        "height": 568,
+        "progress": 0.42,
+        "pixels": 50256
+      },
+      {
+        "width": 320,
+        "height": 568,
+        "progress": 1,
+        "pixels": 85264
+      }
+    ],
+    "decoded": {
+      "exported": "https://example.com/dotonbori",
+      "transported": "https://example.com/dotonbori"
+    },
+    "browserErrors": []
+  },
+  "fullSceneValidation": {
+    "command": "npm run smoke:dotonbori-scene",
+    "result": "passed",
+    "orbitViews": 48,
+    "buildings": 58,
+    "coverageError": 8.126832540256146e-14,
+    "synchronizedGroups": [
+      {
+        "name": "ground",
+        "startChanged": 81959,
+        "settleChanged": 39931,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true
+      },
+      {
+        "name": "architecture",
+        "startChanged": 64967,
+        "settleChanged": 19601,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true
+      },
+      {
+        "name": "glico",
+        "startChanged": 615,
+        "settleChanged": 28,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true
+      },
+      {
+        "name": "donki",
+        "startChanged": 4418,
+        "settleChanged": 717,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true
+      }
+    ],
+    "donkiMatchesOrdinaryMotion": true,
+    "decodedExport": "https://example.com/dotonbori",
+    "decodedTransportedSurfaces": "https://example.com/dotonbori",
+    "responsiveViews": 9,
+    "defaultSpeedPlayback": [
+      {
+        "view": "qr",
+        "frames": [
+          {
+            "progress": 0.7085364774315079,
+            "visibleBuildings": 58,
+            "elapsedMs": 628.7999999970198
+          },
+          {
+            "progress": 0.7578359770933256,
+            "visibleBuildings": 58,
+            "elapsedMs": 632.5
+          },
+          {
+            "progress": 0.7764033552811386,
+            "visibleBuildings": 58,
+            "elapsedMs": 648.3999999985099
+          },
+          {
+            "progress": 0.9876890329563153,
+            "visibleBuildings": 58,
+            "elapsedMs": 915.6999999992549
+          },
+          {
+            "progress": 1,
+            "visibleBuildings": 58,
+            "elapsedMs": 1218.5999999977648
+          }
+        ]
+      },
+      {
+        "view": "design",
+        "frames": [
+          {
+            "progress": 0.6945148307283857,
+            "visibleBuildings": 58,
+            "elapsedMs": 292.5
+          },
+          {
+            "progress": 0.2502475859591451,
+            "visibleBuildings": 58,
+            "elapsedMs": 625.6000000014901
+          },
+          {
+            "progress": 0.23054686191173834,
+            "visibleBuildings": 58,
+            "elapsedMs": 642.7000000029802
+          },
+          {
+            "progress": 0.013455706865727834,
+            "visibleBuildings": 58,
+            "elapsedMs": 912.3000000007451
+          },
+          {
+            "progress": 0,
+            "visibleBuildings": 58,
+            "elapsedMs": 1453.6000000014901
+          }
+        ]
+      }
+    ],
+    "checks": "Complete surface coverage; 48 orbit views; frozen reversals; Glico/Donki synchronization; water, wake, cloth, shops and visitors; Asahi logo placement, contrast and travel; default-speed public actions at 960x900 DPR 1; desktop/mobile paused rendering at DPR 2."
+  },
+  "validation": {
+    "targetedTests": "passed: Dotonbori, depth shading, roof details, shared logo rendering, plus motion-data replacement/disposal regression",
+    "build": "passed",
+    "typecheck": "passed",
+    "lint": "passed",
+    "style": "passed",
+    "docs": "passed",
+    "color": "249 pre-existing violations, all in plan/playable-ui/reference/playable-ui-demo-v5.html; unrelated file unchanged"
+  }
+}

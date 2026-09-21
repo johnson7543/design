@@ -4,7 +4,7 @@ const referencePoint = Object.freeze({ latitude: 35.6590439, longitude: 139.7005
 
 /** Preserve the reference's curbside garden relationship on the fitted road.
  * Move the whole setting west; its station-facing approach stays open.
- * See docs/design-qr/hachiko-square.md for the map anchor and photo dates. */
+ * See docs/designqr-package/cities/shibuya/hachiko-square.md for the map anchor and photo dates. */
 export const HACHIKO_SQUARE_OFFSET = Object.freeze({ eastMetres: -5.5, southMetres: 0 });
 export const hachikoSquarePoint = (east: number, south: number) =>
   citySurveyPoint(east + HACHIKO_SQUARE_OFFSET.eastMetres, south + HACHIKO_SQUARE_OFFSET.southMetres);

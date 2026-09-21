@@ -338,7 +338,7 @@ def build(only=None):
     manifest = {"schema": "designqr-shibuya-assets", "version": 2, "blender": bpy.app.version_string,
         "authoringUp": "+Z", "runtimeUp": "+Y", "vehicleForward": "+Z", "assets": assets,
         "materials": {materials[role].name: {"role": role, "swatch": swatches[swatch]} for role, swatch in roles.items()},
-        "provenance": "Original facades on modified PLATEAU Shibuya 2025 footprints; no reference media, external textures, or uploaded logos. See docs/design-qr/shibuya-architecture.md."}
+        "provenance": "Original facades on modified PLATEAU Shibuya 2025 footprints; no reference media, external textures, or uploaded logos. See docs/designqr-package/cities/shibuya/architecture.md."}
     (EXPORT_DIR / "shibuya-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     if bpy.context.window and original_scene:
         bpy.context.window.scene = original_scene

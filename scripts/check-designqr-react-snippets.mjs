@@ -112,8 +112,6 @@ assert.equal(
 );
 
 const advancedRecommendationInputs = [
-  ['preset theme', { theme: 'summer' }],
-  ['tree shape', { tree: { shape: 'wide' } }],
   ['initial view', { view: 'qr' }],
   ['details title', { details: { title: 'Current setup' } }],
   ['title scale', { details: { titleScale: 1.2 } }],
@@ -130,7 +128,11 @@ const advancedRecommendationInputs = [
   ['transparent background', { transparentBackground: true }],
 ];
 
-for (const [name, input] of advancedRecommendationInputs) {
+for (const [name, input] of [
+  ['preset theme', { theme: 'summer' }],
+  ['tree shape', { tree: { shape: 'wide' } }],
+  ...advancedRecommendationInputs,
+]) {
   assert.equal(
     getRecommendedDesignQRReactExample(normalizeDesignQRConfig({
       value: 'https://design.example.com/configured',
@@ -209,12 +211,57 @@ function formatSnippetValue(value) {
 }
 
 const generatedFiles = [];
-const simpleCityConfig = normalizeDesignQRConfig({ value: 'Shibuya', design: 'city' });
-assert.equal(getRecommendedDesignQRReactExample(simpleCityConfig), 'simple');
-const simpleCitySource = createDesignQRReactSnippet(simpleCityConfig);
-assert.match(simpleCitySource, /design="city"/);
-assert.doesNotMatch(simpleCitySource, /createTreeTheme|theme=|tree=/);
-generatedFiles.push({ name: 'shibuya-city-simple', source: simpleCitySource });
+for (const preset of ['shibuya', 'dotonbori', 'tokyo-tower']) {
+  const simpleCityConfig = normalizeDesignQRConfig({
+    value: `https://design.example.com/${preset}`,
+    design: 'city',
+    theme: preset,
+  });
+  assert.equal(
+    getRecommendedDesignQRReactExample(simpleCityConfig),
+    'simple',
+    `${preset}: choosing a city preset and content must recommend Simple.`
+  );
+  const simpleCitySource = createDesignQRReactSnippet(simpleCityConfig);
+  assert.ok(simpleCitySource.includes(`value="${simpleCityConfig.value}"`));
+  assert.match(simpleCitySource, /design="city"/);
+  assert.ok(simpleCitySource.includes(`theme="${preset}"`), `${preset}: Simple must preserve the selected city.`);
+  assert.doesNotMatch(
+    simpleCitySource,
+    /createTreeTheme|tree=|defaultView=|details=|interaction=|logo=|transparentBackground=/,
+    `${preset}: Simple must use package defaults for all other settings.`
+  );
+  generatedFiles.push({ name: `${preset}-city-simple`, source: simpleCitySource });
+
+  for (const [name, input] of advancedRecommendationInputs) {
+    assert.equal(
+      getRecommendedDesignQRReactExample(normalizeDesignQRConfig({
+        ...simpleCityConfig,
+        ...input,
+      })),
+      'advanced',
+      `${preset}: ${name} must still recommend Advanced.`
+    );
+  }
+
+  assert.equal(
+    getRecommendedDesignQRReactExample(normalizeDesignQRConfig({
+      ...simpleCityConfig,
+      logo: false,
+      transparentBackground: false,
+      interaction: { transitionSpeed: 1 },
+    })),
+    'simple',
+    `${preset}: explicit default settings must still recommend Simple.`
+  );
+}
+
+const simpleTreeSource = createDesignQRReactSnippet(normalizeDesignQRConfig({
+  value: 'https://design.example.com/tree',
+}));
+assert.match(simpleTreeSource, /<DesignQR value="https:\/\/design\.example\.com\/tree" \/>/);
+assert.doesNotMatch(simpleTreeSource, /design=|theme=|tree=/);
+generatedFiles.push({ name: 'tree-simple', source: simpleTreeSource });
 
 for (const example of examples) {
   const snippets = [

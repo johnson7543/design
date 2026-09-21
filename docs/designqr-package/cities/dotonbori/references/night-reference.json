@@ -1,0 +1,1157 @@
+{
+  "schema": "designqr-dotonbori-night-references",
+  "version": 13,
+  "retrieved": "2026-09-11",
+  "reviewed": "2026-09-21",
+  "evidence": [
+    {
+      "id": "S14",
+      "publisher": "Osaka Convention & Tourism Bureau",
+      "url": "https://discover.osaka-info.jp/jp/articles/osaka-night-view",
+      "published": "2026-01-07",
+      "captureDate": "unknown",
+      "files": [
+        {
+          "file": "night-1.webp",
+          "url": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_01.webp",
+          "bytes": 283500,
+          "sha256": "a90f54f615e07c6625f0d60d9174ed3921474323b2e0b5c8b43ad159849634ee"
+        },
+        {
+          "file": "night-2.webp",
+          "url": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_02.webp",
+          "bytes": 241346,
+          "sha256": "382d0435b585bf3805cde7e3cd86e8f3646aa912e538564c3b3c9dcca3a0afed"
+        },
+        {
+          "file": "night-3.webp",
+          "url": "https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_03.webp",
+          "bytes": 216100,
+          "sha256": "8453f118d880c36dc52fc25cbab653a591116f00f08d3e0a4cc046663d132067"
+        }
+      ]
+    },
+    {
+      "id": "S5-night",
+      "publisher": "Osaka City Construction Bureau",
+      "url": "https://www.city.osaka.lg.jp/kensetsu/page/0000010881.html",
+      "captureDate": "unknown; page describes the 2004 riverwalk completion",
+      "files": [
+        {
+          "file": "municipal-night.jpg",
+          "url": "https://www.city.osaka.lg.jp/kensetsu/cmsfiles/contents/0000010/10881/14-03.jpg",
+          "bytes": 27500,
+          "sha256": "9d8a20eb205cfe88760a5a39cefd8c6e685ef6b1a85136f687d9e0647f49f0a5"
+        }
+      ]
+    },
+    {
+      "id": "S15",
+      "publisher": "Nankai / Tonbori Riverwalk and Osaka Prefecture shopping-street feature",
+      "urls": [
+        "https://www.tonbori.jp/osanpo/",
+        "https://osaka-shotengai-info.com/shop/takoyadotonbori-kukuru-honten/",
+        "https://dotonbori-kukuru.com/shop"
+      ],
+      "captureDate": "unknown; the prefecture cooking image is hosted under 2023/01",
+      "retrieved": "2026-09-11",
+      "files": [
+        {
+          "file": "river-restaurant.png",
+          "url": "https://www.tonbori.jp/osanpo/img/sv04b.png",
+          "bytes": 152194,
+          "sha256": "993d945ddbbe646c464527f0f5c8f7d71abc8c83f157b3fc4518a84b4c3e9146"
+        },
+        {
+          "file": "takoyaki-counter.jpg",
+          "url": "https://osaka-shotengai-info.com/wp-content/uploads/2023/01/%E7%84%BC%E3%81%84%E3%81%A6%E3%82%8B%E3%82%B7%E3%83%BC%E3%83%B3%E8%AA%BF%E6%95%B4.jpg",
+          "bytes": 294464,
+          "sha256": "fa350bcdd9e761c2d8816896be4de6fd2fab09ddae881e1fb769cd8bdf82eabc"
+        }
+      ]
+    },
+    {
+      "id": "S16",
+      "publisher": "Kani Doraku main-store owner; historical host corroboration by Japan Food Journal",
+      "urls": [
+        "https://douraku.co.jp/kansai/honten/",
+        "https://douraku.co.jp/lacne/api/shop/honten/",
+        "https://news.nissyoku.co.jp/news/nss-8065-0059"
+      ],
+      "retrieved": "2026-09-11",
+      "captureDate": "unknown",
+      "hostIdentity": {
+        "address": "大阪府大阪市中央区道頓堀1-6-18",
+        "ownerMapPoint": {
+          "latitude": 34.668802,
+          "longitude": 135.501487
+        },
+        "comparison": "Owner map point falls inside B046 in a manual source-coordinate cross-check; the 1996-07-10 report identifies its north/west Asahi sign. Not a facade survey or current panel measurement."
+      },
+      "files": [
+        {
+          "file": "kani-exterior.jpg",
+          "url": "https://douraku.co.jp/lacne/photo/upload/OYRbCZyjstBd8H4l.jpg",
+          "title": "Street exterior",
+          "bytes": 653687,
+          "sha256": "7420f57d9c8a0627f5c068cd2331af2bb06d8f0fb430640eeda90ff7cd4b660a",
+          "visuallyInspected": true
+        },
+        {
+          "file": "kani-seating.jpg",
+          "url": "https://douraku.co.jp/lacne/photo/upload/NQUwFpjg6PbsmzO1.jpg",
+          "title": "First-floor chair seating",
+          "bytes": 244735,
+          "sha256": "e725184ef452298a0c7d2846066114304bcf6064a4d720f9a4e7274371e9d567",
+          "visuallyInspected": true
+        },
+        {
+          "file": "kani-tank.jpg",
+          "url": "https://douraku.co.jp/lacne/photo/upload/d6uUCzKu1ACFkuZK.jpg",
+          "title": "First-floor elevator hall and crab tank",
+          "bytes": 791445,
+          "sha256": "6ef9b43d9fd0d2966591dcbc64b9271a3f2d91d212c9b7ca71783b3c3cff8fb9",
+          "visuallyInspected": true
+        }
+      ]
+    },
+    {
+      "id": "S20",
+      "publisher": "Pip Co., Ltd.; Hana Langue owner",
+      "urls": [
+        "https://www.pipjapan.co.jp/products/recommend/tokeidai/",
+        "https://osaka-hanalangue.com/"
+      ],
+      "retrieved": "2026-09-20",
+      "captureDate": "unknown; Pip page identifies the clock inauguration as 2017-10-05",
+      "files": [
+        {
+          "file": "pip-mainvisual_sp.jpg",
+          "url": "https://www.pipjapan.co.jp/products/recommend/tokeidai/img/mainvisual_sp.jpg",
+          "bytes": 193259,
+          "sha256": "0b694b12c1afbfa6441d89c827402a2e0d50c00ab3579245a9bdfa037a7babb0",
+          "dimensions": [
+            640,
+            289
+          ],
+          "visuallyInspected": true
+        },
+        {
+          "file": "pip-history_ph03.jpg",
+          "url": "https://www.pipjapan.co.jp/products/recommend/tokeidai/img/history_ph03.jpg",
+          "bytes": 64486,
+          "sha256": "b7fe2b60ea6e5af933940fd7e314098d060387da033821853dbb3c91428560d6",
+          "dimensions": [
+            444,
+            296
+          ],
+          "visuallyInspected": true
+        },
+        {
+          "file": "pip-event_ph03.jpg",
+          "url": "https://www.pipjapan.co.jp/products/recommend/tokeidai/img/event_ph03.jpg",
+          "bytes": 59777,
+          "sha256": "fe1746c20798cb5d773ab61ad02ebcbb5588303db22a15a38f728aeecbbbfbc3",
+          "dimensions": [
+            341,
+            227
+          ],
+          "visuallyInspected": true
+        }
+      ],
+      "use": "Pip north clock above Snow Brand and separate east sign; Hana Langue spelling and flower-shaped biscuit. S14 establishes the other restored sign placements, not current tenancy."
+    }
+  ],
+  "observations": [
+    {
+      "image": "night-1.webp",
+      "visible": [
+        "south-bank Glico/Snow Brand/Estem/Kaigen/CHINTAI/Promise/SAMTY sign sequence",
+        "recessed shopfronts and horizontal glazing bands",
+        "warm bank lights and blue/gold broken water reflections",
+        "open DOTON boat and small visitor groups",
+        "thin sign cabinet edge rails and horizontal seams",
+        "window/service-unit band beneath SAMTY",
+        "Snow Brand dairy campaign with cow illustration and 牧場の朝 lettering",
+        "Yellow 大阪 花ラング advertisement below the SAMTY service band and above lower windows",
+        "Blue 明日を、元気に！ slogan below the dairy panel"
+      ],
+      "use": "frontage ordering, night contrast, illustrative reflections; source S6 governs the updated Glico header"
+    },
+    {
+      "image": "night-2.webp",
+      "visible": [
+        "densely signed riverwalk east of this crop",
+        "lit storefronts and water-level viewpoint"
+      ],
+      "use": "lighting context only; the Ferris wheel and out-of-crop signs are not placed in this tile"
+    },
+    {
+      "image": "night-3.webp",
+      "visible": [
+        "east approach to Ebisubashi",
+        "northwest commercial building vertical ribs, upper AQUA/Haier panels and H&M base",
+        "bridge fascia panel seams and bright underside ribbon",
+        "visitors photographing and watching the boat",
+        "projecting lamps on the upper painted signs",
+        "Pip upper sign and FANCL lower panel on the bridge-facing B037 east wall",
+        "Salonpas portrait/product panel and H&M fashion panels on B034 south; H&M panels on the adjoining east face"
+      ],
+      "use": "manually fit visible fronts to B034 source solids, retaining the source setback above 30.83 m"
+    },
+    {
+      "image": "municipal-night.jpg",
+      "visible": [
+        "two-tier banks",
+        "small lights along the rail",
+        "broken elongated sign reflections"
+      ],
+      "use": "lighting and paving rhythm only; historical image does not establish current advertisements"
+    },
+    {
+      "image": "river-restaurant.png",
+      "visible": [
+        "River-facing restaurant entrances",
+        "Menu boards and small service signs",
+        "Terrace chairs and tables",
+        "Awning and umbrella"
+      ],
+      "use": "Local shop character only; the pictured terrace is not registered to a building in this crop and its outdoor furniture is not copied into the tile."
+    },
+    {
+      "image": "takoyaki-counter.jpg",
+      "visible": [
+        "Close-up of rounded takoyaki cooking in rows on a dark metal griddle",
+        "Small turning picks"
+      ],
+      "use": "Miniature griddle/food shapes. Does not establish counter dimensions or any modeled frontage tenant."
+    },
+    {
+      "image": "kani-exterior.jpg",
+      "visible": [
+        "Street-side large crab sign",
+        "Glazing with dark divisions",
+        "Warm framed interior lamps"
+      ],
+      "use": "Building character only; no street-side crab copied onto the river facade."
+    },
+    {
+      "image": "kani-seating.jpg",
+      "visible": [
+        "First-floor tables beside river-facing windows",
+        "Upholstered chairs and ceramic tableware",
+        "Framed warm pendant lamps",
+        "Frosted lower glazing"
+      ],
+      "use": "Original shallow dining-window fittings on B046; dimensions and arrangement are interpreted."
+    },
+    {
+      "image": "kani-tank.jpg",
+      "visible": [
+        "Elevator-hall crab tank",
+        "Framed glass and stone base",
+        "Cool illumination",
+        "Nearby menu displays"
+      ],
+      "use": "Original miniature tank vignette. Its window-facing position is illustrative, not a claim that the photographed hall is visible there."
+    },
+    {
+      "image": "pip-history_ph03.jpg",
+      "visible": [
+        "North clock with vine decoration and Pip footer directly above the Snow Brand sign",
+        "A separate advertisement on the adjoining east face"
+      ],
+      "use": "Clock face and corner relationship, drawn from original paths with a fixed 7:15 miniature pose; no live clock or current campaign claim."
+    }
+  ],
+  "frontages": [
+    {
+      "id": "B037",
+      "e": -9.43,
+      "n": -12.64,
+      "width": 6.5,
+      "bottom": 2,
+      "top": 35.4,
+      "face": "north",
+      "sourceId": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B039",
+      "e": -40.68,
+      "n": -13.36,
+      "width": 12.9,
+      "bottom": 1.95,
+      "top": 29.8,
+      "face": "north",
+      "sourceId": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B041",
+      "e": -28.55,
+      "n": -12.85,
+      "width": 10.6,
+      "bottom": 1.95,
+      "top": 27.6,
+      "face": "north",
+      "sourceId": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B046",
+      "e": 22.33,
+      "n": -15.88,
+      "width": 14.3,
+      "bottom": 1.95,
+      "top": 37.8,
+      "face": "north",
+      "sourceId": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B046-west",
+      "e": 14.68,
+      "n": -22.8,
+      "width": 12.7,
+      "bottom": 1.95,
+      "top": 37.8,
+      "face": "west",
+      "sourceId": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B034-south-lower",
+      "e": -16.6,
+      "n": 16.98,
+      "width": 20.8,
+      "bottom": 2.2,
+      "top": 30.6,
+      "face": "south",
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B034-south-upper",
+      "e": -18.1,
+      "n": 17.01,
+      "width": 14.2,
+      "bottom": 31.1,
+      "top": 49.4,
+      "face": "south",
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B034-east-lower",
+      "e": -5.52,
+      "n": 27.3,
+      "width": 19.2,
+      "bottom": 2.2,
+      "top": 30.6,
+      "face": "east",
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B034-east-upper",
+      "e": -10.63,
+      "n": 24.96,
+      "width": 15,
+      "bottom": 31.1,
+      "top": 49.4,
+      "face": "east",
+      "sourceId": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B031-west",
+      "e": 15.97,
+      "n": 27.5,
+      "width": 18.6,
+      "bottom": 2,
+      "top": 34.2,
+      "face": "west",
+      "sourceId": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "manual source-envelope/photo fit, not calibrated photogrammetry"
+    },
+    {
+      "id": "B037-east",
+      "e": -5.957,
+      "n": -17.882,
+      "width": 9.6,
+      "bottom": 5.25,
+      "top": 35.4,
+      "face": "east",
+      "sourceId": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+      "units": "metres; local east, north, T.P. display elevation",
+      "registration": "S14 bridge-side sign registration on the continuous source east wall; existing ground-floor treatment stays below this reservation."
+    }
+  ],
+  "limitations": [
+    "Composite visual reference state; publication dates do not establish a common capture date.",
+    "Frontage dimensions other than the separately documented Glico panel are approximate photo fits. Source building vertices and roofs are unchanged.",
+    "B034 upper and lower fronts follow different source envelopes; the photographs do not resolve the source model’s stepped geometry into an exact curved facade.",
+    "Lettering and graphic panels are original simplified illustrations of inspected signage, not pixel-accurate advertising reproductions or a current campaign inventory. S14 dairy/Kaigen imagery and S6 Asahi/Glico imagery are interpreted; unobserved rear facades remain generated.",
+    "Warm/cool window occupancy, light intensities, water glimmer and representative visitor routes are authored presentation choices.",
+    "The boat, source buildings and mapped river retain the earlier geometry and source limitations.",
+    "S15 supports local food-service character only. B037/B041 food uses and B049 cafe tenancy remain unverified. Noren, lantern profiles, menus, merchandise and fittings are representative.",
+    "S16 supports B046 restaurant identity and first-floor dining/tank features, not exact bay dimensions, floor plans or the tank visibility from the west window. Its river and west fronts have windows only; no public entrance is asserted.",
+    "B046/B049 north forecourts fill the display gap to the modeled upper walk. Source clipping prevents water/walk/building overlap, but the 1.95 m level and patch widths are interpretations, not resolved local terrain measurements.",
+    "The complete ground-floor context layer records geometric coverage, not additional photo coverage or verified tenancies. Source floor levels and diagrammatic terrain remain subject to the existing datum limits.",
+    "Distinct bay compositions are illustrative design identities, not additional verified merchants. B039 remains neutral commercial frontage; its former unverified sweets-shop assignment is removed. Known corner hosts share finishes and artwork; multiple windows can belong to one store."
+  ],
+  "activity": {
+    "pedestrians": 64,
+    "bridgeWalking": 16,
+    "bankWalking": 28,
+    "bridgeViewing": 8,
+    "upperBankViewing": 12,
+    "behavior": "seeded irregular routes, lateral offsets, individual pace/eased stops, viewing pairs and photo poses; clock freezes with water/boat through pause, reduced motion and QR turns"
+  },
+  "redistribution": "Photographs remain outside the repository. Runtime and Blender pack only repository-authored geometry, original canvas sign art, and the existing open source geometry derivatives.",
+  "runtimeRegistration": {
+    "method": "Original photo hints are retained above. Runtime detail is aligned to a matching continuous source wall with at most 14.4 cm fitting thickness. Approximate joins require a shared source edge; nearby parallel setback walls stay separate. The fitted plane clears the source vertices. Source shapes are unchanged; Donki follows the separately recorded composition translation.",
+    "ownership": "One facade owner per reference wall, including the finished complement of all registered rectangles. No generic QR skin at corners or between photo panels. Patches follow source triangles and discard Float32-collapsed faces. B034 closed ribs and glazing follow its original sloped east setback. B046-south owns its source-fitted street elevation; B049 reserves only its 3.1 m ground-floor band. B037-east reserves only its upper sign/glazing band, starting at 5.25 m, and preserves the existing source-floor shops beneath it.",
+    "frontages": [
+      {
+        "front": "B037",
+        "sourceBuilding": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+        "centerEastNorthM": [
+          -9.421,
+          -12.898
+        ],
+        "widthM": 6.5,
+        "bottomTPM": 2,
+        "topTPM": 35.4,
+        "wallYawRadians": -2.32
+      },
+      {
+        "front": "B039",
+        "sourceBuilding": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742",
+        "centerEastNorthM": [
+          -41.051,
+          -13.757
+        ],
+        "widthM": 12.6,
+        "bottomTPM": 1.95,
+        "topTPM": 29.8,
+        "wallYawRadians": -2.317
+      },
+      {
+        "front": "B040",
+        "sourceBuilding": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+        "centerEastNorthM": [
+          -18.049,
+          -13.137
+        ],
+        "widthM": 10.093,
+        "bottomTPM": 1.95,
+        "topTPM": 33.7,
+        "wallYawRadians": -2.332
+      },
+      {
+        "front": "B041",
+        "sourceBuilding": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85",
+        "centerEastNorthM": [
+          -29.051,
+          -13.257
+        ],
+        "widthM": 10.102,
+        "bottomTPM": 1.95,
+        "topTPM": 27.6,
+        "wallYawRadians": -2.307
+      },
+      {
+        "front": "B046",
+        "sourceBuilding": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+        "centerEastNorthM": [
+          23.949,
+          -16.145
+        ],
+        "widthM": 11.593,
+        "bottomTPM": 1.95,
+        "topTPM": 34.519,
+        "wallYawRadians": -2.335
+      },
+      {
+        "front": "B046-west",
+        "sourceBuilding": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+        "centerEastNorthM": [
+          14.975,
+          -22.335
+        ],
+        "widthM": 9.001,
+        "bottomTPM": 1.95,
+        "topTPM": 34.519,
+        "wallYawRadians": -0.817
+      },
+      {
+        "front": "B046-south",
+        "sourceBuilding": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+        "centerEastNorthM": [
+          22.326,
+          -28.382
+        ],
+        "widthM": 14.9,
+        "bottomTPM": 1.26,
+        "topTPM": 34.5,
+        "wallYawRadians": 0.592
+      },
+      {
+        "front": "B034-south-lower",
+        "sourceBuilding": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+        "centerEastNorthM": [
+          -16.598,
+          17.211
+        ],
+        "widthM": 20.8,
+        "bottomTPM": 2.2,
+        "topTPM": 30.6,
+        "wallYawRadians": 0.777
+      },
+      {
+        "front": "B034-south-upper",
+        "sourceBuilding": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+        "centerEastNorthM": [
+          -18.098,
+          17.224
+        ],
+        "widthM": 14.2,
+        "bottomTPM": 31.1,
+        "topTPM": 49.4,
+        "wallYawRadians": 0.777
+      },
+      {
+        "front": "B034-east-lower",
+        "sourceBuilding": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+        "centerEastNorthM": [
+          -5.869,
+          27.307
+        ],
+        "widthM": 19.2,
+        "bottomTPM": 2.2,
+        "topTPM": 30.6,
+        "wallYawRadians": 2.337
+      },
+      {
+        "front": "B034-east-upper",
+        "sourceBuilding": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+        "centerEastNorthM": [
+          -10.915,
+          24.955
+        ],
+        "widthM": 15,
+        "bottomTPM": 37.113,
+        "topTPM": 49.4,
+        "wallYawRadians": 2.374
+      },
+      {
+        "front": "B031-west",
+        "sourceBuilding": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4",
+        "centerEastNorthM": [
+          16.137,
+          26.47
+        ],
+        "widthM": 17.168,
+        "bottomTPM": 2,
+        "topTPM": 34.2,
+        "wallYawRadians": -0.783
+      },
+      {
+        "front": "B037-east",
+        "sourceBuilding": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+        "centerEastNorthM": [
+          -5.957,
+          -17.882
+        ],
+        "widthM": 9.6,
+        "bottomTPM": 5.25,
+        "topTPM": 35.4,
+        "wallYawRadians": 2.352
+      },
+      {
+        "front": "B049-north",
+        "sourceBuilding": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429",
+        "centerEastNorthM": [
+          43.199,
+          -14.632
+        ],
+        "widthM": 26.431,
+        "bottomTPM": 1.95,
+        "topTPM": 5.05,
+        "wallYawRadians": -2.366,
+        "groundFloorOnly": true,
+        "evidence": "Source wall geometry with an unverified contextual cafe; not a photo-registered tenant."
+      }
+    ],
+    "glico": "The separately verified 10.38 x 20 m panel retains its dimensions; the frame has a small intentional overhang beyond the source wall.",
+    "groundFloor": {
+      "fronts": [
+        "B037",
+        "B039",
+        "B040",
+        "B041",
+        "B046",
+        "B046-west",
+        "B046-south",
+        "B034-south-lower",
+        "B034-east-lower",
+        "B031-west",
+        "B049-north"
+      ],
+      "bays": 42,
+      "displayBays": 33,
+      "doubleDoorEntrances": 8,
+      "foodCounters": 5,
+      "lanterns": 13,
+      "menus": 5,
+      "frontageDetails": [
+        {
+          "front": "B037",
+          "building": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d",
+          "kind": "dining",
+          "bays": 2,
+          "entrances": 1,
+          "counters": 1,
+          "lanterns": 1,
+          "menus": 1,
+          "layoutKey": "B037:3908128473:0:3",
+          "identity": "bldg_7bf89cd8-a58a-4891-a357-3162812dde2d:dining",
+          "finish": 0,
+          "artVariant": 3,
+          "bayRoles": [
+            "counter",
+            "entry"
+          ],
+          "bayWidthsM": [
+            3.327828720106037,
+            2.572171279893962
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 2,
+          "top": 5.1,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B039",
+          "building": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742",
+          "kind": "commercial",
+          "bays": 3,
+          "entrances": 1,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 0,
+          "layoutKey": "B039:4075904663:3:1",
+          "identity": "bldg_23f218a7-b6c5-4dfc-a904-9f53dac5f742:commercial",
+          "finish": 3,
+          "artVariant": 1,
+          "bayRoles": [
+            "glazing",
+            "entry",
+            "directory"
+          ],
+          "bayWidthsM": [
+            4.730020671429121,
+            2.8696951646473323,
+            4.400082957852592
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 1.95,
+          "top": 5.05,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B040",
+          "building": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+          "kind": "lobby",
+          "bays": 3,
+          "entrances": 1,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 0,
+          "layoutKey": "B040:3824093283:3:2",
+          "identity": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614:lobby",
+          "finish": 3,
+          "artVariant": 2,
+          "bayRoles": [
+            "directory",
+            "entry",
+            "bench"
+          ],
+          "bayWidthsM": [
+            3.135852596377722,
+            2.3648460058135257,
+            3.9923060007314226
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 1.95,
+          "top": 5.05,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B041",
+          "building": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85",
+          "kind": "takoyaki",
+          "bays": 3,
+          "entrances": 1,
+          "counters": 2,
+          "lanterns": 1,
+          "menus": 1,
+          "layoutKey": "B041:3807315664:1:0",
+          "identity": "bldg_8c47976a-840f-413d-9bd8-fd1dfbcaed85:takoyaki",
+          "finish": 1,
+          "artVariant": 0,
+          "bayRoles": [
+            "counter",
+            "entry",
+            "cabinet"
+          ],
+          "bayWidthsM": [
+            3.7097338900101655,
+            2.585238780904707,
+            3.207218806245917
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 1.95,
+          "top": 5.05,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B046",
+          "building": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+          "kind": "restaurant",
+          "bays": 3,
+          "entrances": 0,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 1,
+          "layoutKey": "B046:3924758997:2:0",
+          "identity": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a:restaurant",
+          "finish": 2,
+          "artVariant": 0,
+          "bayRoles": [
+            "seating",
+            "glazing",
+            "seating"
+          ],
+          "bayWidthsM": [
+            3.2798623272994987,
+            4.617135544148494,
+            3.095663444993125
+          ],
+          "diningWindows": 3,
+          "crabTanks": 0,
+          "bottom": 1.95,
+          "top": 5.05,
+          "maxProjection": 0.79,
+          "evidence": "S16 owner photos; interpreted window fit"
+        },
+        {
+          "front": "B046-west",
+          "building": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+          "kind": "restaurant",
+          "bays": 2,
+          "entrances": 0,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 1,
+          "layoutKey": "B046-west:3101306431:2:0",
+          "identity": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a:restaurant",
+          "finish": 2,
+          "artVariant": 0,
+          "bayRoles": [
+            "tank",
+            "seating"
+          ],
+          "bayWidthsM": [
+            3.5581193005946776,
+            4.842568937658556
+          ],
+          "diningWindows": 2,
+          "crabTanks": 1,
+          "bottom": 1.95,
+          "top": 5.05,
+          "maxProjection": 0.79,
+          "evidence": "S16 owner photos; interpreted window fit"
+        },
+        {
+          "front": "B046-south",
+          "building": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+          "kind": "restaurant",
+          "bays": 3,
+          "entrances": 0,
+          "entranceFrames": 1,
+          "counters": 0,
+          "lanterns": 10,
+          "menus": 0,
+          "bottom": 1.26,
+          "top": 4.91,
+          "maxProjection": 0.81,
+          "identity": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a:restaurant",
+          "finish": 2,
+          "artVariant": 0,
+          "layoutKey": "B046-south:S19-F1",
+          "bayRoles": [
+            "display",
+            "entrance-reveal",
+            "display"
+          ],
+          "bayWidthsM": [
+            3.0387999999999997,
+            7.6023999999999985,
+            3.0387999999999997
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "evidence": "S19/F1 owner street/corner photo; source plane and floor; interpreted proportions; street walking datum unresolved"
+        },
+        {
+          "front": "B034-south-lower",
+          "building": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+          "kind": "retail",
+          "bays": 6,
+          "entrances": 1,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 0,
+          "layoutKey": "B034-south-lower:3376976724:3:0",
+          "identity": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73:retail",
+          "finish": 3,
+          "artVariant": 0,
+          "bayRoles": [
+            "mannequin",
+            "entry",
+            "rail",
+            "folded",
+            "glazing",
+            "mannequin"
+          ],
+          "bayWidthsM": [
+            4.129767012808153,
+            2.389240114960968,
+            3.0072199339691967,
+            3.9243389894483514,
+            3.465223428830066,
+            3.2842105199832656
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 2.2,
+          "top": 5.300000000000001,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B034-east-lower",
+          "building": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73",
+          "kind": "retail",
+          "bays": 5,
+          "entrances": 1,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 0,
+          "layoutKey": "B034-east-lower:83664210:3:0",
+          "identity": "bldg_6b39f217-6938-46f4-be4f-b63dadaf6e73:retail",
+          "finish": 3,
+          "artVariant": 0,
+          "bayRoles": [
+            "mannequin",
+            "entry",
+            "rail",
+            "folded",
+            "glazing"
+          ],
+          "bayWidthsM": [
+            3.610314650810792,
+            2.6973128410075575,
+            3.682880052057035,
+            3.8473139452674667,
+            4.762178510857145
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 2.2,
+          "top": 5.300000000000001,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B031-west",
+          "building": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4",
+          "kind": "commercial",
+          "bays": 5,
+          "entrances": 1,
+          "counters": 0,
+          "lanterns": 0,
+          "menus": 0,
+          "layoutKey": "B031-west:3006840853:2:3",
+          "identity": "bldg_20d649b2-8ed9-4907-8d04-ad66a6952df4:commercial",
+          "finish": 2,
+          "artVariant": 3,
+          "bayRoles": [
+            "glazing",
+            "directory",
+            "service",
+            "entry",
+            "glazing"
+          ],
+          "bayWidthsM": [
+            3.899557649020953,
+            3.2260206086709355,
+            3.237888600843323,
+            2.3741336168628373,
+            3.83046170387408
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 2,
+          "top": 5.1,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        },
+        {
+          "front": "B049-north",
+          "building": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429",
+          "kind": "cafe",
+          "bays": 7,
+          "entrances": 1,
+          "counters": 2,
+          "lanterns": 1,
+          "menus": 1,
+          "layoutKey": "B049-north:415994046:3:1",
+          "identity": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429:cafe",
+          "finish": 3,
+          "artVariant": 1,
+          "bayRoles": [
+            "counter",
+            "entry",
+            "seating",
+            "shelf",
+            "glazing",
+            "cabinet",
+            "seating"
+          ],
+          "bayWidthsM": [
+            3.9303782664316533,
+            2.8222426653053185,
+            4.0928384644147435,
+            3.9774514852993206,
+            3.0967658901812714,
+            3.1030047089798067,
+            4.808487642767424
+          ],
+          "diningWindows": 0,
+          "crabTanks": 0,
+          "bottom": 1.95,
+          "top": 5.05,
+          "maxProjection": 0.79,
+          "evidence": "S14 facade; S15 interpreted fittings"
+        }
+      ],
+      "features": [
+        "Opaque warm display recesses",
+        "Takoyaki trays and confectionery sample cabinets",
+        "Menu cases with original food illustrations and outlined Japanese labels",
+        "Shelves, bottles, cups and tiled counters",
+        "Split noren, ribbed lanterns and shallow awnings",
+        "Retail mannequins and clothing rails",
+        "Lobby directories, double-door seams, handles, entry mats and thresholds",
+        "Portal frames, lintels and warm light strips",
+        "B046 dining-window tables, chairs, ceramic tableware, framed pendants and frosted lower glazing",
+        "One original miniature crab-tank display and seafood menus",
+        "B049 cafe service area, pastry cabinet, seating, shelving, quiet glazing and off-center entry",
+        "Two source-clipped north forecourts joining the existing upper walk"
+      ],
+      "evidence": "S14 locates the photo-directed commercial bases. S15 supports local food-service character and generic uses at B037/B041/B049. S16 corroborates B046 restaurant identity and first-floor dining/tank feature types. Fittings, bay layout, menu content and the tank window placement are miniature interpretations, not a surveyed floor plan or current tenant inventory.",
+      "grounding": "Food-service fronts meet the modeled upper walk at 1.95–2.00 m TP; B046/B049 north fronts use two source-clipped forecourts totaling 101.40684258477083 square metres at 1.95 m. They exclude water, existing walks and building footprints. Level and extent remain display interpretations. B046 north/west are window-only. Existing B031/B034 display-floor fits remain approximate. All fittings stay within 0.79 m relief.",
+      "diningWindows": 5,
+      "crabTanks": 1,
+      "artworkAtlasPixels": [
+        2048,
+        1536
+      ],
+      "forecourts": {
+        "runtime": "packages/designqr/src/designs/city/dotonbori-storefront-access-data.ts",
+        "generator": "scripts/blender/prepare-dotonbori-storefront-access.py",
+        "fronts": [
+          "B046",
+          "B049-north"
+        ],
+        "patches": 2,
+        "areaM2": 101.40684258477083,
+        "heightM": 1.95,
+        "interpretation": "Display pavement completion; source-clipped but not surveyed.",
+        "ownership": "Each patch retains its source host and remains present at every 3D rotation."
+      },
+      "scope": "Ten individually directed fronts. Additional context completion is recorded separately in ground-floor-coverage.json.",
+      "frontageComposition": "Uneven bay widths and complementary service/display/seating/glazing roles replace cloned complete shops. Known corner hosts share finishes; context display arrangements respond to QR content. Layout keys identify illustrative facade treatments, not real tenants. Menus and awnings are localized to the service area. Four coordinated artwork variants occupy 48 cells in one retained 2048x1536 atlas.",
+      "artworkCells": 48,
+      "artworkVariants": 4,
+      "entranceReveals": 1,
+      "streetFacade": "B046-south: source floor 1.26 m, 3.65 m entrance/eave band, maximum relief 0.81 m, 12.6 m interpreted lower elevation; source walking datum unresolved. The pictured entrance is not functional access. S19/F1; see facade-reference.json."
+    },
+    "signDetail": {
+      "atlasSize": [
+        2048,
+        1024
+      ],
+      "artCells": 14,
+      "logoBackingCell": 12,
+      "geometry": [
+        "Shallow sign cabinet reveals and abutting metal caps",
+        "Projecting lamp brackets and warm light faces",
+        "Glazing transoms and partial blinds",
+        "Louvered service units in the band beneath SAMTY"
+      ],
+      "limits": "Cabinet depths, lamp positions, blinds and service-unit dimensions are photo-directed miniature fits. They are not measured construction details.",
+      "asahiAspect": "North and west faces use separate artwork cells to preserve the can and lettering proportions on their differently sized source walls.",
+      "kaniFasciaCell": 14
+    },
+    "logo": {
+      "front": "B046",
+      "sourceBuilding": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+      "panel": "north Asahi",
+      "insetM": 0.2,
+      "wallOffsetM": 0.6,
+      "behavior": "Top-align the aspect-fitted upload inside the north panel. Use Osaka ivory backing for dark artwork and navy for light artwork, chosen from a one-time alpha-weighted brightness sample; preserve upload pixels and restore original artwork on removal. West Asahi unchanged. The host and logo remain present throughout 3D rotation and share sign-to-QR travel in both transition directions."
+    },
+    "storefrontAccessRegistration": [
+      {
+        "id": "B046",
+        "building": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+        "width": 11.592661316441117,
+        "base": 1.95,
+        "center": [
+          23.949324836126102,
+          -16.14451500171303
+        ],
+        "unitU": [
+          0.9997737334864212,
+          0.021271620310614026
+        ],
+        "unitN": [
+          -0.021271620310614026,
+          0.9997737334864105
+        ]
+      },
+      {
+        "id": "B046-west",
+        "building": "bldg_bc4a46b3-c8b8-4921-b928-b880430f9d0a",
+        "width": 9.000688238253232,
+        "base": 1.95,
+        "center": [
+          14.974904532595655,
+          -22.335260120122634
+        ],
+        "unitU": [
+          0.03198431429211723,
+          0.9994883709374847
+        ],
+        "unitN": [
+          -0.9994883709374847,
+          0.03198431429212434
+        ]
+      },
+      {
+        "id": "B049-north",
+        "building": "bldg_855dffaa-1263-4a5f-bd07-8ed04eded429",
+        "width": 26.43116912337954,
+        "base": 1.95,
+        "center": [
+          43.1994032406716,
+          -14.632259747161065
+        ],
+        "unitU": [
+          0.9999563302569427,
+          -0.00934545767021433
+        ],
+        "unitN": [
+          0.00934545767021433,
+          0.9999563302569427
+        ]
+      }
+    ],
+    "contextGroundFloor": {
+      "coverageRecord": "ground-floor-coverage.json",
+      "reviewValue": "https://example.com/dotonbori",
+      "sections": 239,
+      "bays": 561,
+      "completeSceneSections": 251,
+      "completeSceneBays": 609,
+      "completeSceneEntrances": 24,
+      "completeSceneFoodCounters": 90,
+      "completeSceneMenus": 75,
+      "evidence": "S15 guides local shop character only; all new uses, interior plans, shutters and service fittings are QR-generated interpretations. Existing known host uses stay coherent.",
+      "fitting": "Full 3.1 m wall support for rectangular fittings; clipped panels/ribs on partial walls. Context relief <= 0.62 m and <= 42% of sampled available clearance. Doors require modeled ground within 0.16 m of the source floor.",
+      "retention": "All 58 selected bodies retained. 56 have eligible exposed fronts; B005 and B054 are enclosed at ground level. Donki has six separately directed display/entrance bays.",
+      "artwork": "Private shared 2048x1536 storefront atlas: 48 cells, four coordinated treatments, portable outlines. Information icons avoid labeling display-only windows as entrances.",
+      "composition": "Uneven bay widths and complementary service/display/seating/glazing roles replace cloned complete shops. Known corner hosts share finishes; context display arrangements respond to QR content. Layout keys identify illustrative facade treatments, not real tenants. Menus and awnings are localized to the service area. Four coordinated artwork variants occupy 48 cells in one retained 2048x1536 atlas."
+    },
+    "riverbankSigns": {
+      "record": "facade-audit.json",
+      "regularPanels": 21,
+      "restoredPanels": 7,
+      "atlas": {
+        "columns": 4,
+        "rows": 6,
+        "width": 2048,
+        "height": 1536
+      },
+      "paintedCells": 20,
+      "privateLogoCell": 12,
+      "features": [
+        "B037 north Pip clock and Snow Brand slogan",
+        "B037 east Pip/FANCL",
+        "B039 Hana Langue advertisement",
+        "B034 south Salonpas/H&M"
+      ],
+      "morph": "All seven restored panels carry their complete textured surfaces and cabinet geometry through QR turns, reversals and content edits.",
+      "rendering": "Art clips to individual atlas cells; cabinets fit the actual source walls with separated edge rails. Five private textures total remain retained."
+    }
+  },
+  "lettering": {
+    "source": "https://github.com/notofonts/noto-cjk/blob/main/Sans/OTF/Japanese/NotoSansCJKjp-Medium.otf",
+    "sha256": "dd523e580e3413c480b2d701bf64e534c20f8419e3cfb6a44c2bdcd8d2a6c052",
+    "license": "SIL OFL 1.1",
+    "builder": "scripts/build-dotonbori-lettering.py",
+    "runtime": "Forty-nine fitted label outlines, including clock numerals; no host-font dependency or runtime network request. Typeface outlines are not exact brand lettering."
+  },
+  "glicoAnimation": {
+    "reference": "glico-animation-reference.json",
+    "source": "S17",
+    "behavior": "Track/rainbow illustrations and coordinated reflected light share the existing activity clock. The current atlas blend, cabinet and reflected colors freeze into the QR transformation. Still-photo motifs are reference-directed; timing and light response are authored. The editable review captures the current time-zero geometry."
+  },
+  "waterMotion": {
+    "reference": "water-motion-reference.json",
+    "source": "S18",
+    "behavior": "Source-contained reflection drift and spreading stern crests share the existing activity clock. Current geometry and composited colors join the QR turn and freeze across reversals/content edits. The current static-review counts are recorded in the waterfront review manifest."
+  },
+  "facadeCompletion": "facade-reference.json",
+  "presentationLighting": {
+    "evidence": "Authored emphasis using the existing inspected photographs and approved Osaka roles; not surveyed photometry.",
+    "massings": "building/roof = mix(navy, highRise, 0.18/0.22); retain muted Donki finish and warm narrow wheel accents.",
+    "spill": "Existing seven sign light fields use 0.43 strength and vertical falloff coefficient 14 in normalized tile coordinates; reflections use 9 m decay.",
+    "glow": "A tight low-strength bright-pixel screen composite behind sharp source artwork on the existing presentation canvas. No additional WebGL pass or render target.",
+    "transition": "Glow fades over 8–65% progress. River-led warmWindow pulse belongs to the moving surfaces. Exact QR inks remain unchanged.",
+    "transparent": "Bypass presentation glow; retain original source alpha."
+  }
+}

@@ -37,6 +37,8 @@ export type {
   DesignQRInteractionOptions,
   DesignQRLogoOptions,
   DesignQRThemePreset,
+  DesignQRTreePreset,
+  DesignQRCityPreset,
   DesignQRView,
   ResolvedTreeTheme,
   Result,
@@ -54,6 +56,7 @@ export type {
   TreeTheme,
   TreeWeatherType,
 } from './types.ts';
+export { CITY_PRESETS, isCityPreset } from '../designs/city/presets.ts';
 export { DesignQRConfigError } from './types.ts';
 export {
   VIEW_TRANSITION_SPEED_DEFAULT,

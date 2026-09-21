@@ -1,7 +1,7 @@
 # Product demo video workflow
 
 **Status:** Active<br>
-**Source of truth:** [`record-product-demo` skill](../../skills/record-product-demo/SKILL.md), [`record-demo-video.mjs`](../../scripts/record-demo-video.mjs), and checked-in files under [`scripts/demo-video-scenarios/`](../../scripts/demo-video-scenarios/).
+**Source of truth:** [`record-product-demo` skill](../../skills/record-product-demo/SKILL.md), [`record-demo-video.mjs`](../../scripts/record-demo-video.mjs), and checked-in files under [`scripts/demo-video-scenarios/`](../../scripts/demo-video-scenarios).
 
 This workflow records the real local product UI, generates its MP4/poster, and verifies that the intended catalog or product component references those assets.
 

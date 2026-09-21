@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const registryPath = join(projectRoot, 'docs', 'design-registry.json');
-const globalColorRegistryPath = 'docs/design-system/colors.md';
+const globalColorRegistryPath = 'docs/global-standards/colors.md';
 const failures = [];
 
 function repositoryPath(path) {
@@ -170,7 +170,7 @@ for (const design of registry.designs ?? []) {
   }
 
   const colorDocument = loadedDocuments.get('colors') ?? '';
-  if (colorDocument && !colorDocument.includes('design-system/colors.md')) {
+  if (colorDocument && !colorDocument.includes('global-standards/colors.md')) {
     failures.push(`${design.docsDirectory}/${design.documents.colors}: link the global color registry`);
   }
 }
@@ -191,7 +191,7 @@ for (const route of registeredRoutes) {
   }
 }
 
-const reservedDocumentationAreas = new Set(['demo-videos', 'design-system']);
+const reservedDocumentationAreas = new Set(['demo-videos', 'global-standards']);
 for (const entry of await readdir(join(projectRoot, 'docs'), { withFileTypes: true })) {
   if (!entry.isDirectory() || reservedDocumentationAreas.has(entry.name)) continue;
   const areaPath = join(projectRoot, 'docs', entry.name);

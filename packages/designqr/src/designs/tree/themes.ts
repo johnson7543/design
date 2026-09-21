@@ -1,8 +1,10 @@
-import { SHIBUYA_PALETTE as CITY } from '../city/palette.ts';
+import { TOKYO_TOWER_PALETTE } from '../city/tokyo-tower-palette.ts';
+import { SHIBUYA_PALETTE as CITY, OSAKA_NIGHT_SWATCHES as OSAKA, mixCityColor } from '../city/palette.ts';
 import {
   DesignQRConfigError,
   type DesignQRConfigV1,
   type DesignQRThemePreset,
+  type DesignQRTreePreset,
   type ResolvedTreeTheme,
   type TreeGroundFeature,
   type TreePaletteColors4,
@@ -315,12 +317,10 @@ export const TREE_THEME_PRESETS = Object.freeze({
   summer: SUMMER_THEME,
   autumn: AUTUMN_THEME,
   winter: WINTER_THEME,
-}) satisfies Readonly<Record<Exclude<DesignQRThemePreset, 'shibuya'>, Readonly<ResolvedTreeTheme>>>;
+}) satisfies Readonly<Record<DesignQRTreePreset, Readonly<ResolvedTreeTheme>>>;
 
 /** Shared presentation/QR roles; city geometry has its own renderer. */
-export const DESIGN_QR_THEME_PRESETS = Object.freeze({
-  ...TREE_THEME_PRESETS,
-  shibuya: Object.freeze({
+const CITY_THEME = Object.freeze({
     foliageColor: CITY.blue, foliageShadowColor: CITY.ink,
     foliageHighlightColor: CITY.coolLight, foliageMidtoneColor: CITY.glassLight,
     foliageShape: 'pixel',
@@ -357,7 +357,15 @@ export const DESIGN_QR_THEME_PRESETS = Object.freeze({
     weatherType: 'none', weatherAmount: 0, weatherColor: CITY.coolLight,
     ambientParticleType: 'none', ambientParticleAmount: 0, ambientParticleColor: CITY.warmLight,
     snowflakeAmount: 0, snowflakeColor: CITY.paper,
-  } as const satisfies ResolvedTreeTheme),
+} as const satisfies ResolvedTreeTheme);
+
+export const DESIGN_QR_THEME_PRESETS = Object.freeze({
+  ...TREE_THEME_PRESETS,
+  shibuya: CITY_THEME,
+  'tokyo-tower': Object.freeze({ ...CITY_THEME, skyTop: TOKYO_TOWER_PALETTE.sky, skyBottom: TOKYO_TOWER_PALETTE.horizon }),
+  dotonbori: Object.freeze({
+    ...CITY_THEME, skyTop: OSAKA.navy, skyBottom: mixCityColor(OSAKA.navy, OSAKA.blue, .28),
+  }),
 });
 
 export type TreeThemeOverrides = Partial<ResolvedTreeTheme>;

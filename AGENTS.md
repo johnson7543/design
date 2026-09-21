@@ -19,10 +19,10 @@ The user does not need to request a documentation pass separately.
   routes/source paths, and link it from `docs/README.md`.
 - Run `npm run design-docs:check` after design or documentation work.
 
-## Design QR interface work
+## DesignQR editor interface work
 
-Before changing Design QR components, layout, responsive behavior, or interface
-CSS, read and follow [`docs/design-qr/style-principles.md`](docs/design-qr/style-principles.md).
+Before changing DesignQR editor components, layout, responsive behavior, or interface
+CSS, read and follow [`docs/designqr-editor/style-principles.md`](docs/designqr-editor/style-principles.md).
 Treat [`src/styles/design-tokens.css`](src/styles/design-tokens.css) as the
 executable source of truth.
 
@@ -38,10 +38,17 @@ executable source of truth.
   changes. Run `npm run smoke:production` when layout, responsive behavior,
   routing, or interaction geometry changes.
 
+## DesignQR package work
+
+Before changing player rendering, gestures, artwork, or package CSS, read
+[`docs/designqr-package/style-principles.md`](docs/designqr-package/style-principles.md)
+and the package color mappings. Editor UI contracts are maintained separately
+under `docs/designqr-editor/`.
+
 ## Global color contract
 
 Before adding or changing any repository-authored color, read and follow
-[`docs/design-system/colors.md`](docs/design-system/colors.md). Only base RGB
+[`docs/global-standards/colors.md`](docs/global-standards/colors.md). Only base RGB
 colors in its approved-color list may be used anywhere in source, styles,
 renderers, assets, defaults, or documentation. Do not add a new approved color
 unless the user explicitly requests a repository palette change.
@@ -54,7 +61,7 @@ unless the user explicitly requests a repository palette change.
 - Keep color roles and component mappings in the owning design's product
   documentation, never in the global registry.
 - For Design QR seasonal artwork changes, keep
-  [`docs/design-qr/color-palettes.md`](docs/design-qr/color-palettes.md)
+  [`docs/designqr-package/color-palettes.md`](docs/designqr-package/color-palettes.md)
   synchronized.
 - Run `npm run color:check` after color-related changes.
 
@@ -66,7 +73,8 @@ read and use [`skills/record-product-demo/SKILL.md`](skills/record-product-demo/
 ## Documentation organization
 
 - Keep repository entry points (`README.md` and `AGENTS.md`) at the root.
-- Keep product documentation under `docs/<product>/`; reserve `.agents/rules/`
+- Follow the four ownership areas in `docs/README.md`: global standards, home
+  page UI, DesignQR package, and DesignQR editor UI. Reserve `.agents/rules/`
   for substantial agent-only workflows that do not belong in this file.
 - Register every implemented visual product in `docs/design-registry.json`.
 - Use lowercase kebab-case filenames and add maintained documents to the nearest

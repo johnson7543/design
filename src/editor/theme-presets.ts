@@ -13,7 +13,9 @@ export const THEME_PRESET_OPTIONS = [
 
 /** City presets stay separate from Tree's seasonal/custom-theme selection. */
 export const CITY_THEME_PRESET_OPTIONS = [
-  { id: 'shibuya', name: 'shibuya', label: 'Shibuya' },
+  { id: 'shibuya', name: 'shibuya', label: '渋谷' },
+  { id: 'dotonbori', name: 'dotonbori', label: '道頓堀' },
+  { id: 'tokyo-tower', name: 'tokyo-tower', label: '東京タワー' },
 ] as const satisfies ReadonlyArray<{
   id: DesignQRThemePreset;
   name: DesignQRThemePreset;

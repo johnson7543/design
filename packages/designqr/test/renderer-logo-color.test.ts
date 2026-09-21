@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { Color, PerspectiveCamera, Scene, Texture } from 'three';
+import { Color, Mesh, type MeshBasicMaterial, PerspectiveCamera, Scene, Texture } from 'three';
 
 import { TreeBlockType } from '../src/designs/tree/constants.ts';
 import type { VoxelBlock } from '../src/designs/tree/treeBuilder.ts';
@@ -136,4 +136,23 @@ test('renders the logo image without a generated frame or backplate', () => {
 
   const disposeLogo = Reflect.get(renderer, 'disposeLogoVisual') as () => void;
   disposeLogo.call(renderer);
+});
+
+test('hidden city logos return to full opacity when switching to Tree or a visible billboard', () => {
+  const renderer = Object.create(ThreeFallbackRenderer.prototype) as Record<string, unknown>, scene = new Scene();
+  Object.assign(renderer, { scene, camera: new PerspectiveCamera(), treeData: { gridSize: 29, trunkHeight: 1 }, currentProgress: 0,
+    logoConfig: { src: '/fixture-logo.png', alt: 'Fixture logo', size: .16 } });
+  const create = Reflect.get(renderer, 'createLogoVisual') as (t: Texture, aspect: number) => void;
+  const transform = Reflect.get(renderer, 'updateLogoTransform') as (p: number) => void;
+  create.call(renderer, new Texture(), 1);
+  const group = scene.getObjectByName('designqr-logo')!, image = group.children[0] as Mesh<import('three').BufferGeometry, MeshBasicMaterial>;
+  const anchor = { x: .2, y: .25, z: .1, width: .12, height: .2, angle: .8, visible: false };
+  Reflect.set(renderer, 'cityScene', { setLogoPresent() {}, getLogoAnchor: () => anchor });
+  transform.call(renderer, .5); assert.equal(group.visible, false);
+  transform.call(renderer, .9); assert.ok(image.material.opacity > 0 && image.material.opacity < 1);
+  Reflect.set(renderer, 'cityScene', null); transform.call(renderer, 0);
+  assert.equal(group.visible, true); assert.equal(image.material.opacity, 1);
+  Reflect.set(renderer, 'cityScene', { setLogoPresent() {}, getLogoAnchor: () => ({ ...anchor, visible: true }) });
+  transform.call(renderer, 0); assert.equal(group.visible, true); assert.equal(image.material.opacity, 1); assert.equal(image.material.depthTest, true);
+  (Reflect.get(renderer, 'disposeLogoVisual') as () => void).call(renderer);
 });

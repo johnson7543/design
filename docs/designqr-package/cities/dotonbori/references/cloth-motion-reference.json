@@ -1,0 +1,36 @@
+{
+  "schema": "designqr-dotonbori-cloth-motion-reference",
+  "version": 2,
+  "reviewed": "2026-09-18",
+  "status": "Implemented gentle motion on the existing three split noren and the boat mast pennant.",
+  "sources": {
+    "storefronts": "S14 registers the commercial fronts. S15 and night-reference.json retain the local shop references and explicitly identify noren, fittings and B037/B041/B049 food uses as miniature interpretations.",
+    "boat": "S13 and waterfront-reference.json retain the operator drawing and inspected vessel photographs. The existing small mast pennant is an interpreted fitting, not a measured or identified operator flag.",
+    "limits": "No additional storefront identity, flag graphic, observed fabric motion, wind measurement or current weather is claimed. This step animates existing interpreted objects. Timing, bends, mount details and clearance are authored miniature choices."
+  },
+  "geometry": {
+    "noren": "Four separate 0.53 m high flaps at each existing B037, B041 and B049-north doorway. Width follows the existing doorway with 0.035 m splits. A fixed top rod supports the top seams. The two light marks are painted into the outer fabric flaps, replacing detached rigid overlays.",
+    "pennant": "An unbranded 0.38 by 0.24 m sheet replaces the solid mast insert. Its hoist stays fixed at the existing pole, with slight sag and a free edge. It shares the boat's transform and tile clipping.",
+    "clearance": "Curtain free edges move laterally at most 0.006 m per flap, preserving over 0.022 m between neighboring edges. Surface depth remains approximately 0.414–0.511 m from the wall, inside the existing 0.79 m fitting relief. Pennant normal displacement stays below 0.057 m and below the mast tip.",
+    "rendering": "Two retained vertex-colored meshes, 1260 noren vertices and 120 pennant vertices. Double-sided, depth-tested fabric with one pass per mesh, no texture, and no overlapping rigid cloth skin. Separate painted color regions share the fabric vertices."
+  },
+  "motion": {
+    "breezeEnvelopeSeconds": 18,
+    "stillWindowSeconds": "16–18 and 0–2 across each envelope boundary",
+    "behavior": "A shared eased breeze envelope drives all fabric, with stable per-flap phase offsets and small waves toward each free edge. A slower strength modulation varies successive gusts. Fixed seams never move. Quiet intervals retain the same positions without uploading the buffer.",
+    "clock": "Uses the existing per-player boat/crowd/water/Glico clock. Pause, reduced motion, QR view and both turn directions freeze cloth geometry. Content edits preserve the phase and private materials; regenerated facade cloth is evaluated at the retained time before rendering."
+  },
+  "integration": {
+    "ownership": "Noren vertices retain source-building ownership. Every host and cloth surface stays present throughout 3D rotation and both QR transformation directions.",
+    "morph": "Every current fabric triangle and fixed rod participates in complete surface transport, preserving vertex paint, source ownership and the current boat pose/crop. No cloth sampling cap applies; exact endpoints use the shared canonical QR layers.",
+    "palette": "Existing storefront accents, ivory marks and the ivory boat pennant, with programmatic fold shading. No new base colors or QR ink changes.",
+    "staticReview": "The editable Blender review captures the current runtime geometry at time zero. Browser captures document the animation; source building and bridge GLBs retain their metric geometry."
+  },
+  "sourceFiles": [
+    "packages/designqr/src/designs/city/dotonbori-cloth.ts",
+    "packages/designqr/src/designs/city/dotonbori-storefronts.ts",
+    "packages/designqr/src/designs/city/dotonbori-facades.ts",
+    "packages/designqr/src/designs/city/dotonbori-activity.ts",
+    "packages/designqr/src/renderer/webgl/DotonboriScene.ts"
+  ]
+}

@@ -19,7 +19,7 @@ export class CityMorphMesh {
 attribute vec3 cityStart;
 attribute vec3 citySize;
 attribute vec3 cityEnd;
-attribute float cityAngle;
+attribute vec4 cityAngle;
 attribute vec3 cityTargetColor;
 attribute vec3 cityGroup;
 attribute vec2 cityReveal;
@@ -29,19 +29,22 @@ float cityTileEase(float p, float start, float end) {
   float t = clamp((p - start) / (end - start), 0.0, 1.0);
   return t * t * (3.0 - 2.0 * t);
 }`).replace('#include <color_vertex>', `#include <color_vertex>
-vColor.rgb = mix(vColor.rgb, cityTargetColor, cityMorphWeights.z);
+float cityProgress = clamp((cityMorphWeights.y - cityAngle.y) / (cityAngle.z - cityAngle.y), 0.0, 1.0);
+float cityVertical = cityTileEase(cityProgress, 0.02, 0.92);
+vColor.rgb = mix(vColor.rgb, cityTargetColor, cityTileEase(cityProgress, 0.50, 0.94));
 `).replace('#include <begin_vertex>', `
-vCityReveal = cityTileEase(cityMorphWeights.y, cityReveal.x, cityReveal.y);
-float travel = cityTileEase(cityMorphWeights.y, 0.42, 0.90);
-float settle = cityTileEase(cityMorphWeights.y, cityGroup.z, 0.94);
+vCityReveal = cityTileEase(cityProgress, cityReveal.x, cityReveal.y);
+float travel = cityTileEase(cityProgress, 0.42, 0.90);
+float settle = cityTileEase(cityProgress, cityGroup.z, 0.94);
 vec3 extent = mix(citySize, vec3(cityMorphWeights.w, 0.002, cityMorphWeights.w), settle);
-extent.y = mix(citySize.y, 0.002, cityMorphWeights.x);
-float angle = cityAngle * (1.0 - settle);
+extent.y = mix(citySize.y, 0.002, cityVertical);
+float angle = cityAngle.x * (1.0 - settle);
 vec3 local = position * extent;
 vec3 transformed = vec3(local.x * cos(angle) + local.z * sin(angle), local.y,
   -local.x * sin(angle) + local.z * cos(angle));
 vec2 ground = cityStart.xz + cityGroup.xy * travel + (cityEnd.xz - cityStart.xz - cityGroup.xy) * settle;
-transformed += vec3(ground.x, mix(cityStart.y, cityEnd.y, cityMorphWeights.x), ground.y);
+float lift = cityAngle.w * sin(3.141592653589793 * cityTileEase(cityProgress, 0.08, 0.88));
+transformed += vec3(ground.x, mix(cityStart.y, cityEnd.y, cityVertical) + lift, ground.y);
 `);
       shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>
 varying float vCityReveal;`).replace('#include <color_fragment>', `#include <color_fragment>
@@ -49,7 +52,7 @@ varying float vCityReveal;`).replace('#include <color_fragment>', `#include <col
 if (vCityReveal <= 0.0) discard;
 diffuseColor.a *= vCityReveal;`);
     };
-    material.customProgramCacheKey = () => 'designqr-whole-city-morph-v3';
+    material.customProgramCacheKey = () => 'designqr-whole-city-morph-v4';
     this.mesh = this.create(tiles.length, material);
     this.setTiles(tiles, grid);
   }
@@ -63,7 +66,9 @@ diffuseColor.a *= vCityReveal;`);
       colors.set([shade, shade, shade], i * 3);
     }
     geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
-    for (const [name, size] of [['cityStart', 3], ['citySize', 3], ['cityEnd', 3], ['cityAngle', 1], ['cityTargetColor', 3], ['cityGroup', 3], ['cityReveal', 2]] as const) {
+    // Angle and timing share one attribute: keep the shader within WebGL's
+    // minimum 16 vertex attribute locations, including the instance matrix.
+    for (const [name, size] of [['cityStart', 3], ['citySize', 3], ['cityEnd', 3], ['cityAngle', 4], ['cityTargetColor', 3], ['cityGroup', 3], ['cityReveal', 2]] as const) {
       geometry.setAttribute(name, new InstancedBufferAttribute(new Float32Array(capacity * size), size).setUsage(DynamicDrawUsage));
     }
     const mesh = new InstancedMesh(geometry, material, capacity);
@@ -89,7 +94,8 @@ diffuseColor.a *= vCityReveal;`);
     const windows = cityBuildingRevealWindows(tiles.map(tile => tile.source));
     tiles.forEach(({ source: s, target: t, motion }, i) => {
       start.setXYZ(i, s.x, s.y, s.z); size.setXYZ(i, s.width, s.height, s.depth);
-      end.setXYZ(i, t.x, t.light ? -.002 : .001, t.z); angle.setX(i, s.angle ?? 0);
+      end.setXYZ(i, t.x, t.light ? -.002 : .001, t.z);
+      angle.setXYZW(i, s.angle ?? 0, motion.timing?.start ?? 0, motion.timing?.end ?? 1, motion.timing?.lift ?? 0);
       color.setXYZ(i, t.ink.r, t.ink.g, t.ink.b);
       group.setXYZ(i, motion.x, motion.z, motion.settle);
       reveal.setXY(i, ...windows[i]);

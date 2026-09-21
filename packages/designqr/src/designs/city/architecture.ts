@@ -1,5 +1,6 @@
 import { BufferGeometry, Color, Float32BufferAttribute, ShapeUtils, Vector2, Vector3 } from 'three';
 import { cityNoise, type CityBuilding } from './layout.ts';
+import { cityFacadeVariation } from './building-variation.ts';
 import { CITY_PAVEMENT_HEIGHT, citySurfaceContainsBounds, roadMetres, type RoadPoint } from './road-network.ts';
 import { SHIBUYA_PALETTE as P, type ShibuyaPalette } from './palette.ts';
 import type { CitySignDesign } from './sign-artwork.ts';
@@ -136,10 +137,8 @@ export function buildCityArchitecturalModel(b: CityBuilding, palette: ShibuyaPal
     band(f, 0, 1, base, base + b.height, P[b.facade], 0);
     const floors = b.floors;
     const floorHeight = b.height / floors;
-    const rhythm = cityNoise(edge * 43 + 19, b.detailSeed);
-    const columns = Math.max(1, Math.floor(f.length / roadMetres(qfront ? 1.6 : 2.1 + rhythm * 1.8)));
-    const inset = .08 + rhythm * .16;
-    const sill = .16 + cityNoise(edge * 43 + 23, b.detailSeed) * .22;
+    const { bayMetres, inset, sill } = cityFacadeVariation(edge, b.detailSeed);
+    const columns = Math.max(1, Math.floor(f.length / roadMetres(qfront ? 1.6 : bayMetres)));
     // Crossing-facing shopfronts.
     band(f, .025, .975, base + roadMetres(.5), base + Math.min(roadMetres(3.4), b.height * .65), P.windowLight);
     for (let floor = 0; floor < floors; floor++) {

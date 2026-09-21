@@ -1,0 +1,142 @@
+Dotonbori source-study artwork — source notice
+
+Building and road geometry: Osaka City / MLIT Urban Bureau, Project PLATEAU,
+27100_osaka-shi_city_2025_citygml_1_op, mesh 52350400.
+Catalog: https://api.plateauview.mlit.go.jp/datacatalog/citygml/27100
+Source policy: https://www.mlit.go.jp/plateau/site-policy/
+
+Water-area plan: Geospatial Information Authority of Japan (GSI), WA layer.
+Source information: https://maps.gsi.go.jp/development/ichiran.html
+Source policy: https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html
+
+Ebisubashi main-deck dimensional envelope: Osaka City, March 2008 completion
+drawings, recovered from the municipal document archive:
+https://web.archive.org/web/20230805233636id_/https://www.city.osaka.lg.jp/kankyo/cmsfiles/contents/0000580/580243/siryou3.pdf
+
+Modifications: horizontal projection, a 160 m crop centered at longitude
+135.50125 / latitude 34.66905, triangulation, crop caps, uniform scaling and
+diagnostic palette shading. The full research master retains 73 building
+objects. The player uses a 144 m square centered on Ebisubashi at local
+E4.196907/N2.163932, rotated 45 degrees across the QR tile. The extended source
+inventory has 132 buildings in original coordinates. The compact product retains
+58 after eight small edge omissions and six context omissions around Donki.
+Donki's complete B092 assembly translates 80 m west as an explicitly authored
+composition; shapes, heights and facing directions of all eight landmarks remain.
+The river, road alignment and bridge registration remain source-based. The
+extended source solids use the same source building and road GML.
+The bridge study interpolates published profile levels, converts O.P. to T.P.
+using O.P. minus 1.3 m, and registers its plan against audited road vertices.
+
+Reference-directed detail added September 2026:
+- Riverwalk: Osaka City's standard section and CTI Engineering's bridge photo.
+  https://www.city.osaka.lg.jp/kensetsu/page/0000010881.html
+  https://www.ctie.co.jp/english/project/project648.html
+- DOTON: Ipponmatsu Shipping's fleet gallery, photographs and advertising
+  document (2020-03-05, printed page 04, embedded 2016 general arrangement).
+  https://www.ipponmatsu.co.jp/gallery/?id=anker03
+  https://www.ipponmatsu.co.jp/assets/pdf/business-advertisement.pdf
+  Drawing: 16.4 m overall, 15.4 m between perpendiculars, 3.6 m beam.
+  Current gallery capacity 60 differs from the older drawing's 80 passengers.
+- Glico: owner's 20.00 m by 10.38 m sign dimensions and frontal photograph.
+  https://www.glico.com/jp/health/contents/glicosign/
+- Night frontages and illumination: Osaka Convention & Tourism Bureau feature,
+  published 2026-01-07; photographs inspected 2026-09-11, capture dates unknown.
+  https://discover.osaka-info.jp/jp/articles/osaka-night-view
+  Manual frontage fits follow source envelopes; sign illustrations, window
+  lighting and water reflections are original simplified interpretations.
+
+- Ground-floor shop context: Nankai / Tonbori Riverwalk walking guide and Osaka
+  Prefecture's Kukuru main-store feature, inspected 2026-09-11.
+  https://www.tonbori.jp/osanpo/
+  https://osaka-shotengai-info.com/shop/takoyadotonbori-kukuru-honten/
+  Cooking and shop character direct original miniature counter/display fittings.
+  Generic uses, menus, noren, lanterns and retail merchandise are interpretations,
+  not verified tenant assignments. Photos are neither packed nor redistributed.
+  The same context now directs all eligible exposed ground-floor fronts,
+  including side/rear shops, lobbies, closed shutters and service finishes.
+  Those uses vary with QR content and do not extend photographic coverage.
+  Source-ground levels are retained; doors require modeled pavement support.
+  Partial-wall details clip to source triangles and shared walls stay structural.
+- B046 restaurant windows: Kani Doraku main-store owner photographs of first-floor
+  chair seating and the elevator-hall crab tank, inspected 2026-09-11.
+  https://douraku.co.jp/kansai/honten/
+  https://douraku.co.jp/lacne/api/shop/honten/
+  The owner's location and a historical Asahi-sign report corroborate the host:
+  https://news.nissyoku.co.jp/news/nss-8065-0059 (1996-07-10).
+  Tables, framed lamps and the small crab-tank display are original miniature
+  geometry; exact window layouts and tank visibility are interpretations.
+  B049's cafe is unverified context. North forecourts fill a source-clipped display
+  terrain gap, not a surveyed plaza. No owner photograph is redistributed.
+
+- Facade completion: owner street/corner photo and Tourism Bureau east-approach
+  photo re-inspected 2026-09-20; source hashes and limits in facade-reference.json.
+  https://douraku.co.jp/area/shop/photo/?shop_id=1
+  https://douraku.co.jp/lacne/photo/upload/OYRbCZyjstBd8H4l.jpg
+  https://d3ed8zo3ba2djd.cloudfront.net/tombori_river_cruise_03.webp
+  B046-south's entrance/eave, panels, inset windows and corner framing use
+  interpreted proportions on the original oblique source wall. The street datum
+  remains unresolved; the exterior crab is described in the later refinement
+  section below. B034's closed ribs
+  and glazing follow source sloped triangles. Unphotographed rear elevations
+  remain unresolved. Perimeter mineral finishes describe model sections only.
+
+- Riverbank sign completion: Tourism Bureau south-row/east-approach photographs
+  re-inspected 2026-09-20, together with Pip's owner photographs and Hana Langue's
+  product site. Reference files record exact image hashes and fitted wall panels.
+  https://www.pipjapan.co.jp/products/recommend/tokeidai/
+  https://www.pipjapan.co.jp/products/recommend/tokeidai/img/history_ph03.jpg
+  https://osaka-hanalangue.com/
+  Pip clock/sign, FANCL, Hana Langue, Snow Brand slogan, Salonpas and H&M fashion
+  panels use original paths and bundled lettering. Campaign dates, dimensions
+  and portraits remain interpreted. The Hana Langue advertisement does not
+  identify a modeled tenant; the clock is a fixed reference pose. Photographs
+  and third-party campaign assets are not redistributed.
+
+Boat, bridge fittings, bank strips, visitors and sign illustration are original
+miniature interpretations. Owner photographs and advertising PDF pages are not
+redistributed as textures. The Glico host/bottom are manual photo fits. Standard
+bank levels use O.P. minus 1.3 m; display water is the published range midpoint,
+not a local observation. People and boat motion are representative, not a dated
+traffic record. Colors map to the repository palette, not surveyed finishes.
+
+This artwork remains an incomplete source-based miniature, not a finished
+surveyed reconstruction, navigation map or engineering model. Local vertical
+registration, the 31 mm bridge profile/section discrepancy, finished surfaces,
+outer bypass/approach ramps, detailed supports and unobserved facades remain open.
+The night scene combines references and does not assert a single capture date.
+The current composition retains all 58 selected source buildings, including the
+Glico-side block, with complete attached detail. All buildings use
+source footprints; eight photo-directed hosts retain source dimensions.
+Other runtime heights, window bays, glazing, floor rhythms, roof equipment and
+original campaigns are QR-generated artistic choices using Shibuya's shared
+rules, not inferred measurements or an inventory of real Osaka businesses.
+Source masters preserve original metric geometry; the focused GLB records the
+separate Donki presentation translation without changing its source shape.
+Photographed brand names and signs do not imply endorsement by their owners.
+
+The package code's MIT license does not replace the original source terms.
+
+Ebisu Tower reference-directed geometry and motion, September 2026:
+- Don Quijote operator: store map, 77.4 m highest point, 10.5 m boarding,
+  32 cabins and a 15-minute ride.
+  https://www.donki.com/store/map.php?shop_id=110
+  https://www.donki.com/kanransha/
+- Intamin manufacturer: fixed oval track, mounting, cabins and central relief.
+  https://www.intamin.com/project/yebisu-tower-osaka/
+The attraction uses its identified PLATEAU host with an explicit 80 m west
+presentation translation for the compact composition. Track
+width/depth, cabins, relief and shop fittings are interpreted proportions.
+Photographs are inspected references, not redistributed textures. The runtime
+uses the existing Osaka palette and 32 upright cabins on a 900-second circuit.
+Foreground context heights are static artistic choices for river visibility.
+
+Kani Doraku exterior sign and dining-window refinement, September 2026:
+- Owner street/interior photographs and third-generation sign description:
+  https://douraku.co.jp/area/shop/photo/?shop_id=1
+  https://prtimes.jp/main/html/rd/p/000000037.000093595.html
+- WSTV original main-store motion footage, listed 2010-04-13:
+  https://www.wstv.jp/localities/interesting_signs.html
+  https://www.youtube.com/watch?v=NQJvmAcijck
+The original crab geometry fits the registered street wall. Its 12-second
+movement and shallow interior layouts are authored interpretations, not current
+mechanism measurements or surveyed floor plans. Reference media is not bundled.

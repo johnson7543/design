@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Minus, Plus, X, ZoomIn } from 'lucide-react';
+import { Minus, Plus, Waves, X, ZoomIn } from 'lucide-react';
 import { PREVIEW_ZOOM_MIN } from 'designqr/editor';
 import { EDITOR_PREVIEW_ZOOM_MAX } from '../editor/preview-zoom';
 
@@ -10,9 +10,10 @@ export interface PreviewZoomControlsProps {
   onClose: () => void;
   onStep: (direction: number) => void;
   onReset: () => void;
+  onRiverView?: () => void;
 }
 
-export function PreviewZoomControls({ scale, isOpen, onToggle, onClose, onStep, onReset }: PreviewZoomControlsProps) {
+export function PreviewZoomControls({ scale, isOpen, onToggle, onClose, onStep, onReset, onRiverView }: PreviewZoomControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const percent = `${Math.round(scale * 100)}%`;
@@ -76,8 +77,17 @@ export function PreviewZoomControls({ scale, isOpen, onToggle, onClose, onStep, 
               <Plus size={16} aria-hidden="true" />
             </button>
           </div>
+          {onRiverView && (
+            <button type="button" className="preview-zoom-action preview-river-view" onClick={() => {
+              onRiverView(); onClose(); toggleRef.current?.focus({ preventScroll: true });
+            }}>
+              <Waves size={16} aria-hidden="true" /> River view
+            </button>
+          )}
           <p className="preview-zoom-help">Pinch to zoom and pan. Mouse: scroll to zoom, Shift + drag to pan. Keys: + / − / 0.</p>
-          <p className="preview-zoom-note">View only · exports and embeds unchanged.</p>
+          <p className="preview-zoom-note">{onRiverView
+            ? 'Zoom does not affect exports. River view changes the 3D export angle.'
+            : 'View only · exports and embeds unchanged.'}</p>
         </div>
       )}
     </div>

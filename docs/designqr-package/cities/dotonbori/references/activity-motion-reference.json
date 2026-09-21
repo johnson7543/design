@@ -1,0 +1,92 @@
+{
+  "schema": "designqr-dotonbori-activity-motion-reference",
+  "version": 3,
+  "reviewed": "2026-09-18",
+  "status": "Implemented two distinct shop scenes, bridge/boat reactions, three moving crabs and destination-based bridge visits.",
+  "sources": [
+    {
+      "id": "S15 / M7",
+      "url": "https://osaka-shotengai-info.com/shop/takoyadotonbori-kukuru-honten/",
+      "supports": "Local takoyaki preparation and food-service character, retained in the existing source ledger and night reference.",
+      "limits": "Does not establish B041 as Kukuru, a river-facing cooking station, an interior layout or the modeled preparation/handoff behavior. B037 and B041 remain interpreted food counters."
+    },
+    {
+      "id": "M8",
+      "url": "https://www.tonbori.jp/osanpo/",
+      "supports": "The riverwalk operator describes restaurants accessible from the promenade.",
+      "limits": "Does not register the modeled bays or specify their door mechanisms. No door motion or steam was added."
+    },
+    {
+      "id": "S13 / M6",
+      "url": "https://www.ipponmatsu.co.jp/cruise/tombori.html",
+      "supports": "The operator's guide-led river cruise, the existing DOTON interpretation and its passage through the bridge area.",
+      "limits": "Individual visitors, phones, greetings and wave timing are authored representative activity. No observed participants or gesture footage is claimed. The model retains 26 representative seated passengers."
+    },
+    {
+      "id": "S16 / M3",
+      "url": "https://douraku.co.jp/about/",
+      "supports": "The owner describes live-crab tanks; S16 and night-reference.json retain the inspected first-floor tank photographs.",
+      "limits": "The existing B046-west window placement is an interpretation. Crab shape, size, gait and timing are illustrative. This is separate from the separately registered exterior moving-crab landmark (kani-sign-reference.json)."
+    }
+  ],
+  "anchors": {
+    "prep": "B041's existing counter role and work surface. One blue-shirted worker with an apron and preparation pick; shallow upper body fits above the worktop.",
+    "service": "B037's existing counter role. One ivory-shirted server and coral-shirted customer exchange a tray with three food pieces. The customer moves sideways within the same bay on supported upper-walk pavement.",
+    "visitors": "Existing stationary bridge visitors 45 and 48 use phones; visitor 50 turns toward and greets the passing boat. Original arms are replaced; positions and crowd count stay fixed.",
+    "passenger": "One existing passenger at boat-local (-1.96, 0, 1.25) m replaces its rigid body with an articulated seated pose. The seat and passenger count remain unchanged.",
+    "tank": "The existing B046-west tank bay keeps its frame and pedestal; three articulated crabs replace the old rigid shapes.",
+    "coordinates": "Use the actual fitted source-wall U, height and outward normal, including the reversed U direction relative to Three.js local X. Reflected geometry retains outward triangle winding and vertex paint."
+  },
+  "authoredMotion": {
+    "bridgeJourneys": "Eight visitors cross between the bridge approaches, four make short river-view visits and four wait and shift position near the approaches. Independently phased trips ease into destination holds (8–32 seconds for crossers, 19–44 seconds for local visitors), with three-second turns in place before departure and small head movements while waiting. No oval walking laps, respawns or position resets. These roles, routes and timings are authored; no observed pedestrian trajectories are claimed.",
+    "preparationSeconds": 23,
+    "serviceSeconds": 40,
+    "service": "Customer approaches, receives the tray, steps aside to hold it, returns it and steps aside. Hands continuously support the tray. Neither food nor tray disappears or teleports at the loop boundary.",
+    "phoneSeconds": [
+      26,
+      33
+    ],
+    "greetingEnvelopeSeconds": 9,
+    "greetingProximityM": {
+      "offAtOrBeyond": 28,
+      "fullAtOrWithin": 12
+    },
+    "greeting": "The bridge visitor and passenger use staggered gestures, gated by boat proximity. Phones have separate readable holds and never flash.",
+    "crabSeconds": [
+      21,
+      27,
+      33
+    ],
+    "crab": "Each crab makes short sideways movements over a 0.07 m span, with small jointed leg lifts, claw opening and quiet intervals. Timings and amplitudes are not measurements of live animals.",
+    "clock": "All use the existing per-player scene clock. Pause, reduced motion and either QR turn direction freeze the evaluated state. Content edits retain the time and private materials."
+  },
+  "clearance": {
+    "bridge": "Separate swept paths leave passing space and avoid the existing eight stationary bridge viewers. All walking leg corners are checked against the source bridge deck triangles; moving body parts and bags are checked against the other visitors over repeated trips.",
+    "shops": "Workers clear the solid backing and stay above the worktop. Staff/customer vertices stay within their fitted counter bay and away from the adjacent entrance. Customer path support is checked before creating the scene.",
+    "tank": "All crab vertices stay above the 0.975 m pedestal top and below the 1.275 m upper frame, measured from the storefront base. Depth stays between the backing and the 0.55 m front clearance limit.",
+    "boat": "The waving passenger stays inside the side railing and above the deck. The boat's existing route and tile clipping apply to its moving body parts."
+  },
+  "integration": {
+    "rendering": "Three retained vertex batches: owned shop/tank activity, bridge arms/phones and one boat-local passenger. No additional textures or per-frame geometry allocation. Vertex colors use the existing Osaka palette and derived shading.",
+    "ownership": "Shop/crab triangles retain source-host ownership. All hosts and actors stay present at every 3D rotation and throughout both QR transformation directions.",
+    "reservedParts": {
+      "shopAndCrab": 95,
+      "bridgeArmsAndPhones": 22,
+      "passenger": 11,
+      "participatingVisitorBodies": 18,
+      "maximum": 146
+    },
+    "morph": "Every body, utensil, tray item, crab limb and phone carries its full current geometry and vertex paint into area-conserving QR surface transport. Boat parts use their actual frozen transform and crop. No detail sampling cap or QR ink change applies.",
+    "review": "Geometry tests cover source fitting, prop support/contact, bay/tank/boat clearance, independent clocks, quiet intervals, dense QR edits, visibility, reversals and disposal. Browser captures verify each action changes pixels while reusing resources and freezes through both QR directions.",
+    "staticReview": "The editable Blender review captures the current runtime geometry at time zero. Browser captures document the animation; source building and bridge GLBs retain their metric geometry."
+  },
+  "sourceFiles": [
+    "packages/designqr/src/designs/city/dotonbori-action-batch.ts",
+    "packages/designqr/src/designs/city/dotonbori-shop-activity.ts",
+    "packages/designqr/src/designs/city/dotonbori-reactions.ts",
+    "packages/designqr/src/designs/city/dotonbori-storefronts.ts",
+    "packages/designqr/src/designs/city/dotonbori-facades.ts",
+    "packages/designqr/src/designs/city/dotonbori-activity.ts",
+    "packages/designqr/src/renderer/webgl/DotonboriScene.ts"
+  ]
+}

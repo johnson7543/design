@@ -172,11 +172,11 @@ async function verifyCityPresetSelection(page) {
     };
   });
   const initial = await readSelection();
-  assert.equal(initial.label, 'Shibuya');
+  assert.equal(initial.label, '渋谷');
   assert.equal(initial.selected, 'true');
   assert.equal(initial.active && initial.enabled && initial.aligned, true, 'The City preset must use the standard selected chip and preset row.');
   assert.equal(initial.focusUnclipped, true, 'The City preset row must not clip its keyboard focus ring.');
-  assert.equal(initial.presetCount, 1, 'City must expose only its implemented Shibuya preset.');
+  assert.equal(initial.presetCount, 3, 'City must expose 渋谷, 道頓堀 and 東京タワー.');
   await page.click(selector);
   await page.focus(selector);
   for (const key of ['Enter', 'Space']) await page.keyboard.press(key);
@@ -293,7 +293,7 @@ try {
     await load(page, configUrl('/qr'));
     assert.equal(await page.$eval('.design-type-tabs button:nth-child(2)', button => button.getAttribute('aria-pressed')), 'true');
     assert.equal(await page.$eval('.mode-btn[title="3D City"]', button => button.textContent.trim()), '3D City');
-    assert.equal(await page.$eval('.designqr-root', stage => stage.getAttribute('aria-label').includes('Shibuya city')), true);
+    assert.equal(await page.$eval('.designqr-root', stage => stage.getAttribute('aria-label').includes('渋谷')), true);
     assert.equal(await page.$('[aria-label="Add Theme"]'), null, 'City must not offer custom themes.');
     assert.equal(await page.$('.custom-themes-row'), null);
     await verifyCityPresetSelection(page);

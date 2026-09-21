@@ -1,0 +1,73 @@
+{
+  "schema": "designqr-dotonbori-kani-sign-reference",
+  "version": 1,
+  "reviewed": "2026-09-20",
+  "status": "Implemented the source-fitted street crab, six uplights and refined first-floor dining windows.",
+  "references": [
+    {
+      "id": "S19/F1",
+      "publisher": "Kani Doraku, main-store owner",
+      "pageUrl": "https://douraku.co.jp/area/shop/photo/?shop_id=1",
+      "imageUrl": "https://douraku.co.jp/lacne/photo/upload/OYRbCZyjstBd8H4l.jpg",
+      "sha256": "7420f57d9c8a0627f5c068cd2331af2bb06d8f0fb430640eeda90ff7cd4b660a",
+      "observed": "The crab is mounted on the pale folded street elevation above the tiled entrance eave, below the window band. Six separate floodlights project in front of its lower edge.",
+      "captureDate": null
+    },
+    {
+      "id": "S23-A",
+      "publisher": "Kani Doraku, owner press release",
+      "pageUrl": "https://prtimes.jp/main/html/rd/p/000000037.000093595.html",
+      "publicationDate": "2025-01-28",
+      "imageUrl": "https://prcdn.freetls.fastly.net/release_image/93595/37/93595-37-d9ec134d2d0f793c70f334c7b80c4851-720x479.jpg",
+      "bytes": 61668,
+      "sha256": "7a5b7ebb2b92798bb9b7d63b88f1d21f4af0934f9fc5db7aac903e12e56d4594",
+      "dimensions": [720, 479],
+      "visuallyInspected": true,
+      "captureDate": null,
+      "observed": "Third-generation main-store crab: rounded tapering carapace with raised texture, eight folded legs with pale joints, two raised inward-facing pincers, stalked dark eyes and six uplights.",
+      "limits": "Photo proportions and feature count, not surveyed dimensions. The release's general discussion of leg mechanisms does not measure this sign's cycle."
+    },
+    {
+      "id": "S23-B",
+      "publisher": "Walker Station TV / WSTV1, original filmed site visit",
+      "pageUrl": "https://www.wstv.jp/localities/interesting_signs.html",
+      "videoUrl": "https://www.youtube.com/watch?v=NQJvmAcijck",
+      "listingDate": "2010-04-13",
+      "downloadFormat": "134, 640x360, video only",
+      "bytes": 2190065,
+      "sha256": "adf7091a4949f8e53eecb57b9321fe19d1d304e50ed50ac8725c28b60a2380aa",
+      "inspectedSeconds": [8, 12, 16, 22, 28, 34, 40],
+      "visuallyInspected": true,
+      "observed": "Main-store fascia and street elevation match the owner stills. The carapace stays still, folded legs sweep slowly, and the raised pincers open and close. The 28/34/40-second close views show changing claw gaps and leg angles.",
+      "limits": "Historical footage establishes movement type. The model's 12-second period, amplitude and phase offsets are authored; current motor timing and precise hinge depths remain unmeasured."
+    },
+    {
+      "id": "S16 dining, re-inspected",
+      "publisher": "Kani Doraku, main-store owner",
+      "imageUrl": "https://douraku.co.jp/lacne/photo/upload/NQUwFpjg6PbsmzO1.jpg",
+      "bytes": 244735,
+      "sha256": "e725184ef452298a0c7d2846066114304bcf6064a4d720f9a4e7274371e9d567",
+      "observed": "Pitched dark-framed pendant lamps, timber ceiling beams, upholstered chairs, ceramic pots, paper settings and chopstick holders beside frosted lower windows.",
+      "limits": "Supports individual fittings. Shallow window staging, table locations and compressed depth are interpretations, not the actual floor plan."
+    }
+  ],
+  "registration": {
+    "front": "B046-south",
+    "outwardNormalEastNorth": [-0.19226348, -0.98134334],
+    "sourceFloorTPM": 1.26,
+    "centerAboveSourceFloorM": 5.13,
+    "reservedAlongWallM": [-3.7, 3.7],
+    "reservedAboveSourceFloorM": [3.65, 7.44],
+    "maximumProjectionM": 1.6,
+    "method": "Owner-photo proportions fitted between the existing eave and first window band on the registered oblique source wall. This is not calibrated photogrammetry.",
+    "clearance": "Full-cycle vertices remain inside the street-wall reservation, outside the wall finish and clear of neighbouring source buildings. Floodlights stay below the carapace and outside its moving legs.",
+    "openingView": "The river-side opening camera sees the opposite side of the host. Orbit to the street side to inspect the crab; no duplicate river-facing sign or camera-dependent hiding is added."
+  },
+  "runtime": {
+    "geometry": "Closed carapace, eight articulated folded legs, two closed palms with separately moving tapered fingers, eye stalks and shell nodules in one retained vertex batch. The bracket and uplights use the existing static frontage batch.",
+    "clock": "Shared private scene activity clock. Pause and reduced motion freeze it; QR turns capture the complete current pose and do not advance it. Content edits retain phase and material identity.",
+    "qr": "All drawn triangles, including hidden/back faces, become owned QR surface patches. No sampled part cap, substitute icon or disappearing mesh.",
+    "palette": "Existing coral/charcoal shell blends, coral/ivory joints and fingers, charcoal eyes, ivory glints, metal brackets and warmWindow lights. Dining timber and wall tones derive only from existing gold, charcoal and stone.",
+    "photographPolicy": "Reference photos and video remain outside the repository. Runtime geometry is original; no source media is bundled as artwork."
+  }
+}

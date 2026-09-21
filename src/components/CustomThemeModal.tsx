@@ -15,7 +15,7 @@ import {
   type TreeShapeStyle,
 } from 'designqr/editor';
 import type {
-  DesignQRThemePreset,
+  DesignQRTreePreset,
 } from 'designqr/config';
 import type { CustomTheme } from '../editor/types';
 
@@ -29,7 +29,7 @@ interface CustomThemeModalProps {
 }
 
 interface MultiFoliagePreset {
-  preset: Exclude<DesignQRThemePreset, 'shibuya'>;
+  preset: DesignQRTreePreset;
   emoji: string;
   name: string;
   main: string;
@@ -51,7 +51,7 @@ const MULTI_FOLIAGE_PRESETS: MultiFoliagePreset[] = [
 ];
 
 interface MultiGroundPreset {
-  preset: Exclude<DesignQRThemePreset, 'shibuya'>;
+  preset: DesignQRTreePreset;
   emoji: string;
   name: string;
   base: string;
@@ -66,7 +66,7 @@ const MULTI_GROUND_PRESETS: MultiGroundPreset[] = [
 ];
 
 interface MultiGrassPreset {
-  preset: Exclude<DesignQRThemePreset, 'shibuya'>;
+  preset: DesignQRTreePreset;
   emoji: string;
   name: string;
   lawn: string;
@@ -127,7 +127,7 @@ const DERIVE_GROUND_FEATURE_COLOR_ROLES = {
 } satisfies Partial<CustomTheme>;
 
 function getFoliagePresetRoles(
-  preset: Exclude<DesignQRThemePreset, 'shibuya'>
+  preset: DesignQRTreePreset
 ): Partial<CustomTheme> {
   const theme = TREE_THEME_PRESETS[preset];
   return {
@@ -152,7 +152,7 @@ function getFoliagePresetRoles(
 }
 
 function getGroundPresetRoles(
-  preset: Exclude<DesignQRThemePreset, 'shibuya'>
+  preset: DesignQRTreePreset
 ): Partial<CustomTheme> {
   const theme = TREE_THEME_PRESETS[preset];
   return {
@@ -167,7 +167,7 @@ function getGroundPresetRoles(
 }
 
 function getGroundFeaturePresetRoles(
-  preset: Exclude<DesignQRThemePreset, 'shibuya'>
+  preset: DesignQRTreePreset
 ): Partial<CustomTheme> {
   const theme = TREE_THEME_PRESETS[preset];
   return {

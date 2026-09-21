@@ -1,0 +1,155 @@
+{
+  "schema": "designqr-city-startup-audit",
+  "reviewed": "2026-09-22",
+  "version": "0.2.1",
+  "status": "loading-size blocker resolved; full local staged-source gates passed; Pixel 7 Pro visual/scan feedback positive; iPhone and remote final-commit CI pending",
+  "method": "Static relative ESM import/export closure; gzip level 9 per file; external peers and dynamic imports excluded.",
+  "budgetGzipBytes": 65536,
+  "published020": {
+    "entry": "designqr.js",
+    "method": "Static relative ESM import/export closure; gzip level 9 per file; external peers and dynamic imports excluded.",
+    "bytes": 877980,
+    "gzipBytes": 216572,
+    "files": [
+      {
+        "file": "designqr.js",
+        "bytes": 846825,
+        "gzipBytes": 206357
+      },
+      {
+        "file": "codec-BwXgr5SM.js",
+        "bytes": 16364,
+        "gzipBytes": 5285
+      },
+      {
+        "file": "url-D0Zb7Jzr.js",
+        "bytes": 7816,
+        "gzipBytes": 2709
+      },
+      {
+        "file": "BufferGeometryUtils-H8RlQyKX.js",
+        "bytes": 5782,
+        "gzipBytes": 1640
+      },
+      {
+        "file": "previewZoom-v-TV98X0.js",
+        "bytes": 1193,
+        "gzipBytes": 581
+      }
+    ]
+  },
+  "earlier021": {
+    "entry": "designqr.js",
+    "method": "Static relative ESM import/export closure; gzip level 9 per file; external peers and dynamic imports excluded.",
+    "bytes": 6612045,
+    "gzipBytes": 1117484,
+    "files": [
+      {
+        "file": "designqr.js",
+        "bytes": 6579671,
+        "gzipBytes": 1106777
+      },
+      {
+        "file": "codec-C97kgJFZ.js",
+        "bytes": 17583,
+        "gzipBytes": 5776
+      },
+      {
+        "file": "url-CahQoiU3.js",
+        "bytes": 7816,
+        "gzipBytes": 2710
+      },
+      {
+        "file": "BufferGeometryUtils-H8RlQyKX.js",
+        "bytes": 5782,
+        "gzipBytes": 1640
+      },
+      {
+        "file": "previewZoom-v-TV98X0.js",
+        "bytes": 1193,
+        "gzipBytes": 581
+      }
+    ]
+  },
+  "optimized021": {
+    "entry": "designqr.js",
+    "method": "Static relative ESM import/export closure; gzip level 9 per file; external peers and dynamic imports excluded.",
+    "bytes": 162783,
+    "gzipBytes": 46661,
+    "files": [
+      {
+        "file": "designqr.js",
+        "bytes": 129744,
+        "gzipBytes": 34720
+      },
+      {
+        "file": "codec-C97kgJFZ.js",
+        "bytes": 17583,
+        "gzipBytes": 5776
+      },
+      {
+        "file": "url-CahQoiU3.js",
+        "bytes": 7816,
+        "gzipBytes": 2710
+      },
+      {
+        "file": "morph-state-DoN7T5pA.js",
+        "bytes": 5842,
+        "gzipBytes": 2499
+      },
+      {
+        "file": "tokyo-tower-palette-Bt4fml0a.js",
+        "bytes": 605,
+        "gzipBytes": 375
+      },
+      {
+        "file": "previewZoom-v-TV98X0.js",
+        "bytes": 1193,
+        "gzipBytes": 581
+      }
+    ]
+  },
+  "reductionPercent": 95.82,
+  "package": {
+    "files": 323,
+    "packedBytes": 5475524,
+    "unpackedBytes": 29639859,
+    "sha256": "55f160c1b079ed48ea4d3fe06e681f36236fd0a9fef6ae351798def7329f9cee"
+  },
+  "sourceSha256": {
+    "packages/designqr/src/renderer/webgl/LazyCityScene.ts": "f7bd017252b7e77e2fcae7ab4c6218fff5f65cf88b3b6ca84d00a308e34755a6",
+    "packages/designqr/src/renderer/webgl/ThreeFallbackRenderer.ts": "fcda467116bc4887324f0ae33204efd043075ca0d70552782b86cd73f840ce25",
+    "packages/designqr/src/designs/city/camera.ts": "a565ace7b3cf5b04fcf73f6df34e352d3fc51bdc11cf43e9953c1f5ea62bcbb5",
+    "packages/designqr/src/designs/city/morph-state.ts": "e5686af5e73a36f47d6289dd031d37bc4145c3f3a0d91f6ee24e83667864a1fb",
+    "scripts/check-city-startup.mjs": "f42bebd45e1b3cadfae86d6872402cd50a9fedf629d99043f51f1543faf6b80f"
+  },
+  "limits": [
+    "Excludes external peer dependencies, dynamically imported chunks, images, source maps and browser overhead.",
+    "Not a network timing, peak memory or real-device frame-rate measurement.",
+    "The tarball still contains every city."
+  ],
+  "validation": {
+    "packageUnitTests": "passed",
+    "loaderLifecycleCases": 5,
+    "loaderLifecycle": "passed",
+    "shibuyaContentAndDisposal": "passed (23 edits)",
+    "reactConsumer": "passed",
+    "hostedPlayer": "passed",
+    "cityEditor": "passed",
+    "tokyoTower": "passed",
+    "dotonboriEditor": "passed",
+    "dotonboriScene": "passed",
+    "dotonboriSceneReport": "/tmp/dotonbori-scene-Doh8Pc/report.json",
+    "installedPackage": "passed",
+    "installedPackageArtifacts": "/tmp/designqr-city-package-FZE9pf",
+    "freshInstallBuild": "passed",
+    "physicalDevices": "pending",
+    "codeLoadingCases": 9,
+    "failedCodeQrAndPngExport": "passed for all three cities",
+    "freshAndFinalTarballHashesMatch": true,
+    "runtimeMatchesBrowserTestedTarball": true,
+    "changesAfterBrowserQualification": [
+      "package/README.md"
+    ]
+  }
+}

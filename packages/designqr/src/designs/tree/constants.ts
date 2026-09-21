@@ -135,7 +135,8 @@ export function resolveQR2DLightDisplayRgb(hex: string): [number, number, number
   ];
 }
 
-export const VIEW_TRANSITION_DURATION_SECONDS = 5 / 9;
+// Rebase 1× to the former 0.75× pace: (5 / 9) / 0.75 seconds.
+export const VIEW_TRANSITION_DURATION_SECONDS = 20 / 27;
 export const VIEW_TRANSITION_SPEED_MIN = 0.25;
 export const VIEW_TRANSITION_SPEED_MAX = 2;
 export const VIEW_TRANSITION_SPEED_STEP = 0.25;

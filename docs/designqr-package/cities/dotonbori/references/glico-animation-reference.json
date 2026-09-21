@@ -1,0 +1,119 @@
+{
+  "schema": "designqr-dotonbori-glico-animation-reference",
+  "version": 4,
+  "reviewed": "2026-09-20",
+  "status": "Implemented reference-directed LED illustration with authored timing; not a reconstruction of the current advertising playlist.",
+  "source": {
+    "ledgerId": "S17",
+    "url": "https://www.sign-jp.org/98/neos149/museum.html",
+    "title": "NEOS 149 — sixth-generation Osaka Dotonbori Glico sign",
+    "credits": "Ezaki Glico marketing/public relations; cooperation by Asahi Denso",
+    "publication": "2015 issue; photograph capture dates are unverified",
+    "inspected": "Article and downloaded still photographs visually inspected on 2026-09-15. No motion footage inspected.",
+    "photographs": [
+      {
+        "url": "https://www.sign-jp.org/98/neos149/img/museum1.jpg",
+        "pixels": [
+          200,
+          300
+        ],
+        "bytes": 27379,
+        "sha256": "92e0761113aaaff5f195c402a169fbcba4e51f89f3c2e76615ee354815285b14",
+        "observed": "Daylight view of blue track rays, a red disk and the raised-arm runner."
+      },
+      {
+        "url": "https://www.sign-jp.org/98/neos149/img/museum2.jpg",
+        "pixels": [
+          200,
+          300
+        ],
+        "bytes": 21110,
+        "sha256": "db1688c38e97ea3d36f32e437ab8e497eb7954f312f4ebf3d88fc25356403baf",
+        "observed": "Nighttime view of the illuminated track artwork."
+      },
+      {
+        "url": "https://www.sign-jp.org/98/neos149/img/museum11.jpg",
+        "pixels": [
+          160,
+          250
+        ],
+        "bytes": 14084,
+        "sha256": "f9c65feffc36b5d148da2f2016d28ac203ca7dd25c8efcd1eb2a8f1deddb7f43",
+        "observed": "A rainbow arch above the runner, pale distant scenery and a road in perspective."
+      },
+      {
+        "url": "https://www.glico.com/assets/images/large/%E3%82%B0%E3%83%AA%E3%82%B3%E3%82%B5%E3%82%A4%E3%83%B3%E3%83%9A%E3%83%BC%E3%82%B8%E3%83%98%E3%83%83%E3%83%80%E3%83%BC%E7%94%BB%E5%83%8F.jpg",
+        "pixels": [
+          800,
+          533
+        ],
+        "bytes": 127043,
+        "sha256": "25cb2ca0623735cc961c1650546fbb234bc046b3a3f603abe1ef7a0db849a317",
+        "observed": "Owner frontal daylight still: raised fists, tapered arms and calves, facial and garment contours, a bent calf tucked behind the forward thigh and dark shoes. Inspected 2026-09-20; capture date unknown.",
+        "redistributed": false
+      }
+    ],
+    "ownerReferences": [
+      "https://www.glico.com/jp/newscenter/pressrelease/9609/",
+      "https://www.glico.com/jp/health/contents/glicosign/"
+    ]
+  },
+  "interpretation": {
+    "artwork": "Two original canvas illustrations retain the source-fitted 10.38 x 20 metre panel and current header from S6. The owner frontal still directs tapered limbs, asymmetric fists, face contours, shirt/short seams and shoes; the raised calf remains behind the thigh. Historical S17 photographs guide background motifs. No reference photos are redistributed or used as textures.",
+    "palette": "Existing Osaka blue/ivory/coral track roles; coral/gold/bay rainbow with a highRise road, blue/ivory scenery and the same runner/header. No additional base colors.",
+    "loopSeconds": 16,
+    "timeline": [
+      {
+        "seconds": [
+          0,
+          4
+        ],
+        "action": "Hold track"
+      },
+      {
+        "seconds": [
+          4,
+          6
+        ],
+        "action": "Ease from track to rainbow"
+      },
+      {
+        "seconds": [
+          6,
+          10
+        ],
+        "action": "Hold rainbow"
+      },
+      {
+        "seconds": [
+          10,
+          12
+        ],
+        "action": "Ease back to track"
+      },
+      {
+        "seconds": [
+          12,
+          16
+        ],
+        "action": "Hold track"
+      }
+    ],
+    "timingLimit": "Ordering, holds and crossfades are authored miniature choreography. The still photographs do not establish real motion, timing or today's sign program.",
+    "reflection": "Existing B040-owned reflection geometry uses the same phase: blue light moves toward bay, coral light toward gold, with the original water falloff and opacity shimmer. This is an illustrative light response, not measured illumination. Spatial drift and the spreading wake are now documented in water-motion-reference.json."
+  },
+  "runtime": {
+    "source": "packages/designqr/src/designs/city/dotonbori-glico-animation.ts",
+    "sourceBuilding": "bldg_dbb9aa26-307a-4437-9ae4-0bf14437c614",
+    "atlasPixels": [
+      1024,
+      987
+    ],
+    "storage": "One private atlas per player, with two 512 x 987 cells painted once; a shared phase uniform blends their samples. No per-frame canvas painting, texture upload or geometry rebuild.",
+    "clock": "Existing per-player activity clock; stops during pause, reduced motion and all QR transitions. Content edits preserve phase.",
+    "morph": "The complete Glico surface borrows the live atlas and frozen blend uniform. Its panel folds with a 0.12-tile lift; the frame, B031 campaigns and all reflection geometry also retain complete area correspondence.",
+    "ownership": "B040 owns the sign, frame and reflected light. All 58 selected hosts and their details stay present throughout rotation and both QR directions. The frozen artwork returns to settled 3D before animation resumes.",
+    "endpoint": "Glico, wheel, architecture and ground share one global clock. Geometry settles at 72–90% and paint at 54–90%. All transported surfaces reach exact QR cells/inks by 90%; the shared canonical layers finish their handoff at 100%.",
+    "staticReview": "The editable Blender review captures the current runtime geometry at time zero. Browser captures document the animation; source building and bridge GLBs retain their metric geometry."
+  }
+}

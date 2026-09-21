@@ -147,6 +147,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
       case 'winter':
         return <Snowflake size={15} />;
       case 'shibuya':
+      case 'dotonbori':
         return <Building2 size={15} aria-hidden="true" />;
       default:
         return <Flower2 size={15} />;
@@ -294,6 +295,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
             <button
               type="button"
               key={theme.id}
+              lang={designType === 'city' ? 'ja' : undefined}
               className={`season-chip ${activeThemeId === String(theme.id) ? 'active' : ''}`}
               onClick={() => onSelectTheme(String(theme.id))}
               aria-pressed={activeThemeId === String(theme.id)}

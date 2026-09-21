@@ -2,7 +2,7 @@ Noto Serif CJK JP: Copyright 2017–2024 Adobe (http://www.adobe.com/).
 Noto Sans CJK JP: Copyright 2014–2021 Adobe (http://www.adobe.com/).
 Source: https://github.com/notofonts/noto-cjk
 
-Only fitted glyph outlines used in the Shibuya station scene are included.
+Only fitted glyph outlines used in the Shibuya station and Dōtonbori sign scenes are included.
 
 This Font Software is licensed under the SIL Open Font License,
 Version 1.1.

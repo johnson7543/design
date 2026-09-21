@@ -39,9 +39,9 @@ import {
 } from '../src/designs/tree/themes.ts';
 import { resolveQRErrorCorrectionLevel } from '../src/designs/tree/qr.ts';
 
-test('uses the configured transition duration at 1x', () => {
+test('defaults to 1x at the former 0.75x transition pace', () => {
   assert.equal(VIEW_TRANSITION_SPEED_DEFAULT, 1);
-  assert.equal(VIEW_TRANSITION_DURATION_SECONDS, 5 / 9);
+  assert.ok(Math.abs(VIEW_TRANSITION_DURATION_SECONDS - (5 / 9) / 0.75) < 1e-12);
 });
 
 test('starts view transitions on the first frame and settles smoothly', () => {

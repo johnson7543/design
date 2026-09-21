@@ -1,3 +1,4 @@
+import { CITY_PRESETS } from '../designs/city/presets.ts';
 import React, {
   forwardRef,
   useCallback,
@@ -7,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { SHIBUYA_PALETTE } from '../designs/city/palette.ts';
 import type {
   AutoRotateDirection,
   DesignQRLogoOptions,
@@ -122,8 +124,8 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       transitionSpeed = VIEW_TRANSITION_SPEED_DEFAULT,
       logo = false,
       transparentBackground = false,
-      backgroundTop,
-      backgroundBottom,
+      backgroundTop: artworkBackgroundTop,
+      backgroundBottom: artworkBackgroundBottom,
       showQrDetails = false,
       qrTitle = '',
       qrTitleScale = DESIGN_QR_DETAIL_FONT_SCALE_DEFAULT,
@@ -147,6 +149,13 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       ?? systemPrefersReducedMotion;
     const qrLightColorTreatment = treeData.city ? 'exact' : 'lifted';
     const protectQrCardMargin = !!treeData.city;
+    const nightGlow = treeData.city?.preset === 'tokyo-tower' ? 'landmark'
+      : treeData.city?.preset === 'dotonbori' ? 'waterfront' : undefined;
+    // Match Shibuya's light scan atmosphere at the QR endpoint. The existing
+    // presentation gradient handles forward/reverse and reduced-motion changes.
+    const nightScan = treeData.city && CITY_PRESETS[treeData.city.preset ?? 'shibuya'].night && viewMode === 'scan';
+    const backgroundTop = nightScan ? SHIBUYA_PALETTE.sky : artworkBackgroundTop;
+    const backgroundBottom = nightScan ? SHIBUYA_PALETTE.dusk : artworkBackgroundBottom;
     const containerRef = useRef<HTMLDivElement>(null);
     const sourceCanvasRef = useRef<HTMLCanvasElement>(null);
     const presentationCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -172,6 +181,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       qrLightColor: theme.groundColor,
       qrLightColorTreatment,
       protectQrCardMargin,
+      nightGlow,
       showQrDetails,
       title: qrTitle,
       titleScale: qrTitleScale,
@@ -315,7 +325,9 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         renderManagerRef.current.resize(width, height);
         presentationSurfaceRef.current?.resize();
         zoomControllerRef.current?.resize();
-        if (presentationSurfaceRef.current?.hasPreviewZoom) renderManagerRef.current.invalidatePreview();
+        // Resizing clears the source buffer even at the default zoom. Redraw
+        // a paused frame after both canvases resize without advancing activity.
+        renderManagerRef.current.invalidatePreview();
       }
     }, []);
 
@@ -450,6 +462,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
         qrLightColor: theme.groundColor,
         qrLightColorTreatment,
         protectQrCardMargin,
+        nightGlow,
         showQrDetails,
         title: qrTitle,
         titleScale: qrTitleScale,
@@ -470,6 +483,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       qrContentScale,
       qrLightColorTreatment,
       protectQrCardMargin,
+      nightGlow,
       qrTitle,
       qrTitleScale,
       qrTitleColor,
@@ -725,7 +739,7 @@ export const DesignQRCanvas = forwardRef<DesignQRCanvasHandle, DesignQRCanvasPro
       ? `DesignQR code${qrTitle.trim() ? ` titled ${qrTitle.trim()}` : ''}${
           showQrContent ? ` for ${qrValue}` : ''
         }${logoDescription}`
-      : `DesignQR ${treeData.city ? 'Shibuya city' : 'tree'}${logoDescription}`;
+      : `DesignQR ${treeData.city ? CITY_PRESETS[treeData.city.preset ?? 'shibuya'].accessibleName : 'tree'}${logoDescription}`;
     const accessibleLabel = ariaLabel ?? (canToggle
       ? `Show ${viewMode === 'scan' ? 'design' : 'QR'} view. ${presentationLabel}`
       : presentationLabel);

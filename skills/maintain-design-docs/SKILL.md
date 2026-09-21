@@ -13,7 +13,7 @@ for the user to request a documentation pass.
 1. Read `docs/design-registry.json`.
 2. Match the affected route and source paths to a registered design.
 3. Read that design's index, style document, and color document before changing
-   visual behavior. Also read `docs/design-system/colors.md` when colors are in
+   visual behavior. Also read `docs/global-standards/colors.md` when colors are in
    scope.
 4. Treat shared-source changes as affecting every registered design that
    consumes them; review each applicable document.
@@ -60,7 +60,7 @@ architecture as proposed in a separate document.
 ## Color boundary
 
 Every repository-authored base color must already exist in
-`docs/design-system/colors.md`. A design document may assign approved colors to
+`docs/global-standards/colors.md`. A design document may assign approved colors to
 roles, but it cannot authorize a new base color. Add a global color only when
 the user explicitly requests a repository palette change. Runtime user-selected
 colors remain outside the authored allowlist.

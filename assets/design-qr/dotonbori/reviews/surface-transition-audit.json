@@ -1,0 +1,443 @@
+{
+  "schema": "designqr-dotonbori-surface-transition-review",
+  "reviewed": "2026-09-21",
+  "value": "https://example.com/dotonbori",
+  "environment": "Headless Chrome, ANGLE SwiftShader, device pixel ratio 2; viewport emulation, not physical phone GPU measurements.",
+  "opening": {
+    "elevationDegrees": 30,
+    "northOfEastDegrees": 65
+  },
+  "surfaces": {
+    "sourceTriangles": 392717,
+    "degenerateTriangles": 6,
+    "patches": 271856,
+    "bytes": 110541696,
+    "batches": 16,
+    "buildMs": 1181.9000000059605,
+    "wheelCells": [
+      80,
+      51,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      57,
+      86,
+      115,
+      144,
+      173,
+      202,
+      201,
+      200,
+      199,
+      198,
+      197,
+      196,
+      167,
+      138,
+      109,
+      82,
+      83,
+      84,
+      112,
+      113,
+      142,
+      141,
+      140,
+      111
+    ],
+    "cellCount": 841,
+    "coverageError": 8.393286066166183e-14,
+    "buildingCount": 58
+  },
+  "decodedBeforeCanonicalHandoff": "https://example.com/dotonbori",
+  "identicalForwardReversePoses": 12,
+  "playback": [
+    {
+      "width": 960,
+      "height": 900,
+      "view": "qr",
+      "frames": 5,
+      "elapsedMs": 1013.8,
+      "largestFrameGapMs": 522.4
+    },
+    {
+      "width": 960,
+      "height": 900,
+      "view": "design",
+      "frames": 6,
+      "elapsedMs": 1166.2,
+      "largestFrameGapMs": 393
+    }
+  ],
+  "responsiveViews": [
+    {
+      "width": 1440,
+      "height": 900,
+      "progress": 0,
+      "buildings": 58,
+      "paintedPixels": 221721
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "progress": 0.42,
+      "buildings": 58,
+      "paintedPixels": 131095
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "progress": 1,
+      "buildings": 58,
+      "paintedPixels": 238141
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "progress": 0,
+      "buildings": 58,
+      "paintedPixels": 123538
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "progress": 0.42,
+      "buildings": 58,
+      "paintedPixels": 74373
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "progress": 1,
+      "buildings": 58,
+      "paintedPixels": 132496
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "progress": 0,
+      "buildings": 58,
+      "paintedPixels": 80117
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "progress": 0.42,
+      "buildings": 58,
+      "paintedPixels": 48968
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "progress": 1,
+      "buildings": 58,
+      "paintedPixels": 85264
+    }
+  ],
+  "exteriorCrab": {
+    "sourceTriangles": 7504,
+    "frames": [
+      {
+        "id": "B046-south",
+        "angle": 0,
+        "meshes": 9,
+        "inventory": 58,
+        "state": {
+          "name": "dotonbori-kani-exterior-crab",
+          "geometry": "f3ca4517-6afe-42a3-bef1-f22d1f870d1a",
+          "position": 2231081130,
+          "version": 10,
+          "material": "dafea946-9d63-4aef-bfe6-3169ce83ef80"
+        }
+      },
+      {
+        "id": "B046-south",
+        "angle": 0,
+        "meshes": 9,
+        "inventory": 58,
+        "state": {
+          "name": "dotonbori-kani-exterior-crab",
+          "geometry": "f3ca4517-6afe-42a3-bef1-f22d1f870d1a",
+          "position": 2675177190,
+          "version": 11,
+          "material": "dafea946-9d63-4aef-bfe6-3169ce83ef80"
+        }
+      },
+      {
+        "id": "B046-south",
+        "angle": 0,
+        "meshes": 9,
+        "inventory": 58,
+        "state": {
+          "name": "dotonbori-kani-exterior-crab",
+          "geometry": "f3ca4517-6afe-42a3-bef1-f22d1f870d1a",
+          "position": 3227216430,
+          "version": 12,
+          "material": "dafea946-9d63-4aef-bfe6-3169ce83ef80"
+        }
+      },
+      {
+        "id": "B046-south",
+        "angle": 0,
+        "meshes": 9,
+        "inventory": 58,
+        "state": {
+          "name": "dotonbori-kani-exterior-crab",
+          "geometry": "f3ca4517-6afe-42a3-bef1-f22d1f870d1a",
+          "position": 2231081130,
+          "version": 13,
+          "material": "dafea946-9d63-4aef-bfe6-3169ce83ef80"
+        }
+      }
+    ],
+    "samePoseAfter12Seconds": true
+  },
+  "secondaryScreens": {
+    "loopsSeconds": [
+      30,
+      39
+    ],
+    "crossfadesSeconds": [
+      2,
+      2.2
+    ],
+    "retainedAtlas": true,
+    "frames": [
+      {
+        "campaigns": [
+          [
+            8,
+            13,
+            0
+          ],
+          [
+            13,
+            2,
+            0
+          ]
+        ],
+        "morphUniformMatches": true,
+        "textureVersion": 1
+      },
+      {
+        "campaigns": [
+          [
+            8,
+            13,
+            0.5
+          ],
+          [
+            13,
+            2,
+            0
+          ]
+        ],
+        "morphUniformMatches": true,
+        "textureVersion": 1
+      },
+      {
+        "campaigns": [
+          [
+            13,
+            3,
+            0
+          ],
+          [
+            13,
+            2,
+            0
+          ]
+        ],
+        "morphUniformMatches": true,
+        "textureVersion": 1
+      },
+      {
+        "campaigns": [
+          [
+            13,
+            3,
+            0
+          ],
+          [
+            13,
+            2,
+            0.5679939894815925
+          ]
+        ],
+        "morphUniformMatches": true,
+        "textureVersion": 1
+      },
+      {
+        "campaigns": [
+          [
+            13,
+            3,
+            0
+          ],
+          [
+            2,
+            7,
+            0
+          ]
+        ],
+        "morphUniformMatches": true,
+        "textureVersion": 1
+      },
+      {
+        "campaigns": [
+          [
+            8,
+            13,
+            0.5
+          ],
+          [
+            13,
+            2,
+            0
+          ]
+        ],
+        "morphUniformMatches": true,
+        "textureVersion": 1
+      }
+    ]
+  },
+  "riverView": {
+    "elevationDegrees": 50,
+    "northOfEastDegrees": 65,
+    "openingPreserved": true,
+    "retainedThroughQrTurn": true
+  },
+  "synchronizedTiming": {
+    "clock": "Shared normalized progress, independent of building, position and QR density.",
+    "geometrySettle": [
+      0.72,
+      0.9
+    ],
+    "paintBlend": [
+      0.54,
+      0.9
+    ],
+    "qrDecodedAtProgress": 0.9,
+    "groupPixelChecks": {
+      "resolution": [
+        512,
+        512
+      ],
+      "start": [
+        0,
+        0.05
+      ],
+      "settle": [
+        0.88,
+        0.9
+      ],
+      "afterSettle": [
+        0.9,
+        0.94
+      ]
+    },
+    "groups": [
+      {
+        "name": "ground",
+        "triangles": 104036,
+        "startChanged": 81959,
+        "settleChanged": 39931,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true,
+        "ordinaryMotion": []
+      },
+      {
+        "name": "architecture",
+        "triangles": 303316,
+        "startChanged": 65042,
+        "settleChanged": 19853,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true,
+        "ordinaryMotion": []
+      },
+      {
+        "name": "glico",
+        "triangles": 2,
+        "startChanged": 615,
+        "settleChanged": 37,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true,
+        "ordinaryMotion": []
+      },
+      {
+        "name": "donki",
+        "triangles": 136358,
+        "startChanged": 4422,
+        "settleChanged": 717,
+        "afterSettleChanged": 0,
+        "reverseIdentical": true,
+        "ordinaryMotion": [
+          {
+            "progress": 0,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.05,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.3,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.4,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.6,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.74,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.78,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.88,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.9,
+            "changedPixels": 0
+          },
+          {
+            "progress": 0.94,
+            "changedPixels": 0
+          }
+        ]
+      }
+    ],
+    "donkiTravel": "Wheel rails, cabins and relief use the ordinary architecture path for contraction, travel and expansion; all ten rendered comparison phases match exactly.",
+    "donkiTravelComparisonProgress": [
+      0,
+      0.05,
+      0.3,
+      0.4,
+      0.6,
+      0.74,
+      0.78,
+      0.88,
+      0.9,
+      0.94
+    ]
+  },
+  "defaultTransition": {
+    "displayedSpeed": 1,
+    "durationSeconds": 0.9876543209876543,
+    "previousSpeedEquivalent": 0.75,
+    "reducedMotion": "immediate endpoints"
+  },
+  "playbackEnvironment": "Headless Chrome, ANGLE SwiftShader, device pixel ratio 1, 960x900 viewport; not physical phone GPU measurements. Held-progress review images and surface checks retain the environment recorded above."
+}
