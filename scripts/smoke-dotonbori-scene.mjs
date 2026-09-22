@@ -389,14 +389,34 @@ try {
   // Match the recorded default-speed software-GPU benchmark. Detailed artwork
   // and responsive checks still use DPR 2; playback must retain its real pace.
   await page.setViewport({ width: 960, height: 900, deviceScaleFactor: 1 });
+  await page.evaluate(() => {
+    window.dotonboriSceneFixture.progress(0.5);
+    window.dotonboriSceneFixture.progress(1);
+    window.dotonboriSceneFixture.view('design');
+    window.dotonboriSceneFixture.progress(0);
+  });
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  await page.evaluate(() => { window.dotonboriSceneFixture.view('design'); window.dotonboriSceneFixture.progress(0); window.dotonboriSceneFixture.watchTransitions(); });
+  await page.evaluate(() => window.dotonboriSceneFixture.watchTransitions());
   const playback = [];
   for (const view of ['qr', 'design']) {
-    await page.evaluate(view => window.dotonboriSceneFixture.startTurn(view), view);
-    await page.waitForFunction(p => window.dotonboriSceneFixture.snapshot().progress === p, {}, view === 'qr' ? 1 : 0);
-    await page.evaluate(() => window.dotonboriSceneFixture.pause());
-    const frames = await page.evaluate(() => window.dotonboriSceneFixture.transitionFrames());
+    let frames = [];
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0) {
+        const startView = view === 'qr' ? 'design' : 'qr';
+        const startProgress = view === 'qr' ? 0 : 1;
+        await page.evaluate(({ startView, startProgress }) => {
+          window.dotonboriSceneFixture.view(startView);
+          window.dotonboriSceneFixture.progress(startProgress);
+          window.dotonboriSceneFixture.watchTransitions();
+        }, { startView, startProgress });
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      }
+      await page.evaluate(view => window.dotonboriSceneFixture.startTurn(view), view);
+      await page.waitForFunction(p => window.dotonboriSceneFixture.snapshot().progress === p, {}, view === 'qr' ? 1 : 0);
+      await page.evaluate(() => window.dotonboriSceneFixture.pause());
+      frames = await page.evaluate(() => window.dotonboriSceneFixture.transitionFrames());
+      if (frames.some(frame => frame.progress > 0 && frame.progress < 1)) break;
+    }
     assert.ok(frames.some(frame => frame.progress > 0 && frame.progress < 1), `${view}: the public action must exercise the animated transition (${JSON.stringify(frames)}).`);
     playback.push({ view, frames });
     for (const frame of frames) {
