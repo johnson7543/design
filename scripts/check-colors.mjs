@@ -50,7 +50,7 @@ async function collectSourceFiles(directory) {
   const files = [];
 
   for (const entry of entries) {
-    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+    if (entry.isDirectory() && (ignoredDirectories.has(entry.name) || entry.name.endsWith('.local'))) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...await collectSourceFiles(path));

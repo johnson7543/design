@@ -12,7 +12,7 @@ async function collectMarkdownFiles(directory) {
 
   for (const entry of entries) {
     if (directory === projectRoot && entry.name === 'plan') continue;
-    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+    if (entry.isDirectory() && (ignoredDirectories.has(entry.name) || entry.name.endsWith('.local'))) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...await collectMarkdownFiles(path));
