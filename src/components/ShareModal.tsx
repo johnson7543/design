@@ -9,13 +9,14 @@ import {
   Link2,
   Share2,
   Sparkles,
-  X,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { CodeView, HighlightedCode } from './CodeView';
+import { DemoCodeAction } from '../demo-ui/DemoChrome';
+import { DemoDialog } from '../demo-ui/DemoDialog';
 
 type ShareMode = 'share' | 'embed' | 'react';
 type ReactExampleMode = 'simple' | 'advanced' | 'theme';
-type CodeLanguage = 'html' | 'shell' | 'tsx';
 type CopyTarget =
   | 'share-link'
   | 'embed-code'
@@ -34,23 +35,6 @@ const REACT_EXAMPLE_OPTIONS = [
   mode: ReactExampleMode;
   label: string;
 }>;
-const CODE_TOKEN_PATTERN = /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|<\/?[A-Za-z][A-Za-z0-9.-]*|\b[A-Za-z_$][A-Za-z0-9_$-]*\b|\b\d+(?:\.\d+)?\b|[{}[\]()<>=:;,.?/+*-]/g;
-const CODE_KEYWORDS = new Set([
-  'async',
-  'await',
-  'const',
-  'export',
-  'from',
-  'function',
-  'import',
-  'let',
-  'new',
-  'return',
-  'satisfies',
-  'type',
-]);
-const CODE_LITERALS = new Set(['false', 'null', 'true', 'undefined']);
-
 interface CopyFeedback {
   target: CopyTarget;
   status: 'copied' | 'failed';
@@ -71,87 +55,6 @@ interface ShareModalProps {
   onDownload: () => void;
 }
 
-function syntaxTokenClass(
-  token: string,
-  source: string,
-  endIndex: number,
-  language: CodeLanguage
-): string | null {
-  if (
-    token.startsWith('//')
-    || token.startsWith('/*')
-    || token.startsWith('<!--')
-  ) {
-    return 'comment';
-  }
-  if (token.startsWith('"') || token.startsWith("'") || token.startsWith('`')) {
-    return 'string';
-  }
-  if (token.startsWith('<')) return 'tag';
-  if (/^\d/.test(token)) return 'number';
-  if (CODE_KEYWORDS.has(token)) return 'keyword';
-  if (CODE_LITERALS.has(token)) return 'literal';
-
-  if (language === 'shell') {
-    if (token === 'npm') return 'keyword';
-    if (token === 'install') return 'property';
-    return 'string';
-  }
-
-  const remainder = source.slice(endIndex);
-  if (/^\s*=/.test(remainder) || /^\s*:/.test(remainder)) return 'property';
-  if (/^[A-Z]/.test(token)) return 'tag';
-  if (/^[{}[\]()<>=:;,.?/+*-]$/.test(token)) return 'punctuation';
-  return null;
-}
-
-function highlightCode(code: string, language: CodeLanguage): React.ReactNode[] {
-  const result: React.ReactNode[] = [];
-  let cursor = 0;
-  let key = 0;
-
-  for (const match of code.matchAll(CODE_TOKEN_PATTERN)) {
-    const start = match.index;
-    if (start > cursor) result.push(code.slice(cursor, start));
-
-    const token = match[0];
-    const kind = syntaxTokenClass(token, code, start + token.length, language);
-    result.push(kind ? (
-      <span className={`syntax-token syntax-${kind}`} key={key}>
-        {token}
-      </span>
-    ) : token);
-    cursor = start + token.length;
-    key += 1;
-  }
-
-  if (cursor < code.length) result.push(code.slice(cursor));
-  return result;
-}
-
-interface CodeViewProps {
-  code: string;
-  language: CodeLanguage;
-  ariaLabel: string;
-  className?: string;
-}
-
-const CodeView: React.FC<CodeViewProps> = ({
-  code,
-  language,
-  ariaLabel,
-  className = '',
-}) => (
-  <pre
-    className={`share-code-view${className ? ` ${className}` : ''}`}
-    aria-label={ariaLabel}
-    data-language={language}
-    tabIndex={0}
-  >
-    <code>{highlightCode(code, language)}</code>
-  </pre>
-);
-
 async function writeClipboard(value: string): Promise<void> {
   if (navigator.clipboard?.writeText) {
     try {
@@ -167,10 +70,18 @@ async function writeClipboard(value: string): Promise<void> {
   textarea.setAttribute('readonly', '');
   textarea.style.position = 'fixed';
   textarea.style.opacity = '0';
-  document.body.appendChild(textarea);
+  const previousFocus = document.activeElement;
+  const container = previousFocus?.closest('dialog') ?? document.body;
+  container.appendChild(textarea);
+  textarea.focus({ preventScroll: true });
   textarea.select();
-  const copied = document.execCommand('copy');
-  textarea.remove();
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } finally {
+    textarea.remove();
+    if (previousFocus instanceof HTMLElement) previousFocus.focus({ preventScroll: true });
+  }
   if (!copied) throw new Error('Clipboard access is unavailable.');
 }
 
@@ -194,11 +105,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   );
   const [copyFeedback, setCopyFeedback] = useState<CopyFeedback | null>(null);
   const feedbackTimerRef = useRef<number | null>(null);
+  const confettiCanvas = useRef<HTMLCanvasElement>(null);
+  const confettiEffect = useRef<ReturnType<typeof confetti.create> | null>(null);
 
-  useEffect(() => () => {
-    if (feedbackTimerRef.current !== null) {
-      window.clearTimeout(feedbackTimerRef.current);
-    }
+  useEffect(() => {
+    const effect = confetti.create(confettiCanvas.current!, { resize: true });
+    confettiEffect.current = effect;
+    return () => {
+      effect.reset();
+      if (feedbackTimerRef.current !== null) window.clearTimeout(feedbackTimerRef.current);
+    };
   }, []);
 
   const handleCopy = async (target: CopyTarget, value: string) => {
@@ -209,7 +125,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     try {
       await writeClipboard(value);
       setCopyFeedback({ target, status: 'copied' });
-      confetti({
+      confettiEffect.current?.({
         particleCount: 36,
         spread: 54,
         origin: { y: 0.62 },
@@ -262,17 +178,15 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   ) => {
     const label = copyLabel(target, idleLabel);
     return (
-      <button
-        type="button"
-        className={`share-copy-icon-btn ${copyFeedback?.target === target && copyFeedback.status === 'copied' ? 'copied' : ''}`}
+      <DemoCodeAction
+        copied={copyFeedback?.target === target && copyFeedback.status === 'copied'}
         onClick={() => handleCopy(target, value)}
         disabled={!value}
-        aria-label={label}
-        title={label}
+        label={label}
         aria-live="polite"
       >
         {copyIcon(target)}
-      </button>
+      </DemoCodeAction>
     );
   };
 
@@ -298,33 +212,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div
-        className="modal-content share-modal-content glass-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="share-modal-title"
-        aria-describedby="share-modal-description"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="modal-header">
-          <div className="modal-title-wrap">
-            <Sparkles size={18} className="sparkle-icon" />
-            <h3 className="modal-title" id="share-modal-title">Share & Export</h3>
-          </div>
-          <button
-            type="button"
-            className="modal-close-btn"
-            onClick={onClose}
-            aria-label="Close share dialog"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <p className="modal-desc" id="share-modal-description">
-          Download, share, or embed this DesignQR in your application.
-        </p>
+    <DemoDialog title="Share & Export" description="Download, share, or embed this DesignQR in your application."
+      closeLabel="Close share dialog" onClose={onClose}
+      overlay={<canvas ref={confettiCanvas} className="demo-dialog-effects" aria-hidden="true" />}>
 
         {configurationError && (
           <p className="share-configuration-error" role="alert">
@@ -484,7 +374,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 aria-label="DesignQR npm install command"
                 tabIndex={0}
               >
-                {highlightCode(DESIGN_QR_INSTALL_COMMAND, 'shell')}
+                <HighlightedCode code={DESIGN_QR_INSTALL_COMMAND} language="shell" />
               </code>
               {renderCopyButton(
                 'react-install',
@@ -547,7 +437,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             </div>
           </section>
         )}
-      </div>
-    </div>
+    </DemoDialog>
   );
 };

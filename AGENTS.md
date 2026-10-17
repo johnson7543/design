@@ -19,6 +19,20 @@ The user does not need to request a documentation pass separately.
   routes/source paths, and link it from `docs/README.md`.
 - Run `npm run design-docs:check` after design or documentation work.
 
+## Product demo UI standard
+
+For product demo pages, read and follow
+[`docs/global-standards/demo-ui.md`](docs/global-standards/demo-ui.md).
+DesignQR is the reference interface. Use the shared components in `src/demo-ui/`
+for headers, bottom panels, choices, Export, dialogs, and code actions.
+Product themes may change artwork and stage backgrounds; keep shared control,
+dialog, syntax, and feedback tokens unchanged. Use the shared night-stage
+treatment when exposed header text needs light ink.
+
+Register demo routes in `docs/design-registry.json` under `demoRoutes` and run
+`npm run smoke:demo-ui` after changing shared chrome. Update the standard and
+both consuming designs when a common contract changes.
+
 ## DesignQR editor interface work
 
 Before changing DesignQR editor components, layout, responsive behavior, or interface

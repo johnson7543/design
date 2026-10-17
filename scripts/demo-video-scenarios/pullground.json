@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "id": "pullground",
+  "product": "Pullground",
+  "description": "A clean four-game loop: a made basket with a flexible net, full-power backboard smash, dart throw, bowling strike, and skipping stone. Capture-only translation and cropping center the real game; controls remain operable outside the crop. Return to Basketball for the loop.",
+  "route": "/pullground",
+  "windowTitle": "Pullground",
+  "readySelector": ".pullground-demo-viewport",
+  "settleMs": 1500,
+  "viewport": {
+    "width": 576,
+    "height": 1024,
+    "deviceScaleFactor": 1,
+    "isMobile": true,
+    "hasTouch": true
+  },
+  "recording": {
+    "fps": 60,
+    "durationSeconds": 16,
+    "output": "public/previews/pullground.mp4",
+    "poster": "public/previews/pullground.webp",
+    "posterAtSeconds": 1.55,
+    "posterQuality": 82,
+    "size": {
+      "width": 720,
+      "height": 1280
+    },
+    "crf": 22,
+    "crop": {
+      "width": 252,
+      "height": 448,
+      "x": 162,
+      "y": 196
+    }
+  },
+  "quality": {
+    "contactSheetFps": 2,
+    "motionChecks": [
+      {
+        "label": "basketball flight",
+        "startSeconds": 1.8,
+        "durationSeconds": 0.5,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 12
+      },
+      {
+        "label": "basketball net swish",
+        "startSeconds": 2.35,
+        "durationSeconds": 0.2,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 30
+      },
+      {
+        "label": "backboard smash",
+        "startSeconds": 4.5,
+        "durationSeconds": 0.5,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 12
+      },
+      {
+        "label": "dart flight and impact",
+        "startSeconds": 7.3,
+        "durationSeconds": 0.4,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 15
+      },
+      {
+        "label": "bowling roll and pin impact",
+        "startSeconds": 10.4,
+        "durationSeconds": 0.4,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 15
+      },
+      {
+        "label": "stone flight and ripples",
+        "startSeconds": 13.0,
+        "durationSeconds": 0.55,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 15
+      }
+    ]
+  },
+  "actions": [
+    {
+      "action": "wait",
+      "ms": 500
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 288,
+        "y": 40
+      },
+      "to": {
+        "x": 288,
+        "y": 223.6
+      },
+      "durationMs": 800,
+      "holdMs": 350
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 288,
+        "y": 40
+      },
+      "to": {
+        "x": 288,
+        "y": 340
+      },
+      "durationMs": 900,
+      "holdMs": 350
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"dart\"]"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "dart"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 200
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 288,
+        "y": 40
+      },
+      "to": {
+        "x": 302,
+        "y": 223.6
+      },
+      "durationMs": 850,
+      "holdMs": 350
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"bowling\"]"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "bowling"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 200
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 288,
+        "y": 40
+      },
+      "to": {
+        "x": 288,
+        "y": 310
+      },
+      "durationMs": 850,
+      "holdMs": 350
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"stone\"]"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "stone"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 200
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 288,
+        "y": 40
+      },
+      "to": {
+        "x": 280,
+        "y": 285
+      },
+      "durationMs": 850,
+      "holdMs": 350
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"basketball\"]"
+    }
+  ],
+  "application": {
+    "consumerFiles": [
+      "src/platform/DesignHomePage.tsx"
+    ],
+    "videoPublicPath": "/previews/pullground.mp4",
+    "posterPublicPath": "/previews/pullground.webp"
+  },
+  "recordingCss": ".pullground-demo-component { transform: translateY(320px); } .pullground-demo-header { border-bottom-color: transparent; } .pullground-demo-header .header-brand, .pullground-demo-header .header-actions { visibility: hidden; }",
+  "assertions": [
+    {
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "basketball"
+      }
+    },
+    {
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-state",
+        "value": "success"
+      }
+    },
+    {
+      "selector": ".pullground-reveal",
+      "attribute": {
+        "name": "aria-hidden",
+        "value": "true"
+      }
+    }
+  ]
+}

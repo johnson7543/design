@@ -9,6 +9,7 @@ QR behavior, player gestures, export, and public integration APIs.
 | --- | --- |
 | [Interface principles](style-principles.md) | Control rails, components, responsive layout, motion integration, and accessibility |
 | [Color mappings](color-mappings.md) | Semantic UI surfaces, syntax highlighting, and zoom controls |
+| [Shared demo UI standard](../global-standards/demo-ui.md) | DesignQR-based components and contracts reused by every product demo |
 
 ## Sources of truth
 
@@ -16,6 +17,9 @@ QR behavior, player gestures, export, and public integration APIs.
 | --- | --- |
 | Editor orchestration | [`src/App.tsx`](../../src/App.tsx) |
 | Controls and dialogs | [`src/components/`](../../src/components) |
+| Shared demo chrome | [`src/demo-ui/`](../../src/demo-ui), also consumed by Pullground |
+| Shared GitHub control | [`GitHubLink`](../../src/components/GitHubLink.tsx), shared with Pullground |
+| Shared code renderer | [`CodeView`](../../src/components/CodeView.tsx), shared with Pullground's Export dialog |
 | Theme and preview state | [`src/editor/`](../../src/editor) |
 | Layout and styling | [`src/index.css`](../../src/index.css) |
 | Semantic tokens | [`src/styles/design-tokens.css`](../../src/styles/design-tokens.css) |

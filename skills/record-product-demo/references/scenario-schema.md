@@ -93,6 +93,7 @@ Use motion checks only for intervals that should change continuously, not intent
 | `press` | `key`, optional `delayMs` | Press one Puppeteer key such as `Tab`, `Enter`, or `Escape`. |
 | `hover` | `selector` | Move the real pointer over an element. |
 | `scroll` | optional `deltaX`, `deltaY` | Send a mouse-wheel scroll. |
+| `drag` | `selector`, `from`, `to`, optional `pointer`, `durationMs`, `holdMs` | Drag with real touch input (default) or `pointer: "mouse"`. Points are `{ "x": 0, "y": 0 }` CSS-pixel offsets inside the selected element; both endpoints must be visible. Move over `durationMs` (default 800), hold at the end for `holdMs` (default 0), then release. Touch requires `viewport.hasTouch`. |
 | `assert` | assertion fields | Check state immediately at that point in the sequence. |
 
 Use stable product classes or accessible controls. Avoid selectors tied to generated DOM order.

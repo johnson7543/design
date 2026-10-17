@@ -1,0 +1,58 @@
+/* Shared demo chrome. Product themes style the stage, never these controls. */
+.app-header-shell.demo-header-flow {
+  position: relative;
+  top: auto;
+  left: auto;
+  margin-inline: auto;
+  transform: none;
+}
+.demo-header-centered {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.demo-header-centered > .header-actions { justify-self: end; }
+.demo-controls {
+  bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+.demo-controls > * { pointer-events: auto; }
+.demo-controls .season-tabs { overflow: visible; }
+.season-chip:active:not(:disabled) { transform: translateY(0); }
+.season-chip:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.share-copy-icon-btn[aria-pressed="true"] {
+  border-color: var(--qr-border-accent);
+  background: var(--qr-surface-control);
+  color: var(--qr-accent-deep);
+}
+.share-copy-icon-btn[aria-pressed="true"]:hover:not(:disabled) { background: var(--qr-surface-control-hover); }
+.share-copy-icon-btn:active:not(:disabled), .modal-close-btn:active:not(:disabled) { transform: scale(0.96); }
+.share-copy-icon-btn svg { width: 16px; height: 16px; }
+
+.demo-dialog-backdrop {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--qr-ink);
+  overscroll-behavior: contain;
+}
+.demo-dialog-backdrop:not([open]) { display: none; }
+.demo-dialog-backdrop::backdrop { animation: fade-in-backdrop 0.2s ease-out; }
+.demo-dialog-content > :is(.modal-header, .modal-desc) { flex-shrink: 0; }
+.demo-dialog-effects { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+@media (max-width: 640px) {
+  .demo-controls { bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-controls .season-chip { transition: none; }
+  .demo-controls .season-chip:hover, .demo-controls .season-chip:active:not(:disabled),
+  .share-icon-btn:active:not(:disabled), .share-copy-icon-btn:active:not(:disabled), .modal-close-btn:active:not(:disabled) { transform: none; }
+  .demo-dialog-backdrop, .demo-dialog-backdrop::backdrop, .demo-dialog-content { animation: none; }
+}

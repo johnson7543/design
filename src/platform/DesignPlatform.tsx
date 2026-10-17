@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { DesignHomePage } from './DesignHomePage';
 import { DesignNotFoundPage } from './DesignNotFoundPage';
 
 const DesignQRApp = lazy(() => import('../App'));
 const DesignQREmbedRoute = lazy(() => import('../routes/DesignQREmbedRoute'));
+const PullgroundPage = lazy(() => import('../pullground/PullgroundPage'));
 
 interface PageMetadataProps {
   title: string;
@@ -82,6 +83,17 @@ function NotFoundRoute() {
   );
 }
 
+function PullgroundRoute() {
+  return (
+    <>
+      <PageMetadata title="Pullground — Design" description="Playful pull gestures for React. Play basketball, darts, bowling, or stone skipping while your action runs." />
+      <Suspense fallback={<div className="design-route-loading" role="status"><span aria-hidden="true" />Opening Pullground…</div>}>
+        <PullgroundPage />
+      </Suspense>
+    </>
+  );
+}
+
 export function DesignPlatform() {
   return (
     <BrowserRouter>
@@ -89,6 +101,8 @@ export function DesignPlatform() {
         <Route path="/" element={<DesignHomeRoute />} />
         <Route path="/qr" element={<DesignQRRoute />} />
         <Route path="/qr/embed" element={<DesignQREmbedPlayerRoute />} />
+        <Route path="/pullground" element={<PullgroundRoute />} />
+        <Route path="/refresh" element={<Navigate to="/pullground" replace />} />
         <Route path="*" element={<NotFoundRoute />} />
       </Routes>
     </BrowserRouter>

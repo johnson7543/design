@@ -30,3 +30,8 @@ roles. It does not authorize new base colors.
 Alpha variants of these bases provide grid lines, glass surfaces, focus rings,
 and shadows. The Spring route background may consume the matching values from
 the shared seasonal runtime preset.
+
+The recorded Pullground preview preserves its Classic game palette and
+Spring stage background from the [product color mappings](../pullground/color-mappings.md).
+The home page applies no color filter to recorded media; its preview frame and
+focus treatment retain the platform roles above.

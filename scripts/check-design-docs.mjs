@@ -191,6 +191,14 @@ for (const route of registeredRoutes) {
   }
 }
 
+if (!Array.isArray(registry.demoRoutes) || registry.demoRoutes.length === 0) {
+  failures.push('docs/design-registry.json: register product demo routes in demoRoutes');
+} else {
+  for (const route of registry.demoRoutes) {
+    if (!registeredRoutes.has(route)) failures.push(`docs/design-registry.json: demo route ${route} must have a registered design owner`);
+  }
+}
+
 const reservedDocumentationAreas = new Set(['demo-videos', 'global-standards']);
 for (const entry of await readdir(join(projectRoot, 'docs'), { withFileTypes: true })) {
   if (!entry.isDirectory() || reservedDocumentationAreas.has(entry.name)) continue;

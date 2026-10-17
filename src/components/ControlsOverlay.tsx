@@ -33,6 +33,7 @@ import type { AutoRotateDirection, DesignQRLogoOptions } from 'designqr/config';
 import type { CustomTheme } from '../editor/types';
 import { CITY_THEME_PRESET_OPTIONS, THEME_PRESET_OPTIONS } from '../editor/theme-presets';
 import { PreviewZoomControls, type PreviewZoomControlsProps } from './PreviewZoomControls';
+import { DemoChoice, DemoControls, DemoExportButton, DemoPanel } from '../demo-ui/DemoChrome';
 import {
   FloatingLogoControls,
   FloatingQRDetailsControls,
@@ -50,6 +51,7 @@ interface ControlsOverlayProps {
   onOpenEditTheme: (theme: CustomTheme) => void;
   onShare: () => void;
   shareDisabled?: boolean;
+  shareOpen?: boolean;
   isTurntable: boolean;
   onToggleTurntable: () => void;
   autoRotateDirection: AutoRotateDirection;
@@ -100,6 +102,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   onOpenEditTheme,
   onShare,
   shareDisabled = false,
+  shareOpen = false,
   isTurntable,
   onToggleTurntable,
   autoRotateDirection,
@@ -155,7 +158,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   };
 
   return (
-    <div className="controls-overlay">
+    <DemoControls>
       {/* Floating tools directly above the content input */}
       <div className="floating-tools-stack">
         {viewMode === 'scan' && isDetailsEditorOpen && (
@@ -276,33 +279,29 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
       </div>
 
       {/* 2. Customizer & Actions Drawer */}
-      <div className="customizer-card glass-panel">
+      <DemoPanel>
         <div className="design-type-tabs" role="group" aria-label="Design type">
-          <button type="button" className={`season-chip ${designType === 'tree' ? 'active' : ''}`}
-            aria-pressed={designType === 'tree'} onClick={() => onDesignTypeChange('tree')}>
+          <DemoChoice selected={designType === 'tree'} onClick={() => onDesignTypeChange('tree')}>
             <Trees size={15} /><span>Tree</span>
-          </button>
-          <button type="button" className={`season-chip ${designType === 'city' ? 'active' : ''}`}
-            aria-pressed={designType === 'city'} onClick={() => onDesignTypeChange('city')}>
+          </DemoChoice>
+          <DemoChoice selected={designType === 'city'} onClick={() => onDesignTypeChange('city')}>
             <Building2 size={15} /><span>City</span>
-          </button>
+          </DemoChoice>
         </div>
         {/* Each design keeps its presets in the same row; custom themes are Tree-only. */}
         <div className={designType === 'city' ? 'city-preset-row' : 'tree-preset-row'}>
         <div className={`season-tabs${designType === 'city' ? ' city-theme-tabs' : ''}`}
           role="group" aria-label={designType === 'city' ? 'City theme' : 'Tree theme'}>
           {themeOptions.map((theme) => (
-            <button
-              type="button"
+            <DemoChoice
               key={theme.id}
               lang={designType === 'city' ? 'ja' : undefined}
-              className={`season-chip ${activeThemeId === String(theme.id) ? 'active' : ''}`}
               onClick={() => onSelectTheme(String(theme.id))}
-              aria-pressed={activeThemeId === String(theme.id)}
+              selected={activeThemeId === String(theme.id)}
             >
               {getThemeIcon(theme.name)}
               <span>{theme.label}</span>
-            </button>
+            </DemoChoice>
           ))}
 
           {/* Add Custom Theme Button ("+" only) */}
@@ -454,33 +453,15 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
           </div>
 
           {/* Share Button */}
-          <button
-            type="button"
-            className="share-icon-btn"
-            aria-label="Share link"
+          <DemoExportButton
+            label="Share link"
             title={shareDisabled ? 'Fix the QR content before sharing' : 'Share link'}
             onClick={onShare}
             disabled={shareDisabled}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 2v13"></path>
-              <path d="m16 6-4-4-4 4"></path>
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-            </svg>
-          </button>
+            aria-expanded={shareOpen}
+          />
         </div>
-      </div>
-    </div>
+      </DemoPanel>
+    </DemoControls>
   );
 };

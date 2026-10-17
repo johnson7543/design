@@ -32,6 +32,7 @@ introduces.
 | Site header | Brand remains left and the compact primary navigation remains right on the shared header rail. |
 | Catalog heading | Centered display title followed by one restrained descriptive line. |
 | Catalog card | Entire preview is the link target; media stays 9:16, covered, noninteractive, and does not compete with platform navigation. |
+| Pullground preview | Recorded 16-second game loop linking to `/pullground`: a basket, full-power backboard smash, dart throw, bowling strike, and skipping stone. Returns to Basketball for the loop. Uses the same portrait video component as DesignQR, with a WebP poster showing the held basketball. No live gameplay runs on the catalog. |
 | Route loading | Full-viewport seasonal surface with a compact status label and motion-safe spinner. |
 | Not found | Centered message, one brand mark, concise explanation, and one primary route back home. |
 | Footer | Copyright only unless a future platform-level requirement is documented. |
@@ -41,7 +42,8 @@ introduces.
 - Keyboard focus must remain visible on navigation, catalog cards, and fallback
   actions.
 - Catalog media is decorative, muted, excluded from the tab order, and paused
-  when offscreen.
+  when offscreen or the page is hidden. Playback follows changes to the reduced-motion preference.
+- A failed video source falls back to its poster; the full card remains a link.
 - Hover may lift a card without changing its footprint or causing neighboring
   layout movement.
 - Reduced-motion mode removes the loading spin and catalog-card transition and

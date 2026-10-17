@@ -16,5 +16,6 @@ and fallback/not-found experience.
 | Home and fallback components | [`src/platform/`](../../src/platform) |
 | Platform styles | [`src/platform.css`](../../src/platform.css) |
 | Shared tokens | [`src/styles/design-tokens.css`](../../src/styles/design-tokens.css) |
+| Preview playback and responsive checks | [`smoke-production.mjs`](../../scripts/smoke-production.mjs) |
 | Globally permitted colors | [Repository color registry](../global-standards/colors.md) |
 | Agent enforcement | [`AGENTS.md`](../../AGENTS.md) |

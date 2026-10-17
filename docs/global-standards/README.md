@@ -6,6 +6,7 @@ repository-authored assets. Product-specific roles stay in their owning area.
 | Document | Purpose |
 | --- | --- |
 | [Approved colors](colors.md) | Complete base-color allowlist and palette governance |
+| [Demo UI standard](demo-ui.md) | Shared DesignQR-based chrome, controls, dialogs, and verification for every product demo |
 | [Documentation conventions](documentation.md) | Ownership, naming, indexes, and validation |
 | [Design registry](../design-registry.json) | Route and source ownership for maintained contracts |
 

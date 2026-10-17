@@ -9,6 +9,10 @@ Use the [global approved colors](../global-standards/colors.md) through semantic
 [`--qr-*` tokens](../../src/styles/design-tokens.css). Artwork colors belong to
 [the package palettes](../designqr-package/color-palettes.md).
 
+These interface roles also govern every demo through the
+[shared demo UI standard](../global-standards/demo-ui.md). Game/artwork presets
+do not recolor Export, GitHub, panels, choices, dialogs, copy feedback, or syntax.
+
 ## Interface surfaces
 
 | Role | Semantic tokens |
@@ -19,10 +23,13 @@ Use the [global approved colors](../global-standards/colors.md) through semantic
 | Primary actions | `--qr-accent` |
 | Text exposed to Dōtonbori or Tokyo Tower night stages | `--qr-on-night-stage`, derived from the existing light interface color |
 | Night-stage divider and exposed control borders | `--qr-night-stage-border`, the existing light interface color at 45% opacity |
+| GitHub surface on night stages | `--qr-surface-control-hover`, becoming `--qr-surface-solid` on hover; normal interface ink and `--qr-on-night-stage` focus outline |
+| Copy success, including hover | `--qr-success` surface and border, `--qr-on-accent` check |
 
-Night-stage mappings affect the 3D header title/capability badge and floating
-Edit/Logo/Zoom disclosures only. Their hover/open states reuse the warm control
-surface, normal dark ink and accent border; light panels keep existing mappings.
+Night-stage light ink applies to the 3D header title/capability badge and floating
+Edit/Logo/Zoom disclosures. Their hover/open states reuse the warm control
+surface, normal dark ink and accent border. GitHub keeps dark ink on a more
+opaque shared surface; light panels keep existing mappings.
 QR view restores the light scan backdrop and ordinary dark interface mappings.
 
 ## Interface syntax theme

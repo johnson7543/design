@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { access, mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -310,6 +310,82 @@ async function verifyRoute(browser, { path, selectors, expectedTitle }) {
     console.log(`Production route passed: ${routeUrl}`);
   } catch (error) {
     throw new Error(`Production smoke test failed for ${path}: ${error.message}`);
+  } finally {
+    await page.close();
+  }
+}
+
+async function verifyCatalogPreviews(browser) {
+  const page = await browser.newPage();
+  const screenshots = join(tmpdir(), 'design-home-previews');
+  const pullgroundCard = '.design-catalog-card[href="/pullground"]';
+  const appOrigin = new URL(url).origin;
+  const errors = [];
+  let failPullgroundVideo = false;
+  await mkdir(screenshots, { recursive: true });
+  try {
+    page.on('pageerror', error => errors.push(error.message));
+    await page.setRequestInterception(true);
+    page.on('request', request => {
+      const requestUrl = new URL(request.url());
+      if (failPullgroundVideo && requestUrl.pathname === '/previews/pullground.mp4') void request.abort();
+      else if (requestUrl.origin === appOrigin || requestUrl.protocol === 'data:') void request.continue();
+      else void request.abort();
+    });
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    for (const [width, height] of [[1440, 900], [900, 900], [390, 844], [320, 568]]) {
+      await page.setViewport({ width, height });
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector(`${pullgroundCard} video`);
+      const valid = await page.$$eval('.design-catalog-card', cards => cards.length === 2 && cards.every(card => {
+        const video = card.querySelector('video');
+        const frame = card.querySelector('.design-catalog-preview').getBoundingClientRect();
+        return card.getAttribute('aria-label') && video?.muted && video.loop && video.playsInline
+          && video.tabIndex === -1 && video.getAttribute('aria-hidden') === 'true'
+          && video.paused && video.currentTime === 0 && video.poster.endsWith('.webp')
+          && Math.abs(frame.width / frame.height - 9 / 16) < 0.002
+          && frame.width <= 259 && frame.left >= 0 && frame.right <= innerWidth;
+      }));
+      assertLayout(valid, `Home at ${width}px: accessible portrait previews respect reduced motion.`);
+      await page.evaluate(async () => {
+        await Promise.all([...document.querySelectorAll('video')].map(video => new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = resolve;
+          image.onerror = reject;
+          image.src = video.poster;
+        })));
+      });
+      await page.screenshot({ path: join(screenshots, `home-${width}.png`) });
+      if (width <= 390) {
+        await page.$eval(pullgroundCard, card => card.scrollIntoView({ block: 'center' }));
+        await page.screenshot({ path: join(screenshots, `pullground-card-${width}.png`) });
+      }
+    }
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector(`${pullgroundCard} video`);
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+    await page.waitForFunction(() => [...document.querySelectorAll('.design-catalog-video')]
+      .every(video => !video.paused && video.currentTime > 0 && video.videoWidth === 720 && video.videoHeight === 1280));
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await page.waitForFunction(() => [...document.querySelectorAll('video')].every(video => video.paused));
+    await page.setViewport({ width: 320, height: 300 });
+    await page.$eval('.design-home', home => { home.scrollTop = home.scrollHeight; });
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+    await page.waitForFunction(() => document.querySelector('.design-catalog-card[href="/qr"] video').paused
+      && !document.querySelector('.design-catalog-card[href="/pullground"] video').paused);
+
+    failPullgroundVideo = true;
+    await page.setCacheEnabled(false);
+    await page.setViewport({ width: 1440, height: 900 });
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector(`${pullgroundCard} img.design-catalog-video`);
+    await page.waitForFunction(selector => document.querySelector(`${selector} img`).naturalWidth > 0, {}, pullgroundCard);
+    await page.focus(pullgroundCard);
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('.pullground-demo-page');
+    assertLayout(errors.length === 0, `Catalog preview runtime errors: ${errors.join('; ')}`);
+    console.log(`Catalog previews passed: responsive framing, playback, reduced motion, offscreen pause, poster fallback, and Pullground navigation. Screenshots: ${screenshots}`);
   } finally {
     await page.close();
   }
@@ -2279,6 +2355,7 @@ try {
     expectedTitle: 'Not found',
   });
   await verifyAppNavigation(browser);
+  await verifyCatalogPreviews(browser);
   await verifyDesignQrFailureState(browser);
   if (!skipLayout) await verifyDesignQrLayout(browser);
   if (!skipWysiwyg) await verifyDesignQrWysiwygExport(browser);

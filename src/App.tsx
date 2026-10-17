@@ -761,6 +761,7 @@ export const App: React.FC = () => {
           if (!shareDisabled) setShareModalOpen(true);
         }}
         shareDisabled={shareDisabled}
+        shareOpen={shareModalOpen}
         isTurntable={isTurntable}
         onToggleTurntable={handleToggleTurntable}
         autoRotateDirection={autoRotateDirection}

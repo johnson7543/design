@@ -5,10 +5,11 @@ Repository setup stays in the root [README](../README.md).
 
 | Area | What belongs here | Main source |
 | --- | --- | --- |
-| [Global standards](global-standards/README.md) | Repository-wide color rules and documentation conventions | Shared design tokens and documentation registry |
+| [Global standards](global-standards/README.md) | Repository-wide color rules, [demo UI standard](global-standards/demo-ui.md), and documentation conventions | Shared demo components, design tokens, and documentation registry |
 | [Home page UI](home-page/README.md) | Catalog, site shell, loading, and not-found surfaces | `src/platform/`, `src/platform.css` |
 | [DesignQR package](designqr-package/README.md) | Public player, rendering, themes, city assets, integrations, and releases | `packages/designqr/` |
 | [DesignQR editor UI](designqr-editor/README.md) | Controls, theme editing, logo crop, sharing, and responsive editor layout | `src/App.tsx`, `src/components/`, `src/editor/` |
+| [Pullground](pullground/README.md) | Reusable pull actions, basketball/dart/bowling/stone skipping interactions, and demo | `packages/pullground/`, `src/pullground/` |
 | [Demo-video workflow](demo-videos/README.md) | Recording and verifying product previews | `scripts/record-demo-video.mjs` |
 
 The editor consumes the package. A change to artwork, QR rendering, export, or

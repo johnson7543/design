@@ -971,6 +971,18 @@ html, body {
   --site-header-line: var(--qr-night-stage-border);
 }
 
+.app-root[data-stage-tone='night'] .github-star-link {
+  background: var(--qr-surface-control-hover);
+}
+
+.app-root[data-stage-tone='night'] .github-star-link:hover {
+  background: var(--qr-surface-solid);
+}
+
+.app-root[data-stage-tone='night'] .github-star-link:focus-visible {
+  outline-color: var(--qr-on-night-stage);
+}
+
 .app-root[data-stage-tone='night'] :is(.header-brand .site-header-brand, .tech-badge, .floating-edit-toggle) {
   color: var(--qr-on-night-stage);
 }
@@ -1413,7 +1425,7 @@ html, body {
   white-space: nowrap;
 }
 
-.season-chip:hover {
+.season-chip:hover:not(:disabled) {
   background: var(--qr-surface-control-hover);
   color: var(--qr-ink);
   border-color: var(--qr-border-hover);
@@ -2173,12 +2185,16 @@ html, body {
 }
 
 /* 6. Share & Export Modal */
+.modal-backdrop,
+.modal-backdrop::backdrop {
+  background: rgba(40, 32, 24, 0.45);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(40, 32, 24, 0.45);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2588,7 +2604,7 @@ html, body {
     box-shadow var(--qr-transition-control);
 }
 
-.share-copy-icon-btn:hover {
+.share-copy-icon-btn:hover:not(:disabled) {
   border-color: var(--qr-border-hover);
   background: var(--qr-surface-control-hover);
   box-shadow: var(--qr-shadow-control-hover);
@@ -2600,7 +2616,8 @@ html, body {
   box-shadow: none;
 }
 
-.share-copy-icon-btn.copied {
+.share-copy-icon-btn.copied,
+.share-copy-icon-btn.copied:hover:not(:disabled) {
   border-color: var(--qr-success);
   background: var(--qr-success);
   color: var(--qr-on-accent);

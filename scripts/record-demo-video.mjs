@@ -352,6 +352,52 @@ async function runAction(page, item, index) {
         });
         break;
       }
+      case 'drag': {
+        const selector = requiredSelector(item, label);
+        const element = await page.$(selector);
+        const box = await element?.boundingBox();
+        if (!box) throw new Error(`Could not locate a draggable box for ${selector}.`);
+        const durationMs = positiveNumber(item.durationMs ?? 800, 'drag durationMs');
+        const holdMs = item.holdMs ?? 0;
+        if (!Number.isFinite(holdMs) || holdMs < 0) throw new Error('drag holdMs must be non-negative.');
+        const points = [item.from, item.to].map(point => {
+          if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)
+            || point.x < 0 || point.y < 0 || point.x > box.width || point.y > box.height) {
+            throw new Error('drag from/to must be CSS-pixel coordinates inside the selected element.');
+          }
+          const absolute = { x: box.x + point.x, y: box.y + point.y };
+          if (absolute.x < 0 || absolute.x >= viewport.width || absolute.y < 0 || absolute.y >= viewport.height) {
+            throw new Error('drag endpoints must be inside the visible viewport.');
+          }
+          return absolute;
+        });
+        const [from, to] = points;
+        const pointer = item.pointer ?? 'touch';
+        if (!['touch', 'mouse'].includes(pointer)) throw new Error('drag pointer must be touch or mouse.');
+        let touch;
+        if (pointer === 'touch') touch = await page.touchscreen.touchStart(from.x, from.y);
+        else { await page.mouse.move(from.x, from.y); await page.mouse.down(); }
+        try {
+          const started = performance.now();
+          let nextFrame = started + 1000 / recordingFps;
+          while (true) {
+            await wait(Math.max(0, nextFrame - performance.now()));
+            const t = Math.min(1, (performance.now() - started) / durationMs);
+            const x = from.x + (to.x - from.x) * t;
+            const y = from.y + (to.y - from.y) * t;
+            if (touch) await touch.move(x, y);
+            else await page.mouse.move(x, y);
+            if (t === 1) break;
+            // Follow elapsed time rather than queueing stale moves when input is slow.
+            nextFrame = started + (Math.floor((performance.now() - started) * recordingFps / 1000) + 1) * 1000 / recordingFps;
+          }
+          await wait(holdMs);
+        } finally {
+          if (touch) await touch.end();
+          else await page.mouse.up();
+        }
+        break;
+      }
       case 'assert': {
         await assertElement(page, item, label);
         break;
@@ -490,6 +536,7 @@ try {
 
   // Puppeteer supplies real browser input; the running product performs every render.
   for (const [index, action] of scenario.actions.entries()) {
+    console.log(`Action ${index + 1} (${action.action}) at ${((Date.now() - recordingStartedAt) / 1000).toFixed(2)}s`);
     await runAction(page, action, index);
   }
 
@@ -511,15 +558,15 @@ try {
   // Keep a discarded post-roll so ffmpeg can always trim to the exact target.
   await wait(capturePostRollMs);
 
-  const recording = await page.evaluate(() => {
+  const capturedRecording = await page.evaluate(() => {
     document.dispatchEvent(new CustomEvent('design-demo-recorder-stop'));
     return window.__designDemoCaptureDone;
   });
 
-  if (recording.byteLength === 0) {
+  if (capturedRecording.byteLength === 0) {
     throw new Error(`${scenario.product} native tab capture returned an empty recording.`);
   }
-  await writeFile(sourceVideoPath, Buffer.from(recording.base64, 'base64'));
+  await writeFile(sourceVideoPath, Buffer.from(capturedRecording.base64, 'base64'));
 
   await runCommand('/usr/bin/ffmpeg', [
     '-y',
@@ -583,7 +630,7 @@ try {
   console.log(
     `Recorded ${scenario.product}: ${videoPath} ` +
       `(${targetDurationSeconds}s at ${recordingFps} fps from ` +
-      `${recording.byteLength} bytes of native tab capture; ` +
+      `${capturedRecording.byteLength} bytes of native tab capture; ` +
       `${JSON.stringify(captureInfo.settings)})`
   );
   if (posterPath) console.log(`Created ${posterPath}`);

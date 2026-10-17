@@ -12,6 +12,15 @@ hero; interface chrome supports the creation task without competing with the
 rendered result. These rules are the default for every new component and every
 style adjustment.
 
+The [shared demo UI standard](../global-standards/demo-ui.md) carries this
+interface to every product demo. DesignQR consumes the same `DemoHeader`,
+`DemoControls`, `DemoPanel`, `DemoChoice`, `DemoExportButton`, `DemoDialog`, and
+`DemoCodeAction` as Pullground. Export keeps the reference accent square
+and upward tray icon. Share uses the common native dialog: inert background,
+focus containment, Escape/backdrop dismissal, and focus return. Its existing
+copy effects render inside that dialog's overlay. Product themes never
+redefine the shared controls or code palette.
+
 ## Core principles
 
 1. **Artwork first.** Keep the stage visually dominant. Persistent controls use
@@ -212,7 +221,8 @@ Artwork geometry and behavior follow the
 The Dōtonbori night backdrop uses light semantic ink for the exposed product
 title, capability badge and floating Edit/Logo/Zoom disclosures in 3D, plus a light
 header divider. Hover/open disclosures return to their warm light surface and
-dark ink; their keyboard outline remains visible. Panels retain the standard
+dark ink; their keyboard outline remains visible. The GitHub pill uses the more
+opaque shared control surface and a light keyboard outline. Panels retain the standard
 light-surface hierarchy. Preset changes restore the appropriate stage treatment
 without changing control dimensions, rails or reduced-motion behavior.
 QR view uses the light City scan backdrop and normal dark interface ink.

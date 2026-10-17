@@ -6,12 +6,16 @@ const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const componentFiles = [
   'src/App.tsx',
   'src/components/ControlsOverlay.tsx',
+  'src/components/CodeView.tsx',
   'src/components/CustomThemeModal.tsx',
   'src/components/FloatingFlatQRControls.tsx',
   'src/components/Header.tsx',
+  'src/components/GitHubLink.tsx',
   'src/components/InteractiveCheckbox.tsx',
   'src/components/PreviewZoomControls.tsx',
   'src/components/ShareModal.tsx',
+  'src/demo-ui/DemoChrome.tsx',
+  'src/demo-ui/DemoDialog.tsx',
   'packages/designqr/src/react/DesignQR.tsx',
   'packages/designqr/src/react/DesignQRCanvas.tsx',
 ];
@@ -20,6 +24,9 @@ const cssFiles = [
   'src/index.css',
   'src/platform.css',
   'packages/designqr/src/style.css',
+  'src/demo-ui/demo-ui.css',
+  'src/pullground/pullground-demo.css',
+  'src/pullground/pullground-themes.css',
 ];
 
 const failures = [];
@@ -35,6 +42,27 @@ const cssSources = await Promise.all(
 const allCss = cssSources.join('\n');
 const tokenCss = cssSources[0];
 const componentCss = cssSources[1];
+
+for (const path of ['src/pullground/pullground-demo.css', 'src/pullground/pullground-themes.css']) {
+  const source = cssSources[cssFiles.indexOf(path)];
+  if (/--(?:qr-|color-|shadow-)[\w-]+\s*:/.test(source)) {
+    failures.push(`${path}: product themes must not redefine shared demo UI tokens; use docs/global-standards/demo-ui.md`);
+  }
+}
+
+for (const [path, components] of [
+  ['src/components/Header.tsx', ['DemoHeader']],
+  ['src/components/ControlsOverlay.tsx', ['DemoControls', 'DemoPanel', 'DemoChoice', 'DemoExportButton']],
+  ['src/components/ShareModal.tsx', ['DemoDialog', 'DemoCodeAction']],
+  ['src/pullground/PullgroundPage.tsx', ['DemoHeader', 'DemoControls', 'DemoPanel', 'DemoChoice', 'DemoExportButton']],
+  ['src/pullground/ExportModal.tsx', ['DemoDialog']],
+  ['src/pullground/ReactExample.tsx', ['DemoCodeAction']],
+]) {
+  const source = await readFile(join(projectRoot, path), 'utf8');
+  for (const component of components) {
+    if (!source.includes(`<${component}`)) failures.push(`${path}: use the shared ${component} from src/demo-ui`);
+  }
+}
 
 const styledClasses = new Set(
   [...allCss.matchAll(/\.([a-zA-Z_][\w-]*)/g)].map((match) => match[1])

@@ -1,0 +1,13 @@
+/* Component themes extend to the stage; demo controls keep the shared UI palette. */
+.pullground-demo-page[data-theme="simple"] {
+  --pullground-demo-sky-top: #ffffff;
+  --pullground-demo-sky-bottom: color-mix(in srgb, #000000 4%, var(--pullground-demo-sky-top));
+}
+.pullground-demo-page[data-theme="ocean"] {
+  --pullground-demo-sky-top: color-mix(in srgb, #95cfb6 8%, #ffffff);
+  --pullground-demo-sky-bottom: color-mix(in srgb, #064e3b 18%, var(--pullground-demo-sky-top));
+}
+.pullground-demo-page[data-theme="midnight"] {
+  --pullground-demo-sky-top: color-mix(in srgb, #cddbe4 8%, #0f172a);
+  --pullground-demo-sky-bottom: #0f172a;
+}

@@ -1,7 +1,13 @@
 {
   "version": 1,
+  "demoRoutes": ["/qr", "/pullground"],
   "sharedSourcePaths": [
-    "src/styles/design-tokens.css"
+    "src/styles/design-tokens.css",
+    "src/index.css",
+    "src/demo-ui",
+    "scripts/smoke-demo-ui.mjs",
+    "src/components/GitHubLink.tsx",
+    "src/components/CodeView.tsx"
   ],
   "designs": [
     {
@@ -68,10 +74,33 @@
         "src/App.tsx",
         "src/components",
         "src/editor",
-        "src/index.css",
         "src/utils"
       ],
       "docsDirectory": "docs/designqr-editor",
+      "documents": {
+        "index": "README.md",
+        "style": "style-principles.md",
+        "colors": "color-mappings.md"
+      }
+    },
+    {
+      "id": "pullground",
+      "name": "Pullground",
+      "routes": [
+        "/pullground",
+        "/refresh"
+      ],
+      "sourcePaths": [
+        "packages/pullground",
+        "src/pullground",
+        "examples/pullground-consumer",
+        "scripts/smoke-pullground.mjs",
+        "scripts/check-pullground-package.mjs",
+        "scripts/check-pullground-release.mjs",
+        "scripts/pack-pullground.mjs",
+        "scripts/test-pullground-release.mjs"
+      ],
+      "docsDirectory": "docs/pullground",
       "documents": {
         "index": "README.md",
         "style": "style-principles.md",

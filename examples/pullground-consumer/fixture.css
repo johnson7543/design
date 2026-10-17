@@ -1,0 +1,12 @@
+body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; color: #0f172a; background: #ffffff; }
+.consumer-fixture { max-width: 448px; margin: auto; }
+.consumer-fixture h1 { font-size: 20px; }
+.consumer-fixture form { margin-bottom: 48px; }
+.fixture-drag { padding: 24px 12px; }
+.fixture-child, .fixture-outside { min-height: 44px; background: #f6f1e7; color: #0f172a; }
+.fixture-link { display: block; padding: 12px; color: #0f172a; }
+.fixture-nested { overflow: auto; height: 60px; margin: 16px 0; border: 1px solid #0f172a; }
+.fixture-nested > div { height: 160px; }
+.fixture-ignore { padding: 12px; }
+.fixture-themed { --pullground-surface: #f6f1e7; }
+.fixture-viewport { block-size: 240px; }

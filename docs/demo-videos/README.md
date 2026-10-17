@@ -27,7 +27,7 @@ The product and route must already exist. Creating a demo does not implicitly au
 
 1. Finds the implemented route, stable UI selectors, and preview consumer.
 2. Initializes `scripts/demo-video-scenarios/<product-slug>.json` without overwriting existing scenarios.
-3. Converts the requested flow into real click, tap, typing, key, hover, scroll, wait, and assertion actions.
+3. Converts the requested flow into real click, tap, drag, typing, key, hover, scroll, wait, and assertion actions.
 4. Adds or updates the preview video component so it references the scenario's public MP4 and poster paths.
 5. Records the running Vite product through Chrome's tab compositor.
 6. Enforces exact metadata and configured continuous-motion windows, visually inspects the generated contact sheets, and runs repository checks.
@@ -93,6 +93,15 @@ For the existing Design QR scenario, the shortcut remains:
 
 ```bash
 npm run record:qr-preview
+```
+
+Pullground uses [its own scenario](../../scripts/demo-video-scenarios/pullground.json):
+a 16-second portrait loop of a basket, full-power backboard smash, dart throw,
+bowling strike, and skipping stone, returning to Basketball. Capture-only framing centers the real game and keeps
+the mode controls outside the crop. The catalog consumes its MP4 and WebP poster.
+
+```bash
+npm run record:demo -- --scenario scripts/demo-video-scenarios/pullground.json
 ```
 
 ## Definition of done

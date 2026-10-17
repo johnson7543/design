@@ -1,0 +1,43 @@
+{
+  "name": "@johnson7543/pullground",
+  "version": "0.1.0-rc.1",
+  "type": "module",
+  "description": "Playful pull gestures for React, with basketball, darts, bowling, and stone skipping for any action",
+  "license": "MIT",
+  "author": "Johnson YuKai Wang",
+  "keywords": ["react", "pull-to-refresh", "pull-gesture", "interaction", "basketball", "design"],
+  "homepage": "https://design.johnson7543.com/pullground",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnson7543/design.git",
+    "directory": "packages/pullground"
+  },
+  "bugs": { "url": "https://github.com/johnson7543/design/issues" },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "tag": "next"
+  },
+  "main": "./dist/pullground.cjs",
+  "module": "./dist/pullground.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/pullground.js",
+      "require": "./dist/pullground.cjs"
+    },
+    "./style.css": {
+      "types": "./dist/style.d.ts",
+      "default": "./dist/pullground.css"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": ["./dist/pullground.css"],
+  "peerDependencies": { "react": "^19.0.0" },
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --experimental-strip-types --test test/*.test.ts"
+  }
+}
