@@ -102,10 +102,13 @@ npm publish ./johnson7543-pullground-0.1.0-rc.1.tgz --access public --tag next
 
 Publication requires account 2FA. Install the registry version into a fresh
 consumer and verify it, and check actual dist-tags after first publication:
-npm also assigned `latest` during this bootstrap despite `--tag next`. Remove
-that tag so prereleases remain on `next`; reserve `latest` for stable releases.
-Tag removal can require a separate npm authorization. Do not push a publishing
-tag for a manually published version; npm versions cannot be reused.
+npm also assigned `latest` during this bootstrap despite `--tag next`. Its
+removal returned HTTP 400 after browser authorization, so both `next` and `latest` still resolve
+to the prerelease. Keep the prerelease notice and explicit `@next` install
+command; the qualified stable release will move `latest` to `0.1.0`.
+The [release record](releases/0-1-0-rc-1.md) documents the result and matching
+upstream report. Do not push a publishing tag for a manually published version;
+npm versions cannot be reused.
 
 Once the package exists and the stable candidate is ready, configure this npm
 trusted publisher:

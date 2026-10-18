@@ -9,9 +9,11 @@ matching website deployment remain in preparation.
 The accepted archive was published to npm with public access and `--tag next`.
 The registry publication time is `2026-10-18T16:12:24.690Z`, which is 2026-10-19
 in Asia/Taipei. The downloaded registry archive matches the accepted candidate
-byte for byte, and a fresh React 19.2.8 consumer passed. Removal of npm's
-automatically assigned `latest` tag is pending npm authorization, as tracked in
-the [release record](releases/0-1-0-rc-1.md).
+byte for byte, and a fresh React 19.2.8 consumer passed. npm also assigned
+`latest` to the first publication and rejected its removal with HTTP 400 after
+browser authorization. Both `next` and `latest` currently resolve to this
+prerelease; stable publication will move `latest` to `0.1.0`. The
+[release record](releases/0-1-0-rc-1.md) retains the exact registry results.
 
 The remaining stable-release work is desktop Firefox/Safari acceptance, stable
 metadata and final qualification, trusted publishing, automated publication, and
