@@ -343,8 +343,10 @@ application's client boundary. Framework-specific Server Component integration
 and React 18 support are not claimed.
 
 Automated validation covers React 19.0.0 and 19.2.8 in isolated consumers,
-including Chromium touch emulation and SSR/hydration. Physical Safari/iOS, Android, and other desktop
-browsers remain release qualification tasks; emulation is not device validation.
+including Chromium touch emulation and SSR/hydration. The maintainer also reported
+successful pull, aim, release, and return-animation checks on iPhone Safari and
+Android Chrome. Device/browser versions were not recorded; separate desktop
+Firefox and Safari qualification remains pending for the stable release.
 
 | Symptom | Check |
 | --- | --- |
