@@ -1,8 +1,28 @@
 # Pullground release notes
 
-Status: `0.1.0-rc.1` published on `next`; stable `0.1.0` prepared for qualification
+Status: Stable `0.1.0` published on `latest`; `0.1.0-rc.1` remains on `next`
 
 [Documentation index](README.md) · [Release plan](release-plan.md)
+
+## 0.1.0 — 2026-10-19
+
+The first stable release is available on
+[npm](https://www.npmjs.com/package/@johnson7543/pullground/v/0.1.0).
+
+```sh
+npm install @johnson7543/pullground
+```
+
+It preserves the prerelease API, runtime, four games, and four themes. Import
+`Pullground` from the package root and provide `onPull`; styles are automatic.
+The [consumer README](../../packages/pullground/README.md) covers complete React
+examples, sizing, actions, errors, accessibility, and supported integration.
+
+This release adds the completed desktop-browser acceptance record and uses
+GitHub Actions trusted publishing with signed provenance. The
+[stable release record](releases/0-1-0.md) retains the qualification, registry,
+and live-site evidence. Try the [demo](https://design.johnson7543.com/pullground)
+or open it from the [design home page](https://design.johnson7543.com/).
 
 ## 0.1.0-rc.1 — 2026-10-19
 
@@ -34,13 +54,3 @@ not the reusable component.
 
 The [release record](releases/0-1-0-rc-1.md) identifies the source commit,
 published archive, exact UTC timestamp, and completed verification.
-
-## Prepared: 0.1.0
-
-The stable candidate preserves the prerelease API, runtime, games, and themes.
-It uses the standard installation command and records maintainer-confirmed
-desktop Firefox/Safari checks alongside the earlier mobile acceptance.
-
-Final qualification, trusted publishing, stable publication, and the matching
-website deployment follow the [release plan](release-plan.md) and
-[stable release record](releases/0-1-0.md).

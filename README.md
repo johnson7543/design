@@ -43,13 +43,12 @@ Use `onPull` for any synchronous or async action.
 Try the [live demo](https://design.johnson7543.com/pullground). The package is
 [`packages/pullground`](packages/pullground); see its
 [`README`](packages/pullground/README.md) for usage, props, sizing, and
-accessibility. The public `0.1.0-rc.1` prerelease is available on npm's `next`
-channel:
+accessibility. Stable `0.1.0` is available on
+[npm](https://www.npmjs.com/package/@johnson7543/pullground):
 
 ```bash
-npm install @johnson7543/pullground@next
+npm install @johnson7543/pullground
 ```
 
-See the [release record](docs/pullground/releases/0-1-0-rc-1.md) for verification
-and the [release plan](docs/pullground/release-plan.md) for stable `0.1.0` and the
-matching website launch.
+See the [stable release record](docs/pullground/releases/0-1-0.md) for package,
+provenance, browser, and live-demo verification.

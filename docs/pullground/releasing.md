@@ -1,6 +1,6 @@
 # Releasing Pullground
 
-Status: Prerelease published; stable release in preparation<br>
+Status: Stable `0.1.0` published and verified<br>
 Scope: `@johnson7543/pullground` and its matching website demo
 
 [Documentation index](README.md) · [Release plan and acceptance gates](release-plan.md)
@@ -21,7 +21,7 @@ the recommended import must remain just `Pullground` from the package root.
 ## Local preparation
 
 Use Node from `.nvmrc` and install the root lockfile with `npm ci`. The current
-manifest prepares stable `0.1.0`, with `publishConfig.tag` set to `latest`.
+manifest is stable `0.1.0`, with `publishConfig.tag` set to `latest`.
 The public prerelease remains `0.1.0-rc.1` on `next`; see the
 [stable release record](releases/0-1-0.md) for publication status. Set the manifest
 and lockfile together; stable versions must use `latest`, and prereleases must
@@ -104,15 +104,16 @@ npm publish ./johnson7543-pullground-0.1.0-rc.1.tgz --access public --tag next
 Publication requires account 2FA. Install the registry version into a fresh
 consumer and verify it, and check actual dist-tags after first publication:
 npm also assigned `latest` during this bootstrap despite `--tag next`. Its
-removal returned HTTP 400 after browser authorization, so both `next` and `latest` still resolve
-to the prerelease. Keep the prerelease notice and explicit `@next` install
-command; the qualified stable release will move `latest` to `0.1.0`.
+removal returned HTTP 400 after browser authorization, so both tags initially
+resolved to the prerelease. Stable publication subsequently advanced `latest`
+to `0.1.0`; `next` still identifies the prerelease.
 The [release record](releases/0-1-0-rc-1.md) documents the result and matching
 upstream report. Do not push a publishing tag for a manually published version;
 npm versions cannot be reused.
 
-Once the package exists and the stable candidate is ready, configure this npm
-trusted publisher:
+The maintainer approved and configured this npm trusted publisher for the
+stable release. Its first publication succeeded; the
+[release record](releases/0-1-0.md) includes the saved configuration and run.
 
 | Field | Value |
 | --- | --- |
@@ -121,9 +122,9 @@ trusted publisher:
 | Repository | `design` |
 | Workflow filename | `publish-pullground.yml` |
 | Environment | Empty |
-| Allowed action | Direct `npm publish` |
+| Requested permission | Direct `npm publish` |
 
-The authenticated CLI equivalent is:
+The authenticated CLI command used to configure it was:
 
 ```sh
 npm trust github @johnson7543/pullground --repo johnson7543/design --file publish-pullground.yml --allow-publish
@@ -136,13 +137,16 @@ complete within two days. [npm trust documentation](https://docs.npmjs.com/cli/v
 
 ## Stable release and website
 
-Prepare `0.1.0` with `publishConfig.tag: latest`, synchronize the lockfile, update
-the README installation/status text and [release notes](release-notes.md), and
-review the final commit on `main`. Require the complete CI and device gates,
-then exercise the verification-only workflow before pushing `pullground-v0.1.0`.
+`0.1.0` and `pullground-v0.1.0` are already published; use a new version and
+matching tag for subsequent releases. Set `publishConfig.tag: latest`,
+synchronize the lockfile, update the README installation/status text and
+[release notes](release-notes.md), and review the final commit on `main`.
+Require the complete CI and device gates, then exercise the verification-only
+workflow before pushing the matching `pullground-v*` tag.
 
 After npm publication, verify `latest`, provenance, exports, README, and a fresh
-registry consumer. Deploy the website from the matching accepted commit, recording
+registry consumer. Confirm the live website loads the accepted build and record
+its active deployment. If it differs, deploy from the accepted commit, recording
 the prior production deployment for recovery. Check `/`, `/pullground`,
 `/refresh`, `/qr`, `/qr/embed`, preview media, and copied examples before announcing.
 The existing `npm run deploy` targets production; it is not a staging command.

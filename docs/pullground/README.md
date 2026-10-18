@@ -3,22 +3,21 @@
 Pullground is a reusable React pull-action component with tiny basketball,
 dart, bowling, and stone skipping interactions and a clean demo at `/pullground`. The `onPull` callback runs
 synchronous or async actions, including local state changes and data loading.
-The public prerelease is `@johnson7543/pullground@0.1.0-rc.1`, available on npm's
-`next` channel. See the [release record](releases/0-1-0-rc-1.md) for source,
-archive, and installation evidence, and the [release plan](release-plan.md) for
-the remaining stable-release and website checks.
-Stable `0.1.0` metadata and consumer documentation are prepared; its
-[release record](releases/0-1-0.md) tracks qualification and publication.
+Stable `@johnson7543/pullground@0.1.0` is published on npm's `latest` channel,
+with a verified [live demo](https://design.johnson7543.com/pullground).
+The [stable release record](releases/0-1-0.md) identifies the source, archive,
+provenance, installation checks, and production deployment. The earlier
+`0.1.0-rc.1` prerelease remains available on `next`.
 
 | Document | Status | Purpose |
 | --- | --- | --- |
 | [Interface style principles](style-principles.md) | Active | Layout, artwork, input, accessibility, and motion |
 | [Color mappings](color-mappings.md) | Active | Package, demo, and preview color ownership |
 | [Architecture and verification](architecture.md) | Active | Lifecycle, integration, and reproducible checks |
-| [First release plan](release-plan.md) | In preparation | `0.1.0` scope, readiness gates, npm publication, and demo launch |
+| [First release plan](release-plan.md) | Completed | `0.1.0` scope, readiness gates, npm publication, and demo launch |
 | [Release procedure](releasing.md) | Active | Consumer documentation checks, retained archives, and publishing workflow |
 | [Release records](releases/README.md) | Active | Exact source, archive checksums, qualification, and publication evidence |
-| [Release notes](release-notes.md) | Prerelease published | Consumer-facing changes and the planned first stable release |
+| [Release notes](release-notes.md) | Published | Consumer-facing changes in the first stable release and prerelease |
 | [Shared demo UI standard](../global-standards/demo-ui.md) | Active | DesignQR-based chrome and controls used by every demo |
 
 Basketball is the default; the demo's bottom bar switches between Basketball,

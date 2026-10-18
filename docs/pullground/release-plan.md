@@ -1,8 +1,26 @@
 # Pullground first release plan
 
-Updated on 2026-10-19. **Proposed stable release: `@johnson7543/pullground@0.1.0`.**
-The public prerelease `0.1.0-rc.1` is available on `next`. Stable `0.1.0` and the
-matching website deployment remain in preparation.
+Completed on 2026-10-19. **Stable release: `@johnson7543/pullground@0.1.0`.**
+The stable package is published on `latest`; `0.1.0-rc.1` remains on `next`.
+The matching live demo and home-page preview are verified.
+
+## Stable publication — 2026-10-19
+
+The qualified source is `68c845a7aab2ff3bc22088b70c0a74512fa7a747`, tagged
+`pullground-v0.1.0`. Verification-only and publishing workflows passed the full
+repository gate and both React consumer versions. Their archives match the
+accepted local archive byte for byte. The approved trusted publisher completed
+its first publication through GitHub OIDC with signed provenance.
+
+npm made `0.1.0` public at `2026-10-18T18:34:02.675Z`. The registry download,
+fresh consumer, and cryptographic signature checks passed. The live site loads
+the accepted build, and responsive home/demo interaction checks passed at all
+three required viewports. Its existing deployment already served that build.
+The [stable release record](releases/0-1-0.md) retains the exact source, hashes,
+workflow links, browser acceptance, registry evidence, and production version.
+
+The dated preparation entries below preserve their historical state. Release
+execution is complete; the recovery and follow-up guidance remains applicable.
 
 ## Stable candidate preparation — 2026-10-19
 
@@ -22,7 +40,7 @@ match the candidate build. GitHub's complete release gate and both React
 consumers passed on the final source commit. The downloaded CI archive matches
 the local archive byte for byte. The maintainer approved the exact trusted
 publisher and npm saved and verified the configuration. Stable npm publication
-is the next execution step.
+and live-site verification subsequently completed as recorded above.
 
 ## Prerelease publication — 2026-10-19
 
@@ -31,13 +49,13 @@ The registry publication time is `2026-10-18T16:12:24.690Z`, which is 2026-10-19
 in Asia/Taipei. The downloaded registry archive matches the accepted candidate
 byte for byte, and a fresh React 19.2.8 consumer passed. npm also assigned
 `latest` to the first publication and rejected its removal with HTTP 400 after
-browser authorization. Both `next` and `latest` currently resolve to this
-prerelease; stable publication will move `latest` to `0.1.0`. The
+browser authorization. Both tags initially resolved to this prerelease;
+stable publication subsequently moved `latest` to `0.1.0`. The
 [release record](releases/0-1-0-rc-1.md) retains the exact registry results.
 
 Desktop Firefox/Safari acceptance and stable metadata preparation subsequently
-completed as recorded above. Final qualification, trusted publishing, automated
-publication, and the matching website deployment remain.
+completed as recorded above, followed by final qualification, trusted publishing,
+automated publication, and live-site verification.
 
 ## Final prerelease candidate — 2026-10-18
 
@@ -282,18 +300,19 @@ not a private dry run.
    The workflow verifies the tag, runs the gates, and publishes the tested archive
    to `latest`. Verify registry metadata, provenance, README, exports, and a fresh
    installation of `@johnson7543/pullground@0.1.0`.
-5. **Deploy the matching website.** Record the current production deployment
-   identifier, deploy from the accepted release commit, and verify the public
-   home page, preview assets, canonical demo, legacy redirect, and DesignQR
-   routes. Confirm the copied install command resolves to the published package.
+5. **Verify the matching website.** Record the current production deployment
+   identifier and confirm its active assets match the accepted build. Deploy
+   from the accepted release commit if needed, then verify the public home page,
+   preview assets, canonical demo, legacy redirect, and DesignQR routes. Confirm
+   the copied install command resolves to the published package.
 6. **Announce after both checks pass.** Publish the prepared release notes with
    the npm package, demo, and source links. Keep the first announcement focused
    on playful pull actions, the four games, and the simple React integration.
 
 For scoped public packages, npm requires explicit public access on first
 publication. [npm scoped publishing guide](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/)
-Account setup and publish/deploy actions belong to release execution; this
-planning pass does not perform them.
+Account setup and publish/deploy actions belong to authorized release execution.
+The completed execution record is linked above.
 
 ## 5. Recovery and follow-up
 
@@ -313,6 +332,5 @@ stable Pullground version to restore. Coordinate the demo with the corrected
 package and add a regression check for the reported failure.
 
 Package metadata, consumer documentation, release tooling, refreshed media,
-final-commit CI, maintainer mobile acceptance, and the first public prerelease
-are complete. The release record tracks registry verification; the remaining
-stable-release and website gates are listed above.
+final-commit CI, maintainer browser acceptance, trusted publication, registry
+verification, and the matching live website checks are complete.
