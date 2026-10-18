@@ -2,10 +2,11 @@
 
 Pullground is a reusable React pull-action component with tiny basketball,
 dart, bowling, and stone skipping interactions and a clean demo at `/pullground`. The `onPull` callback runs
-synchronous or async actions, including local state changes and data loading. The package is an
-release candidate at `@johnson7543/pullground` version `0.1.0-rc.1`. Implementation
-CI and package-consumer verification passed; first publication remains pending.
-See the [release plan](release-plan.md) for the exact runs and remaining checks.
+synchronous or async actions, including local state changes and data loading.
+The public prerelease is `@johnson7543/pullground@0.1.0-rc.1`, available on npm's
+`next` channel. See the [release record](releases/0-1-0-rc-1.md) for source,
+archive, and installation evidence, and the [release plan](release-plan.md) for
+the remaining stable-release and website checks.
 
 | Document | Status | Purpose |
 | --- | --- | --- |
@@ -15,7 +16,7 @@ See the [release plan](release-plan.md) for the exact runs and remaining checks.
 | [First release plan](release-plan.md) | In preparation | `0.1.0` scope, readiness gates, npm publication, and demo launch |
 | [Release procedure](releasing.md) | Active | Consumer documentation checks, retained archives, and publishing workflow |
 | [Release records](releases/README.md) | Active | Exact source, archive checksums, qualification, and publication evidence |
-| [Release notes](release-notes.md) | Draft | Consumer-facing changes for the first stable release |
+| [Release notes](release-notes.md) | Prerelease published | Consumer-facing changes and the planned first stable release |
 | [Shared demo UI standard](../global-standards/demo-ui.md) | Active | DesignQR-based chrome and controls used by every demo |
 
 Basketball is the default; the demo's bottom bar switches between Basketball,

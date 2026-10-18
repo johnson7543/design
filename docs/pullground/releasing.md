@@ -1,6 +1,6 @@
 # Releasing Pullground
 
-Status: Implemented tooling; first publication pending<br>
+Status: Prerelease published; stable release in preparation<br>
 Scope: `@johnson7543/pullground` and its matching website demo
 
 [Documentation index](README.md) · [Release plan and acceptance gates](release-plan.md)
@@ -21,9 +21,10 @@ the recommended import must remain just `Pullground` from the package root.
 ## Local preparation
 
 Use Node from `.nvmrc` and install the root lockfile with `npm ci`. The current
-candidate is `0.1.0-rc.1`, with `publishConfig.tag` set to `next`. It has not been
-published. Set the manifest and lockfile together; stable versions must use
-`latest`, and prereleases must use `next`.
+manifest records the published `0.1.0-rc.1`, with `publishConfig.tag` set to
+`next`. Prepare a new version for any further publication. Set the manifest and
+lockfile together; stable versions must use `latest`, and prereleases must use
+`next`.
 
 ```sh
 npm run release:pullground:check
@@ -74,16 +75,17 @@ token is needed once the trusted publisher is configured. See
 [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) for the
 supported runner, permissions, and repository requirements.
 
-## First publication
+## First publication (completed)
 
-First complete candidate acceptance and confirm the maintainer has publishing
-access to `@johnson7543`. The planned bootstrap is a public `0.1.0-rc.1` on `next`,
-using the accepted archive from a clean commit:
+The first public release is `0.1.0-rc.1` on `next`, published from the accepted
+clean-commit archive after candidate acceptance and maintainer authentication.
+See the [release record](releases/0-1-0-rc-1.md) for the exact source, archive,
+registry result, and installation checks. The commands below document that
+bootstrap; do not repeat publication of this immutable version.
 
-Before freezing that commit, replace the package README's unpublished banner
-with a prerelease notice and retain its `@next` installation command. Repack and
-qualify this final documentation with the archive; update the repository's
-publication record only after registry verification succeeds.
+Before freezing that commit, the package README's unpublished banner was
+replaced with a prerelease notice and its `@next` installation command retained.
+That final documentation was packed and qualified with the archive.
 
 ```sh
 npm login
@@ -98,9 +100,12 @@ sha256sum --check SHA256SUMS
 npm publish ./johnson7543-pullground-0.1.0-rc.1.tgz --access public --tag next
 ```
 
-Use account 2FA, then install the registry version into a fresh consumer and
-verify it. Do not push a publishing tag for a manually published version; npm
-versions cannot be reused.
+Publication requires account 2FA. Install the registry version into a fresh
+consumer and verify it, and check actual dist-tags after first publication:
+npm also assigned `latest` during this bootstrap despite `--tag next`. Remove
+that tag so prereleases remain on `next`; reserve `latest` for stable releases.
+Tag removal can require a separate npm authorization. Do not push a publishing
+tag for a manually published version; npm versions cannot be reused.
 
 Once the package exists and the stable candidate is ready, configure this npm
 trusted publisher:

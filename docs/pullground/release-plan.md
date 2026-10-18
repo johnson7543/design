@@ -1,7 +1,21 @@
 # Pullground first release plan
 
-Reviewed on 2026-10-16. **Proposed stable release: `@johnson7543/pullground@0.1.0`.**
-The release is in preparation; this document does not mark the package or demo as published.
+Updated on 2026-10-19. **Proposed stable release: `@johnson7543/pullground@0.1.0`.**
+The public prerelease `0.1.0-rc.1` is available on `next`. Stable `0.1.0` and the
+matching website deployment remain in preparation.
+
+## Prerelease publication — 2026-10-19
+
+The accepted archive was published to npm with public access and `--tag next`.
+The registry publication time is `2026-10-18T16:12:24.690Z`, which is 2026-10-19
+in Asia/Taipei. The downloaded registry archive matches the accepted candidate
+byte for byte, and a fresh React 19.2.8 consumer passed. Removal of npm's
+automatically assigned `latest` tag is pending npm authorization, as tracked in
+the [release record](releases/0-1-0-rc-1.md).
+
+The remaining stable-release work is desktop Firefox/Safari acceptance, stable
+metadata and final qualification, trusted publishing, automated publication, and
+the matching website deployment.
 
 ## Final prerelease candidate — 2026-10-18
 
@@ -10,8 +24,8 @@ The finalized consumer README and compatibility wording are committed in
 [Final-commit Verify](https://github.com/johnson7543/design/actions/runs/39120609634)
 passed the complete repository gate. The clean-checkout archive and both React
 consumer reports match the SHA-256 printed by CI. The
-[candidate record](releases/0-1-0-rc-1.md) contains the exact source, checksum,
-artifact location, and confirmed mobile checks. npm publication is pending.
+[release record](releases/0-1-0-rc-1.md) contains the exact source, checksum,
+artifact location, confirmed mobile checks, and subsequent publication evidence.
 
 ## CI-qualified implementation — 2026-10-18
 
@@ -32,12 +46,12 @@ The downloaded archive matches its manifest and both consumer reports; each
 React version passed all six README examples and 16 demo examples. The manifest
 identifies the commit above and `workingTreeDirty: false`.
 
-The consumer README is now being finalized with prerelease wording. This changes
-the package archive even though runtime code is unchanged. Its final clean
-commit and archive must have their own verification evidence before publication;
-the artifact above records the tested implementation baseline.
+At this stage, the consumer README still needed final prerelease wording. That
+changed the package archive even though runtime code was unchanged. The final
+clean commit and archive were qualified separately as recorded above; the
+artifact here records the tested implementation baseline.
 
-First publication remains pending. On 2026-10-18, the npm package lookup returned
+Before publication on 2026-10-18 UTC, the npm package lookup returned
 404, and the maintainer renewed npm login; `npm whoami` confirms `johnson7543`.
 The maintainer confirmed that iPhone Safari and Android Chrome both passed pull,
 aim, release, and return-animation checks. Device models and OS/browser versions
@@ -68,7 +82,7 @@ publishing when preparing the stable candidate and deploy the matching website.
   for bootstrap; no account settings were changed.
 
 See the [implemented release procedure](releasing.md) and
-[draft release notes](release-notes.md). These preparation results precede the
+[release notes](release-notes.md). These preparation results precede the
 clean-commit CI evidence above. The original local artifacts identify their
 dirty-tree origin and remain review builds, separate from downloaded CI evidence.
 
@@ -277,5 +291,6 @@ stable Pullground version to restore. Coordinate the demo with the corrected
 package and add a regression check for the reported failure.
 
 Package metadata, consumer documentation, release tooling, refreshed media,
-implementation CI, and maintainer mobile acceptance are complete. Qualify the
-final README/archive from a clean commit before the first publication.
+final-commit CI, maintainer mobile acceptance, and the first public prerelease
+are complete. The release record tracks registry verification; the remaining
+stable-release and website gates are listed above.

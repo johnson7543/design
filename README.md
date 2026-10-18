@@ -42,6 +42,13 @@ Playful pull gestures for React, with tiny basketball, dart, bowling, and stone 
 Use `onPull` for any synchronous or async action. Try `/pullground` locally. The package is
 [`packages/pullground`](packages/pullground); see its
 [`README`](packages/pullground/README.md) for usage, props, sizing, and
-accessibility. The `0.1.0-rc.1` candidate has not been published to npm; the
-[release procedure](docs/pullground/releasing.md) covers local tarball installation
-and the publication gates.
+accessibility. The public `0.1.0-rc.1` prerelease is available on npm's `next`
+channel:
+
+```bash
+npm install @johnson7543/pullground@next
+```
+
+See the [release record](docs/pullground/releases/0-1-0-rc-1.md) for verification
+and the [release plan](docs/pullground/release-plan.md) for stable `0.1.0` and the
+matching website launch.

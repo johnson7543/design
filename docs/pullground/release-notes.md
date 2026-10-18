@@ -1,8 +1,17 @@
-# Pullground 0.1.0 release notes
+# Pullground release notes
 
-Status: Draft for the first stable release; not yet published
+Status: `0.1.0-rc.1` published on `next`; stable `0.1.0` planned
 
 [Documentation index](README.md) · [Release plan](release-plan.md)
+
+## 0.1.0-rc.1 — 2026-10-19
+
+The first public prerelease is available on
+[npm](https://www.npmjs.com/package/@johnson7543/pullground/v/0.1.0-rc.1).
+
+```sh
+npm install @johnson7543/pullground@next
+```
 
 Pullground adds a small playable interaction to any React pull action. Wrap your
 content with `Pullground` and provide `onPull`; styles are included automatically.
@@ -23,5 +32,11 @@ ships ESM, CommonJS, and TypeScript declarations. See the
 The demo's surrounding controls and animated Pull guide belong to the website,
 not the reusable component.
 
-Publication links and completed device/browser qualification will be recorded
-when the release gates pass. The current working candidate is `0.1.0-rc.1`.
+The [release record](releases/0-1-0-rc-1.md) identifies the source commit,
+published archive, exact UTC timestamp, and completed verification.
+
+## Planned: 0.1.0
+
+Stable publication, trusted publishing, remaining desktop Firefox/Safari
+acceptance, and the matching website deployment follow the
+[release plan](release-plan.md). This prerelease does not mark those steps complete.
