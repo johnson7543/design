@@ -3,7 +3,9 @@
 Pullground is a reusable React pull-action component with tiny basketball,
 dart, bowling, and stone skipping interactions and a clean demo at `/pullground`. The `onPull` callback runs
 synchronous or async actions, including local state changes and data loading. The package is an
-unpublished release candidate at `@johnson7543/pullground` version `0.1.0-rc.1`.
+release candidate at `@johnson7543/pullground` version `0.1.0-rc.1`. Implementation
+CI and package-consumer verification passed; first publication remains pending.
+See the [release plan](release-plan.md) for the exact runs and remaining checks.
 
 | Document | Status | Purpose |
 | --- | --- | --- |

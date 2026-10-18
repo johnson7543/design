@@ -7,8 +7,8 @@ refresh data. Every accepted pull runs your callback, regardless of the shot.
 
 One component import. Styles included. TypeScript types included. React 19.
 
-**Release status:** `0.1.0-rc.1` is being prepared and has not been published.
-Use the local tarball instructions below until the first publication.
+**Prerelease:** `0.1.0-rc.1` is a release candidate for `0.1.0`. The prerelease
+channel is `next`; see the release progress below for publication status.
 
 [Source](https://github.com/johnson7543/design/tree/main/packages/pullground) ·
 [Issues](https://github.com/johnson7543/design/issues) ·
@@ -16,7 +16,7 @@ Use the local tarball instructions below until the first publication.
 
 ## Install
 
-In an existing React 19 web application, after the prerelease is published:
+Install the prerelease in an existing React 19 web application:
 
 ```sh
 npm install @johnson7543/pullground@next
@@ -26,7 +26,7 @@ After the stable release, use `npm install @johnson7543/pullground`.
 Your app provides React and React DOM. No provider, configuration file, or
 separate CSS import is required.
 
-To try the unpublished package, run this in the source repository:
+To test a local build, run this in the source repository:
 
 ```sh
 npm ci

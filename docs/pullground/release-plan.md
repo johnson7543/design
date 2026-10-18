@@ -3,6 +3,40 @@
 Reviewed on 2026-10-16. **Proposed stable release: `@johnson7543/pullground@0.1.0`.**
 The release is in preparation; this document does not mark the package or demo as published.
 
+## CI-qualified implementation — 2026-10-18
+
+The implementation is committed and pushed as
+[`1a963ed91b05e515eb2878c799183420822e926f`](https://github.com/johnson7543/design/commit/1a963ed91b05e515eb2878c799183420822e926f).
+Both GitHub runs completed successfully:
+
+| Run | Evidence |
+| --- | --- |
+| [Verify](https://github.com/johnson7543/design/actions/runs/39061800605) | Complete `npm run check` on the committed implementation |
+| [Publish Pullground — manual verification](https://github.com/johnson7543/design/actions/runs/39105725989) | Complete gate, clean-checkout archive, React 19.0.0 and 19.2.8 consumer checks, matching checksums, and retained artifacts; npm publication skipped |
+
+The retained artifact is
+`pullground-1a963ed91b05e515eb2878c799183420822e926f-1`. Its archive is
+`johnson7543-pullground-0.1.0-rc.1.tgz` (35,901 bytes), with SHA-256
+`f815349f9f231490779e45900ca8cf993234b36d9a42a99a1750cc594d8f33ae`.
+The downloaded archive matches its manifest and both consumer reports; each
+React version passed all six README examples and 16 demo examples. The manifest
+identifies the commit above and `workingTreeDirty: false`.
+
+The consumer README is now being finalized with prerelease wording. This changes
+the package archive even though runtime code is unchanged. Its final clean
+commit and archive must have their own verification evidence before publication;
+the artifact above records the tested implementation baseline.
+
+First publication remains pending. On 2026-10-18, the npm package lookup returned
+404, and the maintainer renewed npm login; `npm whoami` confirms `johnson7543`.
+The maintainer confirmed that iPhone Safari and Android Chrome both passed pull,
+aim, release, and return-animation checks. Device models and OS/browser versions
+were not supplied. Automated browser coverage is Chromium. Complete desktop
+Firefox and Safari qualification before the stable release; the public prerelease
+uses the recorded Chromium and mobile acceptance results. After publication,
+verify a fresh registry installation, then configure trusted
+publishing when preparing the stable candidate and deploy the matching website.
+
 ## Preparation progress — 2026-10-17
 
 - Prepared unpublished `0.1.0-rc.1` metadata and synchronized the lockfile.
@@ -24,11 +58,9 @@ The release is in preparation; this document does not mark the package or demo a
   for bootstrap; no account settings were changed.
 
 See the [implemented release procedure](releasing.md) and
-[draft release notes](release-notes.md). Remaining publication gates are a curated
-clean release commit and CI run, physical-device/other-browser acceptance,
-maintainer npm access and bootstrap, trusted-publisher setup, and the matching
-production deployment. Current local artifacts identify their dirty-tree origin;
-they are review builds, not the final accepted release.
+[draft release notes](release-notes.md). These preparation results precede the
+clean-commit CI evidence above. The original local artifacts identify their
+dirty-tree origin and remain review builds, separate from downloaded CI evidence.
 
 The final local archive is
 `artifacts/pullground/johnson7543-pullground-0.1.0-rc.1.tgz` (35,901 bytes), with
@@ -76,10 +108,10 @@ can follow after release feedback.
 | Launch media | The existing portrait preview shows basketball and darts | Record a preview covering all four games |
 | Website | The demo and catalog entry exist locally | Accept a frozen build, deploy it, and verify the public routes |
 
-The working tree includes shared demo changes and unrelated work. The current
-HEAD is not a release candidate for the complete Pullground implementation.
-Select explicit changes for review and preserve unrelated edits; do not stage
-the entire workspace or publish from the dirty tree.
+At the baseline review, the working tree included shared demo changes and
+unrelated work, and HEAD did not yet contain the complete Pullground
+implementation. Continue to select explicit changes and preserve unrelated
+edits; do not stage the entire workspace or publish from a dirty tree.
 
 ## 1. Prepare the package and release tooling
 
@@ -151,7 +183,10 @@ UI, DesignQR, production smoke, documentation, and package-consumer checks.
 Retain its CI result; earlier local passes are supporting evidence, not a
 substitute for the final candidate run.
 
-Complete this acceptance matrix before publishing:
+Complete this acceptance matrix before the stable release. For the initial
+public prerelease, require the recorded mobile acceptance, automated Chromium
+coverage, both React consumer checks, and clean-commit/archive verification;
+keep the remaining desktop-browser checks explicit in the release record.
 
 | Surface | Required coverage |
 | --- | --- |
@@ -231,6 +266,6 @@ when appropriate. This is the first stable release, so there is no previous
 stable Pullground version to restore. Coordinate the demo with the corrected
 package and add a regression check for the reported failure.
 
-Package metadata, consumer documentation, release tooling, and refreshed media
-are prepared. Complete device acceptance and the final clean-candidate CI gate
-before the first publication.
+Package metadata, consumer documentation, release tooling, refreshed media,
+implementation CI, and maintainer mobile acceptance are complete. Qualify the
+final README/archive from a clean commit before the first publication.
