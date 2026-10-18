@@ -18,9 +18,11 @@ is unchanged from the verified public prerelease. The
 verification-only workflow, trusted publisher, tag publication, and deployment.
 The exact archive passed React 19.0.0 and 19.2.8 consumer checks. Production
 preflight passed at all three required viewports, and the tested live assets
-match the candidate build. GitHub's complete release gate is still running;
-the maintainer approved the exact trusted publisher and npm saved and verified
-the configuration. Stable npm publication has not started.
+match the candidate build. GitHub's complete release gate and both React
+consumers passed on the final source commit. The downloaded CI archive matches
+the local archive byte for byte. The maintainer approved the exact trusted
+publisher and npm saved and verified the configuration. Stable npm publication
+is the next execution step.
 
 ## Prerelease publication — 2026-10-19
 
