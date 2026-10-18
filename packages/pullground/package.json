@@ -1,6 +1,6 @@
 {
   "name": "@johnson7543/pullground",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0",
   "type": "module",
   "description": "Playful pull gestures for React, with basketball, darts, bowling, and stone skipping for any action",
   "license": "MIT",
@@ -16,7 +16,7 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
-    "tag": "next"
+    "tag": "latest"
   },
   "main": "./dist/pullground.cjs",
   "module": "./dist/pullground.js",

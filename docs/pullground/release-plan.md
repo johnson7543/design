@@ -4,6 +4,19 @@ Updated on 2026-10-19. **Proposed stable release: `@johnson7543/pullground@0.1.0
 The public prerelease `0.1.0-rc.1` is available on `next`. Stable `0.1.0` and the
 matching website deployment remain in preparation.
 
+## Stable candidate preparation — 2026-10-19
+
+The maintainer confirmed desktop Firefox and Safari passed pull/aim, keyboard
+controls, Export-dialog focus, and reduced motion. Browser/OS versions were not
+supplied. Together with the earlier mobile confirmation, this completes the
+requested manual browser acceptance.
+
+Prepared `0.1.0` with `publishConfig.tag: latest`, a synchronized lockfile, stable
+installation instructions, and updated compatibility documentation. Runtime code
+is unchanged from the verified public prerelease. The
+[stable release record](releases/0-1-0.md) tracks the final source/archive,
+verification-only workflow, trusted publisher, tag publication, and deployment.
+
 ## Prerelease publication — 2026-10-19
 
 The accepted archive was published to npm with public access and `--tag next`.
@@ -15,9 +28,9 @@ browser authorization. Both `next` and `latest` currently resolve to this
 prerelease; stable publication will move `latest` to `0.1.0`. The
 [release record](releases/0-1-0-rc-1.md) retains the exact registry results.
 
-The remaining stable-release work is desktop Firefox/Safari acceptance, stable
-metadata and final qualification, trusted publishing, automated publication, and
-the matching website deployment.
+Desktop Firefox/Safari acceptance and stable metadata preparation subsequently
+completed as recorded above. Final qualification, trusted publishing, automated
+publication, and the matching website deployment remain.
 
 ## Final prerelease candidate — 2026-10-18
 

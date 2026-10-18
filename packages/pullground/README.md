@@ -7,22 +7,18 @@ refresh data. Every accepted pull runs your callback, regardless of the shot.
 
 One component import. Styles included. TypeScript types included. React 19.
 
-**Prerelease:** `0.1.0-rc.1` is a release candidate for `0.1.0`. The prerelease
-channel is `next`; see the release progress below for publication status.
-
 [Source](https://github.com/johnson7543/design/tree/main/packages/pullground) ·
 [Issues](https://github.com/johnson7543/design/issues) ·
 [Release progress](https://github.com/johnson7543/design/blob/main/docs/pullground/release-plan.md)
 
 ## Install
 
-Install the prerelease in an existing React 19 web application:
+Install in an existing React 19 web application:
 
 ```sh
-npm install @johnson7543/pullground@next
+npm install @johnson7543/pullground
 ```
 
-After the stable release, use `npm install @johnson7543/pullground`.
 Your app provides React and React DOM. No provider, configuration file, or
 separate CSS import is required.
 
@@ -33,11 +29,11 @@ npm ci
 npm run pack:pullground
 ```
 
-Copy `artifacts/pullground/johnson7543-pullground-0.1.0-rc.1.tgz` into your
+Copy `artifacts/pullground/johnson7543-pullground-0.1.0.tgz` into your
 application directory, then install it there:
 
 ```sh
-npm install ./johnson7543-pullground-0.1.0-rc.1.tgz
+npm install ./johnson7543-pullground-0.1.0.tgz
 ```
 
 ## Quick start
@@ -345,8 +341,9 @@ and React 18 support are not claimed.
 Automated validation covers React 19.0.0 and 19.2.8 in isolated consumers,
 including Chromium touch emulation and SSR/hydration. The maintainer also reported
 successful pull, aim, release, and return-animation checks on iPhone Safari and
-Android Chrome. Device/browser versions were not recorded; separate desktop
-Firefox and Safari qualification remains pending for the stable release.
+Android Chrome. Desktop Firefox and Safari checks were also confirmed for
+pull/aim, keyboard controls, demo Export-dialog focus, and reduced motion.
+Device models and OS/browser versions were not recorded.
 
 | Symptom | Check |
 | --- | --- |

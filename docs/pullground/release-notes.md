@@ -1,6 +1,6 @@
 # Pullground release notes
 
-Status: `0.1.0-rc.1` published on `next`; stable `0.1.0` planned
+Status: `0.1.0-rc.1` published on `next`; stable `0.1.0` prepared for qualification
 
 [Documentation index](README.md) · [Release plan](release-plan.md)
 
@@ -35,8 +35,12 @@ not the reusable component.
 The [release record](releases/0-1-0-rc-1.md) identifies the source commit,
 published archive, exact UTC timestamp, and completed verification.
 
-## Planned: 0.1.0
+## Prepared: 0.1.0
 
-Stable publication, trusted publishing, remaining desktop Firefox/Safari
-acceptance, and the matching website deployment follow the
-[release plan](release-plan.md). This prerelease does not mark those steps complete.
+The stable candidate preserves the prerelease API, runtime, games, and themes.
+It uses the standard installation command and records maintainer-confirmed
+desktop Firefox/Safari checks alongside the earlier mobile acceptance.
+
+Final qualification, trusted publishing, stable publication, and the matching
+website deployment follow the [release plan](release-plan.md) and
+[stable release record](releases/0-1-0.md).

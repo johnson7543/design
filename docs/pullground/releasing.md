@@ -21,17 +21,18 @@ the recommended import must remain just `Pullground` from the package root.
 ## Local preparation
 
 Use Node from `.nvmrc` and install the root lockfile with `npm ci`. The current
-manifest records the published `0.1.0-rc.1`, with `publishConfig.tag` set to
-`next`. Prepare a new version for any further publication. Set the manifest and
-lockfile together; stable versions must use `latest`, and prereleases must use
-`next`.
+manifest prepares stable `0.1.0`, with `publishConfig.tag` set to `latest`.
+The public prerelease remains `0.1.0-rc.1` on `next`; see the
+[stable release record](releases/0-1-0.md) for publication status. Set the manifest
+and lockfile together; stable versions must use `latest`, and prereleases must
+use `next`.
 
 ```sh
 npm run release:pullground:check
 npm run test:pullground-release
 npm run pack:pullground
-npm run check:pullground-package -- --tarball artifacts/pullground/johnson7543-pullground-0.1.0-rc.1.tgz
-npm run check:pullground-package -- --tarball artifacts/pullground/johnson7543-pullground-0.1.0-rc.1.tgz --react-version 19.0.0 --online
+npm run check:pullground-package -- --tarball artifacts/pullground/johnson7543-pullground-0.1.0.tgz
+npm run check:pullground-package -- --tarball artifacts/pullground/johnson7543-pullground-0.1.0.tgz --react-version 19.0.0 --online
 ```
 
 Packing builds the workspace and retains the archive, file manifest, compressed

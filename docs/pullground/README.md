@@ -7,6 +7,8 @@ The public prerelease is `@johnson7543/pullground@0.1.0-rc.1`, available on npm'
 `next` channel. See the [release record](releases/0-1-0-rc-1.md) for source,
 archive, and installation evidence, and the [release plan](release-plan.md) for
 the remaining stable-release and website checks.
+Stable `0.1.0` metadata and consumer documentation are prepared; its
+[release record](releases/0-1-0.md) tracks qualification and publication.
 
 | Document | Status | Purpose |
 | --- | --- | --- |
