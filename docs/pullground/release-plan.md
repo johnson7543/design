@@ -3,6 +3,16 @@
 Reviewed on 2026-10-16. **Proposed stable release: `@johnson7543/pullground@0.1.0`.**
 The release is in preparation; this document does not mark the package or demo as published.
 
+## Final prerelease candidate — 2026-10-18
+
+The finalized consumer README and compatibility wording are committed in
+`a8cfdbcf436f07f345bdae195a2a2f5e2672f495`.
+[Final-commit Verify](https://github.com/johnson7543/design/actions/runs/39120609634)
+passed the complete repository gate. The clean-checkout archive and both React
+consumer reports match the SHA-256 printed by CI. The
+[candidate record](releases/0-1-0-rc-1.md) contains the exact source, checksum,
+artifact location, and confirmed mobile checks. npm publication is pending.
+
 ## CI-qualified implementation — 2026-10-18
 
 The implementation is committed and pushed as

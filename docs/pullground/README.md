@@ -14,6 +14,7 @@ See the [release plan](release-plan.md) for the exact runs and remaining checks.
 | [Architecture and verification](architecture.md) | Active | Lifecycle, integration, and reproducible checks |
 | [First release plan](release-plan.md) | In preparation | `0.1.0` scope, readiness gates, npm publication, and demo launch |
 | [Release procedure](releasing.md) | Active | Consumer documentation checks, retained archives, and publishing workflow |
+| [Release records](releases/README.md) | Active | Exact source, archive checksums, qualification, and publication evidence |
 | [Release notes](release-notes.md) | Draft | Consumer-facing changes for the first stable release |
 | [Shared demo UI standard](../global-standards/demo-ui.md) | Active | DesignQR-based chrome and controls used by every demo |
 
