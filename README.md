@@ -39,7 +39,8 @@ custom themes.
 ### Pullground
 
 Playful pull gestures for React, with tiny basketball, dart, bowling, and stone skipping interactions.
-Use `onPull` for any synchronous or async action. Try `/pullground` locally. The package is
+Use `onPull` for any synchronous or async action.
+Try the [live demo](https://design.johnson7543.com/pullground). The package is
 [`packages/pullground`](packages/pullground); see its
 [`README`](packages/pullground/README.md) for usage, props, sizing, and
 accessibility. The public `0.1.0-rc.1` prerelease is available on npm's `next`

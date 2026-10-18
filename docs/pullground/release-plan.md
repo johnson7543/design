@@ -16,6 +16,11 @@ installation instructions, and updated compatibility documentation. Runtime code
 is unchanged from the verified public prerelease. The
 [stable release record](releases/0-1-0.md) tracks the final source/archive,
 verification-only workflow, trusted publisher, tag publication, and deployment.
+The exact archive passed React 19.0.0 and 19.2.8 consumer checks. Production
+preflight passed at all three required viewports, and the tested live assets
+match the candidate build. GitHub's complete release gate is still running;
+the maintainer approved the exact trusted publisher and npm saved and verified
+the configuration. Stable npm publication has not started.
 
 ## Prerelease publication — 2026-10-19
 
