@@ -10,6 +10,9 @@ interactive visual tools and reusable React components.
 Try [Design QR](https://design.johnson7543.com/qr) to turn a URL into a seasonal
 3D tree that transitions into a scannable, customizable QR code.
 
+Try [Pullground](https://design.johnson7543.com/pullground) for playful pull
+gestures with basketball, darts, bowling, and stone skipping.
+
 ## Run the app locally
 
 ```bash
@@ -38,17 +41,10 @@ custom themes.
 
 ### Pullground
 
-Playful pull gestures for React, with tiny basketball, dart, bowling, and stone skipping interactions.
-Use `onPull` for any synchronous or async action.
-Try the [live demo](https://design.johnson7543.com/pullground). The package is
-[`packages/pullground`](packages/pullground); see its
-[`README`](packages/pullground/README.md) for usage, props, sizing, and
-accessibility. Stable `0.1.0` is available on
-[npm](https://www.npmjs.com/package/@johnson7543/pullground):
+[![npm](https://img.shields.io/npm/v/@johnson7543/pullground?logo=npm)](https://www.npmjs.com/package/@johnson7543/pullground)
+[![npm downloads](https://img.shields.io/npm/dm/@johnson7543/pullground?logo=npm)](https://www.npmjs.com/package/@johnson7543/pullground)
 
-```bash
-npm install @johnson7543/pullground
-```
-
-See the [stable release record](docs/pullground/releases/0-1-0.md) for package,
-provenance, browser, and live-demo verification.
+Reusable React component for playful pull gestures with basketball, darts, bowling, and stone skipping.
+[`packages/pullground`](packages/pullground). See its
+[`README`](packages/pullground/README.md) for installation, examples, props, and
+themes.
