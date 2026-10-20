@@ -97,6 +97,10 @@ preview preserves the Classic game palette and Spring stage without a color filt
 Its surrounding frame belongs to [home color mappings](../home-page/color-mappings.md);
 the catalog runs no live gameplay.
 
+The standalone [social video](../demo-videos/README.md#pullground-video-for-x)
+records the complete demo UI with its existing Classic artwork, Spring stage,
+and shared controls. It adds no editorial artwork, text, or color treatment.
+
 Alpha and programmatic blends derive only from approved bases. Component
 presets affect only their own instance. Demo stage styling is scoped to the
 Pullground route; shared controls remain consistent across registered demos.

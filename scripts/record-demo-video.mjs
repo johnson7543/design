@@ -360,6 +360,10 @@ async function runAction(page, item, index) {
         const durationMs = positiveNumber(item.durationMs ?? 800, 'drag durationMs');
         const holdMs = item.holdMs ?? 0;
         if (!Number.isFinite(holdMs) || holdMs < 0) throw new Error('drag holdMs must be non-negative.');
+        const easing = item.easing ?? 'linear';
+        if (!['linear', 'ease-in-out'].includes(easing)) {
+          throw new Error('drag easing must be linear or ease-in-out.');
+        }
         const points = [item.from, item.to].map(point => {
           if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)
             || point.x < 0 || point.y < 0 || point.x > box.width || point.y > box.height) {
@@ -377,22 +381,32 @@ async function runAction(page, item, index) {
         let touch;
         if (pointer === 'touch') touch = await page.touchscreen.touchStart(from.x, from.y);
         else { await page.mouse.move(from.x, from.y); await page.mouse.down(); }
+        const moves = [];
+        let moveError;
         try {
           const started = performance.now();
           let nextFrame = started + 1000 / recordingFps;
           while (true) {
             await wait(Math.max(0, nextFrame - performance.now()));
+            if (moveError) throw moveError;
             const t = Math.min(1, (performance.now() - started) / durationMs);
-            const x = from.x + (to.x - from.x) * t;
-            const y = from.y + (to.y - from.y) * t;
-            if (touch) await touch.move(x, y);
-            else await page.mouse.move(x, y);
+            const progress = easing === 'ease-in-out' ? (1 - Math.cos(Math.PI * t)) / 2 : t;
+            const x = from.x + (to.x - from.x) * progress;
+            const y = from.y + (to.y - from.y) * progress;
+            // CDP preserves dispatch order. Stream moves on the recording clock:
+            // awaiting each touch acknowledgement can throttle input to ~20 Hz.
+            const move = touch ? touch.move(x, y) : page.mouse.move(x, y);
+            moves.push(move.catch(error => { moveError ??= error; }));
             if (t === 1) break;
             // Follow elapsed time rather than queueing stale moves when input is slow.
             nextFrame = started + (Math.floor((performance.now() - started) * recordingFps / 1000) + 1) * 1000 / recordingFps;
           }
+          await Promise.all(moves);
+          if (moveError) throw moveError;
           await wait(holdMs);
         } finally {
+          // Drain dispatched input before releasing, including on a failed move.
+          await Promise.all(moves);
           if (touch) await touch.end();
           else await page.mouse.up();
         }

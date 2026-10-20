@@ -36,6 +36,7 @@ prototype or earlier plan is needed for maintenance.
 | Demo | [Page](../../src/pullground/PullgroundPage.tsx) and [styles](../../src/pullground/pullground-demo.css) |
 | Demo palettes | [Theme mappings](../../src/pullground/pullground-themes.css), scoped to the Pullground page |
 | Catalog video | [Recording scenario](../../scripts/demo-video-scenarios/pullground.json), following the [demo-video workflow](../demo-videos/README.md) |
+| Social video for X | [Full-page capture scenario](../../scripts/demo-video-scenarios/pullground-social.json) and [sharing-video workflow](../demo-videos/README.md#pullground-video-for-x) |
 | Shared demo chrome | [`src/demo-ui/`](../../src/demo-ui), shared with DesignQR |
 | Shared GitHub control | [GitHubLink](../../src/components/GitHubLink.tsx), also used by DesignQR |
 | Export dialog | [ExportModal](../../src/pullground/ExportModal.tsx), using DesignQR's modal styles |

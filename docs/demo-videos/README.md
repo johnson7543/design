@@ -104,6 +104,47 @@ the mode controls outside the crop. The catalog consumes its MP4 and WebP poster
 npm run record:demo -- --scenario scripts/demo-video-scenarios/pullground.json
 ```
 
+## Pullground video for X
+
+The separate [social scenario](../../scripts/demo-video-scenarios/pullground-social.json)
+records the entire `/pullground` demo at a 450×800 mobile viewport and 2× pixel
+density. The 22-second sequence starts with the real animated Pull guide, shows
+a basket and backboard smash, then uses the visible controls to select Dart,
+Bowling, and Stone skipping before returning to Basketball.
+
+Pulls use 1.5–1.7 second real touch gestures with eased starts and stops and a
+160 ms aim hold. The recorder dispatches input at the recording cadence without
+waiting for each browser acknowledgement, then drains pending moves before
+release. This keeps the pull responsive throughout the native capture.
+
+Keep the actual header, GitHub control, game choices, theme row, and Export
+button visible. Preserve the page's existing layout, proportions, colors, and
+motion. The scenario has no `recordingCss` or crop; the recording has no added
+titles, chapter labels, closing cards, or composited artwork.
+
+```bash
+npm run record:demo -- --scenario scripts/demo-video-scenarios/pullground-social.json
+```
+
+Use the standard native Chrome recording prerequisites. No separate social
+exporter or font download is needed.
+
+Outputs live under the ignored `artifacts/pullground/social/` directory:
+
+- `pullground-x.mp4`: 22 seconds, H.264, 900×1600, 60 fps, square pixels,
+  YUV 4:2:0, fast-start metadata, and no audio. This is the sharing copy.
+- `pullground-x-cover.jpg`: a frame from the sharing copy at the same dimensions.
+
+The sharing copy preserves native tab capture at 60 fps without interpolation or
+retiming. It must pass the eight pull and gameplay motion checks and contact-sheet review. Verify
+the real Pull cue, header displacement and return, game selection, and
+net/backboard/pin/ripple effects, with the full control bar visible throughout.
+
+This is a standalone sharing artifact, so its scenario deliberately omits
+`application`. It does not replace the homepage's catalog video or publish a post.
+X's [upload guide](https://help.x.com/en/using-x/x-videos) describes selecting
+a local video file when composing a post.
+
 ## Definition of done
 
 A demo is complete only when:
@@ -113,7 +154,9 @@ A demo is complete only when:
 - The MP4 has the requested duration, dimensions, fps, and square pixels.
 - Continuous-motion windows pass their duplicate-frame gates.
 - Overall and dense motion contact-sheet inspection shows every requested update and smoothly paced transition.
-- The intended consumer references the generated MP4 and poster.
+- For an applied preview, the intended consumer references the generated MP4 and
+  poster. For an explicitly requested standalone export, deliver the local video
+  and cover paths instead.
 - Required lint, documentation, build, style, and smoke checks pass.
 
 The recorder captures only the selected localhost Chrome tab. It does not record the desktop and does not synthesize WebGL frames.

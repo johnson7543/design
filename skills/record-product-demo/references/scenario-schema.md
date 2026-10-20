@@ -93,10 +93,15 @@ Use motion checks only for intervals that should change continuously, not intent
 | `press` | `key`, optional `delayMs` | Press one Puppeteer key such as `Tab`, `Enter`, or `Escape`. |
 | `hover` | `selector` | Move the real pointer over an element. |
 | `scroll` | optional `deltaX`, `deltaY` | Send a mouse-wheel scroll. |
-| `drag` | `selector`, `from`, `to`, optional `pointer`, `durationMs`, `holdMs` | Drag with real touch input (default) or `pointer: "mouse"`. Points are `{ "x": 0, "y": 0 }` CSS-pixel offsets inside the selected element; both endpoints must be visible. Move over `durationMs` (default 800), hold at the end for `holdMs` (default 0), then release. Touch requires `viewport.hasTouch`. |
+| `drag` | `selector`, `from`, `to`, optional `pointer`, `durationMs`, `holdMs`, `easing` | Drag with real touch input (default) or `pointer: "mouse"`. Points are `{ "x": 0, "y": 0 }` CSS-pixel offsets inside the selected element; both endpoints must be visible. Move over `durationMs` (default 800), hold at the end for `holdMs` (default 0), then release. `easing` is `linear` (default) or `ease-in-out` for a gentle acceleration and deceleration. Touch requires `viewport.hasTouch`. |
 | `assert` | assertion fields | Check state immediately at that point in the sequence. |
 
 Use stable product classes or accessible controls. Avoid selectors tied to generated DOM order.
+
+Drags dispatch real input at the recording cadence and wait for outstanding
+acknowledgements before release. Easing changes the pointer trajectory only;
+the product still owns every rendered frame. Review a motion window during
+the drag itself, as well as any animation that follows release.
 
 ## Assertions
 

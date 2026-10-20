@@ -1,0 +1,321 @@
+{
+  "version": 1,
+  "id": "pullground-social",
+  "product": "Pullground",
+  "description": "An unmodified full-page recording of the real Pullground demo for sharing on X. Show the animated Pull guide, basket, backboard smash, dart, bowling, and stone skipping, using the visible game controls. Keep the header, GitHub control, theme row, and Export button in view. No injected CSS, crop, editorial overlays, or retiming. Pulls use 1.5\u20131.7 second eased real touch gestures with a brief 160 ms aim hold, recorded at native 60 fps.",
+  "route": "/pullground",
+  "windowTitle": "Pullground",
+  "readySelector": ".pullground-demo-viewport",
+  "settleMs": 1500,
+  "viewport": {
+    "width": 450,
+    "height": 800,
+    "deviceScaleFactor": 2,
+    "isMobile": true,
+    "hasTouch": true
+  },
+  "recording": {
+    "fps": 60,
+    "durationSeconds": 22,
+    "output": "artifacts/pullground/social/pullground-x.mp4",
+    "poster": "artifacts/pullground/social/pullground-x-cover.jpg",
+    "posterAtSeconds": 3.1,
+    "size": {
+      "width": 900,
+      "height": 1600
+    },
+    "crf": 18
+  },
+  "quality": {
+    "contactSheetFps": 2,
+    "motionChecks": [
+      {
+        "label": "basketball pull",
+        "startSeconds": 2.15,
+        "durationSeconds": 0.85,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 10
+      },
+      {
+        "label": "full power pull",
+        "startSeconds": 5.1,
+        "durationSeconds": 0.9,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 10
+      },
+      {
+        "label": "basketball flight",
+        "startSeconds": 3.55,
+        "durationSeconds": 0.5,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 12
+      },
+      {
+        "label": "basketball net swish",
+        "startSeconds": 4.1,
+        "durationSeconds": 0.2,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 30
+      },
+      {
+        "label": "backboard smash",
+        "startSeconds": 6.85,
+        "durationSeconds": 0.5,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 12
+      },
+      {
+        "label": "dart flight and impact",
+        "startSeconds": 10.35,
+        "durationSeconds": 0.4,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 15
+      },
+      {
+        "label": "bowling roll and pin impact",
+        "startSeconds": 13.75,
+        "durationSeconds": 0.55,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 15
+      },
+      {
+        "label": "stone flight and ripples",
+        "startSeconds": 17.3,
+        "durationSeconds": 0.55,
+        "maxConsecutiveDuplicateFrames": 0,
+        "contactSheetFps": 15
+      }
+    ]
+  },
+  "actions": [
+    {
+      "action": "wait",
+      "ms": 1700
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 225.0,
+        "y": 300.0
+      },
+      "to": {
+        "x": 225.0,
+        "y": 443.4375
+      },
+      "durationMs": 1500,
+      "holdMs": 160,
+      "easing": "ease-in-out"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 225.0,
+        "y": 300.0
+      },
+      "to": {
+        "x": 225.0,
+        "y": 534.375
+      },
+      "durationMs": 1700,
+      "holdMs": 160,
+      "easing": "ease-in-out"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"dart\"]"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "dart"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 350
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 225.0,
+        "y": 300.0
+      },
+      "to": {
+        "x": 235.9375,
+        "y": 443.4375
+      },
+      "durationMs": 1500,
+      "holdMs": 160,
+      "easing": "ease-in-out"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"bowling\"]"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "bowling"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 350
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 225.0,
+        "y": 300.0
+      },
+      "to": {
+        "x": 225.0,
+        "y": 510.9375
+      },
+      "durationMs": 1500,
+      "holdMs": 160,
+      "easing": "ease-in-out"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"stone\"]"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "stone"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 350
+    },
+    {
+      "action": "drag",
+      "selector": ".pullground-demo-viewport",
+      "from": {
+        "x": 225.0,
+        "y": 300.0
+      },
+      "to": {
+        "x": 218.75,
+        "y": 491.40625
+      },
+      "durationMs": 1500,
+      "holdMs": 160,
+      "easing": "ease-in-out"
+    },
+    {
+      "action": "assert",
+      "selector": ".pullground-content",
+      "attribute": {
+        "name": "aria-busy",
+        "value": "true"
+      }
+    },
+    {
+      "action": "wait",
+      "ms": 1300
+    },
+    {
+      "action": "tap",
+      "selector": ".pullground-demo-game[data-game=\"basketball\"]"
+    }
+  ],
+  "assertions": [
+    {
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-game",
+        "value": "basketball"
+      }
+    },
+    {
+      "selector": ".pullground-root",
+      "attribute": {
+        "name": "data-state",
+        "value": "success"
+      }
+    },
+    {
+      "selector": ".pullground-reveal",
+      "attribute": {
+        "name": "aria-hidden",
+        "value": "true"
+      }
+    },
+    {
+      "selector": ".header-brand",
+      "text": "Pullground"
+    },
+    {
+      "selector": ".pullground-demo-guide-pull",
+      "text": "Pull"
+    },
+    {
+      "selector": ".pullground-demo-game[data-game=\"basketball\"]",
+      "attribute": {
+        "name": "aria-pressed",
+        "value": "true"
+      }
+    }
+  ]
+}
